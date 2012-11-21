@@ -23,15 +23,23 @@ public final class R {
     public static final class drawable {
         public static final int ic_launcher=0x7f020000;
         public static final int main=0x7f020001;
+        public static final int splash1=0x7f020002;
+        public static final int splash2=0x7f020003;
+        public static final int splash3=0x7f020004;
+        public static final int splash4=0x7f020005;
     }
     public static final class id {
-        public static final int TableLayout01=0x7f090000;
-        public static final int TextViewTopTitle=0x7f090005;
-        public static final int menu_settings=0x7f090006;
-        public static final int tableRow1=0x7f090001;
-        public static final int tableRow2=0x7f090002;
-        public static final int tableRow3=0x7f090003;
-        public static final int tableRow4=0x7f090004;
+        public static final int ImageView2_Left=0x7f090003;
+        public static final int ImageView2_Right=0x7f090004;
+        public static final int ImageView3_Left=0x7f090006;
+        public static final int ImageView3_Right=0x7f090007;
+        public static final int TableLayout01=0x7f090001;
+        public static final int TableRow01=0x7f090002;
+        public static final int TableRow02=0x7f090005;
+        public static final int TextViewBottomTitle=0x7f090008;
+        public static final int TextViewBottomVersion=0x7f090009;
+        public static final int TextViewTopTitle=0x7f090000;
+        public static final int menu_settings=0x7f09000a;
     }
     public static final class layout {
         public static final int activity_quiz_game=0x7f030000;
