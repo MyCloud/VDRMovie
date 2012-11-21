@@ -44,6 +44,7 @@ public class QuizActivity extends Activity {
 		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 		SharedPreferences.Editor prefEditor = settings.edit();
 		prefEditor.putString("LastDate", now.toString());
+		prefEditor.commit();
 		super.onPause();
 	}
 
