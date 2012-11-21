@@ -2,14 +2,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/black"
     tools:context=".QuizSplashActivity" >
 
     <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/black">
+    android:layout_height="match_parent" >
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -81,20 +82,5 @@
         android:layout_gravity="center_vertical|center_horizontal"
         android:gravity="center"></TextView>
 </LinearLayout>
-    <EditText
-        android:id="@+id/TextViewTopTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:ems="10"
-        android:text="@string/app_logo_top"
-        android:textColor="@color/logo_color"
-        android:textColorHint="@color/logo_color"
-        android:textSize="@dimen/logo_size" >
-
-        <requestFocus />
-    </EditText>
-
+ 
 </RelativeLayout>
