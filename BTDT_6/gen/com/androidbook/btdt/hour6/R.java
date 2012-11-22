@@ -26,25 +26,52 @@ public final class R {
         public static final int version_spacing=0x7f060002;
     }
     public static final class drawable {
-        public static final int ic_launcher=0x7f020000;
-        public static final int main=0x7f020001;
-        public static final int splash1=0x7f020002;
-        public static final int splash2=0x7f020003;
-        public static final int splash3=0x7f020004;
-        public static final int splash4=0x7f020005;
+        public static final int ic_action_attach=0x7f020000;
+        public static final int ic_action_call=0x7f020001;
+        public static final int ic_action_copy=0x7f020002;
+        public static final int ic_action_cut=0x7f020003;
+        public static final int ic_action_delete=0x7f020004;
+        public static final int ic_action_done=0x7f020005;
+        public static final int ic_action_edit=0x7f020006;
+        public static final int ic_action_locate=0x7f020007;
+        public static final int ic_action_mail=0x7f020008;
+        public static final int ic_action_mail_add=0x7f020009;
+        public static final int ic_action_microphone=0x7f02000a;
+        public static final int ic_action_overflow=0x7f02000b;
+        public static final int ic_action_paste=0x7f02000c;
+        public static final int ic_action_photo=0x7f02000d;
+        public static final int ic_action_refresh=0x7f02000e;
+        public static final int ic_action_search=0x7f02000f;
+        public static final int ic_action_select_all=0x7f020010;
+        public static final int ic_action_send=0x7f020011;
+        public static final int ic_action_share=0x7f020012;
+        public static final int ic_action_star=0x7f020013;
+        public static final int ic_action_user=0x7f020014;
+        public static final int ic_action_user_add=0x7f020015;
+        public static final int ic_action_video=0x7f020016;
+        public static final int ic_launcher=0x7f020017;
+        public static final int main=0x7f020018;
+        public static final int splash1=0x7f020019;
+        public static final int splash2=0x7f02001a;
+        public static final int splash3=0x7f02001b;
+        public static final int splash4=0x7f02001c;
     }
     public static final class id {
-        public static final int ImageView2_Left=0x7f0a0003;
-        public static final int ImageView2_Right=0x7f0a0004;
-        public static final int ImageView3_Left=0x7f0a0006;
-        public static final int ImageView3_Right=0x7f0a0007;
-        public static final int TableLayout01=0x7f0a0001;
-        public static final int TableRow01=0x7f0a0002;
-        public static final int TableRow02=0x7f0a0005;
-        public static final int TextViewBottomTitle=0x7f0a0008;
-        public static final int TextViewBottomVersion=0x7f0a0009;
-        public static final int TextViewTopTitle=0x7f0a0000;
-        public static final int menu_settings=0x7f0a000a;
+        public static final int ImageView2_Left=0x7f0a0005;
+        public static final int ImageView2_Right=0x7f0a0006;
+        public static final int ImageView3_Left=0x7f0a0008;
+        public static final int ImageView3_Right=0x7f0a0009;
+        public static final int TableLayout01=0x7f0a0003;
+        public static final int TableRow01=0x7f0a0004;
+        public static final int TableRow02=0x7f0a0007;
+        public static final int TextViewBottomTitle=0x7f0a000a;
+        public static final int TextViewBottomVersion=0x7f0a000b;
+        public static final int TextViewTopTitle=0x7f0a0002;
+        public static final int help_settings=0x7f0a000d;
+        public static final int menu_settings=0x7f0a000c;
+        public static final int myView=0x7f0a0001;
+        public static final int myView2=0x7f0a0000;
+        public static final int toast=0x7f0a000e;
     }
     public static final class layout {
         public static final int activity_quiz_game=0x7f030000;
@@ -56,6 +83,8 @@ public final class R {
     }
     public static final class menu {
         public static final int activity_quiz_splash=0x7f090000;
+        public static final int contextual=0x7f090001;
+        public static final int contextual2=0x7f090002;
     }
     public static final class string {
         public static final int app_logo_bottom=0x7f070009;
@@ -64,6 +93,7 @@ public final class R {
         public static final int app_version_info=0x7f07000a;
         public static final int game=0x7f070005;
         public static final int help=0x7f070001;
+        public static final int help_settings=0x7f07000b;
         public static final int menu=0x7f070002;
         public static final int menu_settings=0x7f070007;
         public static final int scores=0x7f070006;

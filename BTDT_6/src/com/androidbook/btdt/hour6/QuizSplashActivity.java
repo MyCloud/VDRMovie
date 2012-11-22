@@ -1,5 +1,6 @@
 package com.androidbook.btdt.hour6;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -47,7 +48,8 @@ public class QuizSplashActivity extends QuizActivity {
             TableRow row = (TableRow) table.getChildAt(i);
             row.setLayoutAnimation(controller);
         }
-
+        //ActionBar actionBar = getActionBar();
+        //actionBar.hide();
 
 
 	}
