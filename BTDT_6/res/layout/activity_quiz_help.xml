@@ -4,19 +4,22 @@
     android:layout_height="match_parent"
     tools:context=".QuizSplashActivity" >
 
-    <ScrollView
-        android:id="@+id/scrollView_help"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true" >
+    <TextView
+        android:id="@+id/TextView_HelpText"
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-        </LinearLayout>
-    </ScrollView>
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:autoLink="all"
+        android:isScrollContainer="true"
+        android:textStyle="italic"
+
+ 
+        android:linksClickable="true"
+
+        android:fadingEdge="vertical"
+        android:scrollbars="vertical"
+ 
+        android:scrollbarStyle="outsideOverlay"
+        android:bufferType="spannable"></TextView>
 
 </RelativeLayout>

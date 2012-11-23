@@ -89,8 +89,10 @@ public class QuizMenuActivity extends QuizActivity {
 		// TODO Auto-generated method stub
 		switch (item.getItemId()) {
 	    case R.id.menu_settings:
-	      Toast.makeText(this, "Menu Item 1 selected", Toast.LENGTH_SHORT)
-	          .show();
+	      Toast.makeText(this, "Menu Item 1 selected", Toast.LENGTH_SHORT).show();
+          // The animation has ended, transition to the Main Menu screen
+          startActivity(new Intent(QuizMenuActivity.this, QuizHelpActivity.class));
+          QuizMenuActivity.this.finish();
 	      break;
 	    case R.id.help_settings:
 	      Toast.makeText(this, "Menu item 2 selected", Toast.LENGTH_SHORT)

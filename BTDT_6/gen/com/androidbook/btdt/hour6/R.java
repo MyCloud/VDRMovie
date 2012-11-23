@@ -70,11 +70,11 @@ public final class R {
         public static final int TextViewBottomTitle=0x7f0c000b;
         public static final int TextViewBottomVersion=0x7f0c000c;
         public static final int TextViewTopTitle=0x7f0c0003;
+        public static final int TextView_HelpText=0x7f0c0000;
         public static final int actionbanner=0x7f0c0001;
         public static final int help_settings=0x7f0c000e;
         public static final int menu_settings=0x7f0c000d;
         public static final int myView2=0x7f0c0002;
-        public static final int scrollView_help=0x7f0c0000;
         public static final int toast=0x7f0c000f;
     }
     public static final class layout {

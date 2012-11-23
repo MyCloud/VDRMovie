@@ -7,6 +7,7 @@ import java.io.InputStream;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class QuizHelpActivity extends QuizActivity {
@@ -14,17 +15,17 @@ public class QuizHelpActivity extends QuizActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+		setContentView(R.layout.activity_quiz_help);
 		// Read raw file into string and populate TextView
         InputStream iFile = getResources().openRawResource(R.raw.data1);
         try {
-            TextView helpText = (TextView) findViewById(R.id.scrollView_help);
+        	TextView helpText = (TextView) findViewById(R.id.TextView_HelpText);
             String strFile = inputStreamToString(iFile);
             helpText.setText(strFile);
         } catch (Exception e) {
             Log.e("testung", "InputStreamToString failure", e);
         }
-		setContentView(R.layout.activity_quiz_help);
+		
 	}
     /**
      * Converts an input stream to a string
