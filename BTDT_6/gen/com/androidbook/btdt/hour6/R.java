@@ -13,6 +13,9 @@ public final class R {
         public static final int fade_in=0x7f040001;
         public static final int fade_in2=0x7f040002;
     }
+    public static final class array {
+        public static final int action_list=0x7f080000;
+    }
     public static final class attr {
     }
     public static final class color {
@@ -57,21 +60,21 @@ public final class R {
         public static final int splash4=0x7f02001c;
     }
     public static final class id {
-        public static final int ImageView2_Left=0x7f0a0005;
-        public static final int ImageView2_Right=0x7f0a0006;
-        public static final int ImageView3_Left=0x7f0a0008;
-        public static final int ImageView3_Right=0x7f0a0009;
-        public static final int TableLayout01=0x7f0a0003;
-        public static final int TableRow01=0x7f0a0004;
-        public static final int TableRow02=0x7f0a0007;
-        public static final int TextViewBottomTitle=0x7f0a000a;
-        public static final int TextViewBottomVersion=0x7f0a000b;
-        public static final int TextViewTopTitle=0x7f0a0002;
-        public static final int help_settings=0x7f0a000d;
-        public static final int menu_settings=0x7f0a000c;
-        public static final int myView=0x7f0a0001;
-        public static final int myView2=0x7f0a0000;
-        public static final int toast=0x7f0a000e;
+        public static final int ImageView2_Left=0x7f0b0005;
+        public static final int ImageView2_Right=0x7f0b0006;
+        public static final int ImageView3_Left=0x7f0b0008;
+        public static final int ImageView3_Right=0x7f0b0009;
+        public static final int TableLayout01=0x7f0b0003;
+        public static final int TableRow01=0x7f0b0004;
+        public static final int TableRow02=0x7f0b0007;
+        public static final int TextViewBottomTitle=0x7f0b000a;
+        public static final int TextViewBottomVersion=0x7f0b000b;
+        public static final int TextViewTopTitle=0x7f0b0002;
+        public static final int actionbanner=0x7f0b0000;
+        public static final int help_settings=0x7f0b000d;
+        public static final int menu_settings=0x7f0b000c;
+        public static final int myView2=0x7f0b0001;
+        public static final int toast=0x7f0b000e;
     }
     public static final class layout {
         public static final int activity_quiz_game=0x7f030000;
@@ -82,9 +85,9 @@ public final class R {
         public static final int activity_quiz_splash=0x7f030005;
     }
     public static final class menu {
-        public static final int activity_quiz_splash=0x7f090000;
-        public static final int contextual=0x7f090001;
-        public static final int contextual2=0x7f090002;
+        public static final int activity_quiz_splash=0x7f0a0000;
+        public static final int contextual=0x7f0a0001;
+        public static final int contextual2=0x7f0a0002;
     }
     public static final class string {
         public static final int app_logo_bottom=0x7f070009;
@@ -122,10 +125,10 @@ public final class R {
     
  API 14 theme customizations can go here. 
          */
-        public static final int AppBaseTheme=0x7f080000;
+        public static final int AppBaseTheme=0x7f090000;
         /**  Application theme. 
  All customizations that are NOT specific to a particular API-level can go here. 
          */
-        public static final int AppTheme=0x7f080001;
+        public static final int AppTheme=0x7f090001;
     }
 }

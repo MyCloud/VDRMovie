@@ -25,4 +25,10 @@
         Reserved.
     </string>
     <string name="help_settings">Help</string>
+    <string-array name="action_list">
+        <item >Mercury</item>
+        <item >Venus</item>
+        <item >Earth</item>
+        
+    </string-array>
 </resources>
