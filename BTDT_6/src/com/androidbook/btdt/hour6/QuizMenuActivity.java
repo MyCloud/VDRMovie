@@ -2,10 +2,15 @@ package com.androidbook.btdt.hour6;
 
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
+import android.app.ProgressDialog;
 import android.content.ComponentCallbacks;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,6 +22,9 @@ import android.widget.Toast;
 public class QuizMenuActivity extends QuizActivity {
 
 	protected Object mActionMode;
+	GuidTask downloader;
+	ProgressDialog pleaseWaitDialog;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -27,6 +35,12 @@ public class QuizMenuActivity extends QuizActivity {
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.setDisplayShowTitleEnabled(false);
+		
+		// Start loading the questions in the background
+		downloader = new GuidTask();
+		// downloader.execute(TRIVIA_SERVER_QUESTIONS, startingQuestionNumber);
+
+		
         //actionBar.setSelectedNavigationItem(2);
 	//	ActionBar.OnNavigationListener
 		//actionBar.setListNavigationCallbacks(mSpinnerAdapter, mNavigationCallback);
@@ -158,5 +172,46 @@ public class QuizMenuActivity extends QuizActivity {
 	      mActionMode = null;
 	    }
 	  };
+
+	private class GuidTask extends AsyncTask<Object, String, Boolean> {
+		private static final String DEBUG_TAG = "GuidActivity$QuizTask";
+		int startingNumber;
+		
+		@Override
+		protected void onPostExecute(Boolean result) {
+			// TODO Auto-generated method stub
+			super.onPostExecute(result);
+		}
+
+		@Override
+		protected void onPreExecute() {
+			// TODO Auto-generated method stub
+			pleaseWaitDialog = ProgressDialog.show(QuizMenuActivity.this,
+					"VDR Guid", "Downloading VDR Guid data", true, true);
+			pleaseWaitDialog.setOnCancelListener(new OnCancelListener() {
+				public void onCancel(DialogInterface dialog) {
+					Log.d(DEBUG_TAG, "onCancel -- dialog");
+					GuidTask.this.cancel(true);
+				}
+			});
+			
+			super.onPreExecute();
+		}
+
+		@Override
+		protected void onProgressUpdate(String... values) {
+			// TODO Auto-generated method stub
+			super.onProgressUpdate(values);
+		}
+
+
+
+		@Override
+		protected Boolean doInBackground(Object... arg0) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+	}
 
 }
