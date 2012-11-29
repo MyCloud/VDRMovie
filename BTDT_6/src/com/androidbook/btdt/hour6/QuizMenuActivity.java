@@ -1,5 +1,13 @@
 package com.androidbook.btdt.hour6;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.nio.CharBuffer;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.ProgressDialog;
@@ -38,7 +46,7 @@ public class QuizMenuActivity extends QuizActivity {
 		
 		// Start loading the questions in the background
 		downloader = new GuidTask();
-		// downloader.execute(TRIVIA_SERVER_QUESTIONS, startingQuestionNumber);
+		downloader.execute("test", "test2");
 
 		
         //actionBar.setSelectedNavigationItem(2);
@@ -186,6 +194,7 @@ public class QuizMenuActivity extends QuizActivity {
 		@Override
 		protected void onPreExecute() {
 			// TODO Auto-generated method stub
+			Log.d(DEBUG_TAG, "onPreExecute -- dialog");
 			pleaseWaitDialog = ProgressDialog.show(QuizMenuActivity.this,
 					"VDR Guid", "Downloading VDR Guid data", true, true);
 			pleaseWaitDialog.setOnCancelListener(new OnCancelListener() {
@@ -207,9 +216,117 @@ public class QuizMenuActivity extends QuizActivity {
 
 
 		@Override
-		protected Boolean doInBackground(Object... arg0) {
+		protected Boolean doInBackground(Object... params) {
 			// TODO Auto-generated method stub
-			return null;
+			boolean result = false;
+			try {
+				// must put parameters in correct order and correct type,
+				// otherwise a ClassCastException will be thrown
+				//startingNumber = (Integer) params[1];
+				//String pathToQuestions = params[0] + "?max="
+			//			+ "&start=" + startingNumber;
+
+				//Log.d(DEBUG_TAG, "path: " + pathToQuestions + " -- Num: "
+				//		+ startingNumber);
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			       try {
+			    	    String data = new String();
+			    	    Socket s = new Socket("192.168.2.13", 6419);
+			    	    OutputStream os = s.getOutputStream();
+			    	    InputStream is = s.getInputStream();
+			    	    DataInputStream dis = new DataInputStream(is);
+			    	    DataOutputStream dos = new DataOutputStream(os);
+			    	    byte[] rl = new byte[] { 13, 10 };
+			    	    byte[] buffer = new byte[250];
+			    	    // writw command
+			    	    String sendSting = "LSTE 1 NOW";
+			    	    dos.write(sendSting.getBytes());
+			    	    dos.write(rl);
+			    	    // read channel
+						for ( int i = 1; i < 13; i++ ) {
+				    	    data = dis.readLine();
+							Log.d(DEBUG_TAG, data.toString() );						
+						}
+			    	    sendSting = "QUIT";
+			    	    dos.write(sendSting.getBytes());
+			    	    dos.write(rl);
+
+						data = dis.readLine();
+			    	    s.close();
+			    	   
+			    	   /*
+
+			            214 Help message
+						215 EPG data record
+						220 VDR service ready
+						221 VDR service closing transmission channel
+						250 Requested VDR action okay, completed
+						354 Start sending EPG data
+						451 Requested action aborted: local error in processing
+						500 Syntax error, command unrecognized
+						501 Syntax error in parameters or arguments
+						502 Command not implemented
+						504 Command parameter not implemented
+						550 Requested action not taken
+						554 Transaction failed
+			            
+			            
+			            
+			            Socket socket = new Socket("192.168.2.13", 6419);
+			            		//InputStream is = socket.getInputStream();
+			            		OutputStream os = socket.getOutputStream();
+
+			                    byte[] send = new byte[] { 67, 72, 65, 78, 13 };
+			                    os.write(send);
+			                    //os.flush();
+			                    //os.close();
+			            		InputStream is = socket.getInputStream();
+			                    byte[] buffer = new byte[640];
+			                    int read = is.read(buffer);
+			                    while(read != -1){
+			                         //publishProgress(read);
+			                      read = is.read(buffer);
+			                    }
+
+			                    is.close();
+			                    os.close();
+			                    socket.close();
+							*/
+
+
+			        } catch (Exception e) {
+			            e.printStackTrace();
+			        }				
+				
+				
+				
+				
+				
+				// result = loadQuestionBatch(startingNumber, pathToQuestions);
+
+			} catch (Exception e) {
+				Log.e(DEBUG_TAG,
+						"Unexpected failure in XML downloading and parsing", e);
+			}
+
+			return result;
 		}
 
 	}
