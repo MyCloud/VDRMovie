@@ -254,10 +254,10 @@ public class QuizMenuActivity extends QuizActivity {
 				// delete all channels for now the easy way.
 				
 				datasource.deleteAllChannels();
-				for (int channel = 1; channel < 30; channel++) {
+				for (int channel = 1; channel < 20; channel++) {
 					// for all channel that need to be collected
 					// for now its the first 30 channels
-					
+					long cur_Id = 0;
 					sendSting = "LSTE " + channel + " NOW"; // currently
 																	// only
 																	// the
@@ -286,10 +286,12 @@ public class QuizMenuActivity extends QuizActivity {
 							String dataObj[] = data.split(" ", 3);
 							if (dataObj[0].contentEquals("215-C")) {
 								// Channel record store in database
-								datasource.insertChannel(channel, dataObj[2],
+								cur_Id = datasource.insertChannel(channel, dataObj[2],
 										dataObj[1]);
 								Log.d(DEBUG_TAG, sendSting);
 								break;
+							} else if (dataObj[0].contentEquals("215-T")) {
+								// Title record
 							}
 							if (dataObj[0].contentEquals("215")) {
 								// Last event data record quit connection
