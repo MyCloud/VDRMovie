@@ -238,10 +238,12 @@ public class QuizMenuActivity extends QuizActivity {
 			// TODO Auto-generated method stub
 			boolean result = false;
 			try {
-				datasource.open();
+				//datasource.open();
+				datasource.deleteAllChannels();
 				int type;
 				Boolean endOfSession = false;
 				String data = new String();
+				String sendSting = new String();
 				Socket s = new Socket("192.168.2.13", 6419);
 				OutputStream os = s.getOutputStream();
 				InputStream is = s.getInputStream();
@@ -249,11 +251,14 @@ public class QuizMenuActivity extends QuizActivity {
 				DataOutputStream dos = new DataOutputStream(os);
 				byte[] rl = new byte[] { 13, 10 };
 				byte[] buffer = new byte[250];
-				// writw command
-				for (int channel = 1; channel < 30;) {
+				// delete all channels for now the easy way.
+				
+				datasource.deleteAllChannels();
+				for (int channel = 1; channel < 30; channel++) {
 					// for all channel that need to be collected
 					// for now its the first 30 channels
-					String sendSting = "LSTE " + channel + " NOW"; // currently
+					
+					sendSting = "LSTE " + channel + " NOW"; // currently
 																	// only
 																	// the
 																	// now
@@ -261,10 +266,19 @@ public class QuizMenuActivity extends QuizActivity {
 																	// data
 					dos.write(sendSting.getBytes());
 					dos.write(rl);
+					endOfSession = false;
 					do {
 						data = dis.readLine();
 						data.getBytes(0, 2, buffer, 0);
-						type = Integer.parseInt(data);
+						try {
+							type = Integer.parseInt(data.substring(0, 3));							
+						} catch (Exception NumberFormatException) {
+							// TODO: handle exception
+							Log.d(DEBUG_TAG, data.toString());
+							endOfSession = true;
+							// break out of while loop and go no next channel
+							break;							
+						}
 						switch (type) {
 						case 214: // Help message
 							break;
@@ -272,16 +286,14 @@ public class QuizMenuActivity extends QuizActivity {
 							String dataObj[] = data.split(" ", 3);
 							if (dataObj[0].contentEquals("215-C")) {
 								// Channel record store in database
-								//datasource.insertChannel(channel, dataObj[2],
-								//		dataObj[1]);
-								Log.d(DEBUG_TAG, data.toString());
+								datasource.insertChannel(channel, dataObj[2],
+										dataObj[1]);
+								Log.d(DEBUG_TAG, sendSting);
 								break;
 							}
 							if (dataObj[0].contentEquals("215")) {
 								// Last event data record quit connection
-								sendSting = "QUIT";
-								dos.write(sendSting.getBytes());
-								dos.write(rl);
+								endOfSession = true;
 								break;
 							}
 							break;
@@ -299,16 +311,27 @@ public class QuizMenuActivity extends QuizActivity {
 						case 501: // Syntax error in parameters or arguments
 						case 502: // Command not implemented
 						case 504: // Command parameter not implemented
+							Log.d(DEBUG_TAG, data.toString());
+							break;
 						case 550: // Requested action not taken
+							endOfSession = true;
+							break;
 						case 554: // Transaction failed
+							Log.d(DEBUG_TAG, data.toString());
 							break;
 
 						default:
 							Log.d(DEBUG_TAG, data.toString());
 							break;
 						}
+						Log.d(DEBUG_TAG, data.toString());
 					} while (!endOfSession);
 				}
+				sendSting = "QUIT";
+				dos.write(sendSting.getBytes());
+				dos.write(rl);
+				data = dis.readLine();
+				Log.d(DEBUG_TAG, data.toString());
 				s.close();
 
 			} catch (Exception e) {
