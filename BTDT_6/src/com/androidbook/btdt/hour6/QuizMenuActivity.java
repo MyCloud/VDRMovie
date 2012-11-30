@@ -32,6 +32,7 @@ public class QuizMenuActivity extends QuizActivity {
 	protected Object mActionMode;
 	GuidTask downloader;
 	ProgressDialog pleaseWaitDialog;
+	private DatabaseConnector datasource;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +44,11 @@ public class QuizMenuActivity extends QuizActivity {
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.setDisplayShowTitleEnabled(false);
+
+		// open database need to make sure the context is not gone while assess database
+	    datasource = new DatabaseConnector(this);
+		
+		
 		
 		// Start loading the questions in the background
 		downloader = new GuidTask();
@@ -220,6 +226,8 @@ public class QuizMenuActivity extends QuizActivity {
 			// TODO Auto-generated method stub
 			boolean result = false;
 			try {
+			    datasource.open();
+
 				// must put parameters in correct order and correct type,
 				// otherwise a ClassCastException will be thrown
 				//startingNumber = (Integer) params[1];
