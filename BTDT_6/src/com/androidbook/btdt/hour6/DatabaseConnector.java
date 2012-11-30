@@ -35,7 +35,7 @@ public class DatabaseConnector {
 			      newChannel.put(DatabaseOpenHelper.CHANNELS_SERVICE, service);
 
 			      open();
-			      database.insert(DatabaseOpenHelper.TBL_CHANNELS, null, newChannel);
+			      database.insertOrThrow(DatabaseOpenHelper.TBL_CHANNELS, null, newChannel);
 			      close();
 			   }
 

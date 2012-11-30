@@ -5,7 +5,7 @@
     <alpha
         android:fromAlpha="0.0"
         android:toAlpha="1.0"
-        android:duration="2500"
-        android:startOffset="2500">
+        android:duration="250"
+        android:startOffset="250">
     </alpha>
 </set>

@@ -28,15 +28,16 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
 
-	public SQLiteDatabase getWritableDatabase() {
+	/* public SQLiteDatabase getWritableDatabase() {
 		// TODO Auto-generated method stub
 		return null;
-	}
+	} */
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {		
 		// TODO Auto-generated method stub
-        db.execSQL(createTblChannels);		
+	    db.execSQL("DROP TABLE IF EXISTS " + TBL_CHANNELS);
+		db.execSQL(createTblChannels);		
 		
 	}
 
