@@ -8,12 +8,11 @@ import android.database.sqlite.SQLiteDatabase;
 
 public class DatabaseConnector {
 	
-	private static final String DB_NAME = "dbEvents";
 	private SQLiteDatabase database;
 	private DatabaseOpenHelper dbOpenHelper;
 	   
 	public DatabaseConnector(Context context) {
-		dbOpenHelper = new DatabaseOpenHelper(context, DB_NAME, null, 1);
+		dbOpenHelper = new DatabaseOpenHelper(context);
 	}
 	
 	   public void open() throws SQLException 
@@ -28,15 +27,15 @@ public class DatabaseConnector {
 	         database.close();
 	   }	   
 	   
-	   public void insertContact(String name, String cap, String code) 
+	   public void insertChannel(int num, String name, String service ) 
 			   {
-			      ContentValues newCon = new ContentValues();
-			      newCon.put("name", name);
-			      newCon.put("cap", cap);
-			      newCon.put("code", code);
+			      ContentValues newChannel = new ContentValues();
+			      newChannel.put(DatabaseOpenHelper.CHANNELS_NUM, num);
+			      newChannel.put(DatabaseOpenHelper.CHANNELS_NAME, name);
+			      newChannel.put(DatabaseOpenHelper.CHANNELS_SERVICE, service);
 
 			      open();
-			      database.insert("country", null, newCon);
+			      database.insert(DatabaseOpenHelper.TBL_CHANNELS, null, newChannel);
 			      close();
 			   }
 
