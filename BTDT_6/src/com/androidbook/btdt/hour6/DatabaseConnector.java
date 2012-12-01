@@ -71,7 +71,7 @@ public class DatabaseConnector {
 		close();
 	}
 
-	public void insertEvent(long ev_ch_key, int ev_nr, long ev_time, int ev_dr,
+	public long insertEvent(long ev_ch_key, int ev_nr, long ev_time, int ev_dr,
 			String ev_tt, String ev_dt) {
 		ContentValues newEvent = new ContentValues();
 		newEvent.put(DatabaseOpenHelper.EVENT_CHANNELS_KEY , ev_ch_key);
@@ -82,9 +82,9 @@ public class DatabaseConnector {
 		newEvent.put(DatabaseOpenHelper.EVENT_DETAILS, ev_dt);
 
 		open();
-		database.insertOrThrow(DatabaseOpenHelper.TBL_EVENT,
+		long rowId = database.insertOrThrow(DatabaseOpenHelper.TBL_EVENT,
 				null, newEvent);
 		close();
-		
+		return rowId;
 	}
 }

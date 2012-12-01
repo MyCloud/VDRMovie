@@ -292,7 +292,7 @@ public class QuizMenuActivity extends QuizActivity {
 									// Channel record store in database
 									cur_Id = datasource.insertChannel(channel,
 											dataObj[2], dataObj[1]);
-									Log.d(DEBUG_TAG, sendSting);
+									Log.d(DEBUG_TAG, Long.toString(cur_Id) + " " + data );
 									break;
 								} else if (dataObj[0].contentEquals("215-E")
 										& cur_Id >= 0) {
@@ -326,13 +326,15 @@ public class QuizMenuActivity extends QuizActivity {
 																				// together
 									}
 									// write event data
-									datasource.insertEvent( 
+									cur_Id = datasource.insertEvent( 
 											 Ev_ch_key,
 											 Ev_nr,
 											 Ev_time, 
 											 Ev_dr,
 											 Ev_tt,
 											 Ev_dt );
+									Log.d(DEBUG_TAG, Long.toString(cur_Id) + " " + data );
+
 								}
 								if (dataObj[0].contentEquals("215")) {
 									// Last event data record quit connection
@@ -387,6 +389,7 @@ public class QuizMenuActivity extends QuizActivity {
 			} catch (Exception e) {
 				Log.e(DEBUG_TAG, "Unexpected failure in collecting event data",
 						e);
+
 			}
 			datasource.close();
 
