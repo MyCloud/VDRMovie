@@ -237,8 +237,15 @@ public class QuizMenuActivity extends QuizActivity {
 		protected Boolean doInBackground(Object... params) {
 			// TODO Auto-generated method stub
 			boolean result = false;
+			long Ev_ch_key = 0;
+			int Ev_nr = 0;
+			long Ev_time = 0;
+			int Ev_dr = 0;
+			String Ev_tt = "";
+			String Ev_dt = "";
+
 			try {
-				//datasource.open();
+				// datasource.open();
 				datasource.deleteAllChannels();
 				int type;
 				Boolean endOfSession = false;
@@ -252,81 +259,122 @@ public class QuizMenuActivity extends QuizActivity {
 				byte[] rl = new byte[] { 13, 10 };
 				byte[] buffer = new byte[250];
 				// delete all channels for now the easy way.
-				
+
 				datasource.deleteAllChannels();
 				for (int channel = 1; channel < 20; channel++) {
 					// for all channel that need to be collected
 					// for now its the first 30 channels
 					long cur_Id = 0;
 					sendSting = "LSTE " + channel + " NOW"; // currently
-																	// only
-																	// the
-																	// now
-																	// event
-																	// data
+															// only
+															// the
+															// now
+															// event
+															// data
 					dos.write(sendSting.getBytes());
 					dos.write(rl);
+					// clear data
+					cur_Id = -1;
+					Ev_time = -1;
+					Ev_dr = -1;
 					endOfSession = false;
 					do {
-						data = dis.readLine();
-						data.getBytes(0, 2, buffer, 0);
 						try {
-							type = Integer.parseInt(data.substring(0, 3));							
+							data = dis.readLine();
+							data.getBytes(0, 2, buffer, 0);
+							type = Integer.parseInt(data.substring(0, 3));
+							switch (type) {
+							case 214: // Help message
+								break;
+							case 215: // EPG data record
+								String dataObj[] = data.split(" ", 3);
+								if (dataObj[0].contentEquals("215-C")) {
+									// Channel record store in database
+									cur_Id = datasource.insertChannel(channel,
+											dataObj[2], dataObj[1]);
+									Log.d(DEBUG_TAG, sendSting);
+									break;
+								} else if (dataObj[0].contentEquals("215-E")
+										& cur_Id >= 0) {
+									// Event info
+									Ev_ch_key = cur_Id;
+									Ev_nr = Integer.parseInt(dataObj[1]);
+									String eventObj[] = dataObj[2]
+											.split(" ", 4);
+									Ev_time = Long.parseLong(eventObj[0]);
+									Ev_dr = Integer.parseInt(eventObj[1]);
+									Ev_tt = "";
+									Ev_dt = "";
+								} else if (dataObj[0].contentEquals("215-T")
+										& Ev_time > 0 & Ev_dr > 0) {
+									// Title info
+									if (dataObj[2].isEmpty()) {
+										Ev_tt = dataObj[1];
+
+									} else {
+										Ev_tt = dataObj[1] + " " + dataObj[2]; // cat
+																				// together
+									}
+								} else if (dataObj[0].contentEquals("215-D")
+										& !Ev_tt.isEmpty() ) {
+									// Title info
+									if (dataObj[2].isEmpty()) {
+										Ev_dt = dataObj[1];
+
+									} else {
+										Ev_dt = dataObj[1] + " " + dataObj[2]; // cat
+																				// together
+									}
+									// write event data
+									datasource.insertEvent( 
+											 Ev_ch_key,
+											 Ev_nr,
+											 Ev_time, 
+											 Ev_dr,
+											 Ev_tt,
+											 Ev_dt );
+								}
+								if (dataObj[0].contentEquals("215")) {
+									// Last event data record quit connection
+									endOfSession = true;
+									break;
+								}
+								break;
+							case 220: // VDR service ready
+								break;
+							case 221: // VDR service closing transmission
+										// channel
+								endOfSession = true;
+								break;
+							case 250: // Requested VDR action okay, completed
+							case 354: // Start sending EPG data
+							case 451: // Requested action aborted: local error
+										// in processing
+							case 500: // Syntax error, command unrecognized
+							case 501: // Syntax error in parameters or arguments
+							case 502: // Command not implemented
+							case 504: // Command parameter not implemented
+								Log.d(DEBUG_TAG, data.toString());
+								break;
+							case 550: // Requested action not taken
+								endOfSession = true;
+								break;
+							case 554: // Transaction failed
+								Log.d(DEBUG_TAG, data.toString());
+								break;
+
+							default:
+								Log.d(DEBUG_TAG, data.toString());
+								break;
+							}
+							Log.d(DEBUG_TAG, data.toString());
 						} catch (Exception NumberFormatException) {
 							// TODO: handle exception
 							Log.d(DEBUG_TAG, data.toString());
 							endOfSession = true;
 							// break out of while loop and go no next channel
-							break;							
-						}
-						switch (type) {
-						case 214: // Help message
-							break;
-						case 215: // EPG data record
-							String dataObj[] = data.split(" ", 3);
-							if (dataObj[0].contentEquals("215-C")) {
-								// Channel record store in database
-								cur_Id = datasource.insertChannel(channel, dataObj[2],
-										dataObj[1]);
-								Log.d(DEBUG_TAG, sendSting);
-								break;
-							} else if (dataObj[0].contentEquals("215-T")) {
-								// Title record
-							}
-							if (dataObj[0].contentEquals("215")) {
-								// Last event data record quit connection
-								endOfSession = true;
-								break;
-							}
-							break;
-						case 220: // VDR service ready
-							break;
-						case 221: // VDR service closing transmission
-									// channel
-							endOfSession = true;
-							break;
-						case 250: // Requested VDR action okay, completed
-						case 354: // Start sending EPG data
-						case 451: // Requested action aborted: local error
-									// in processing
-						case 500: // Syntax error, command unrecognized
-						case 501: // Syntax error in parameters or arguments
-						case 502: // Command not implemented
-						case 504: // Command parameter not implemented
-							Log.d(DEBUG_TAG, data.toString());
-							break;
-						case 550: // Requested action not taken
-							endOfSession = true;
-							break;
-						case 554: // Transaction failed
-							Log.d(DEBUG_TAG, data.toString());
-							break;
-
-						default:
-							Log.d(DEBUG_TAG, data.toString());
 							break;
 						}
-						Log.d(DEBUG_TAG, data.toString());
 					} while (!endOfSession);
 				}
 				sendSting = "QUIT";

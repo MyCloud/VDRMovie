@@ -70,4 +70,21 @@ public class DatabaseConnector {
 		database.delete("country", "_id=" + id, null);
 		close();
 	}
+
+	public void insertEvent(long ev_ch_key, int ev_nr, long ev_time, int ev_dr,
+			String ev_tt, String ev_dt) {
+		ContentValues newEvent = new ContentValues();
+		newEvent.put(DatabaseOpenHelper.EVENT_CHANNELS_KEY , ev_ch_key);
+		newEvent.put(DatabaseOpenHelper.EVENT_NR, ev_nr);
+		newEvent.put(DatabaseOpenHelper.EVENT_TIME, ev_time);
+		newEvent.put(DatabaseOpenHelper.EVENT_DURATION, ev_dr);
+		newEvent.put(DatabaseOpenHelper.EVENT_TITLE, ev_tt);
+		newEvent.put(DatabaseOpenHelper.EVENT_DETAILS, ev_dt);
+
+		open();
+		database.insertOrThrow(DatabaseOpenHelper.TBL_EVENT,
+				null, newEvent);
+		close();
+		
+	}
 }
