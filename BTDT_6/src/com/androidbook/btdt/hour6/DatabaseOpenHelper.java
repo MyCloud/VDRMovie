@@ -21,9 +21,18 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	public static final String EVENT_DURATION = "dr";
 	public static final String EVENT_TITLE = "tt";
 	public static final String EVENT_DETAILS = "dt";
+
+	public static final String TBL_HASH = "HashTbl";
+	public static final String IDX_HASH = "HashTblIdx";
+	public static final String HASH = "hsh";
+	public static final String HASH_DATA_KEY = "data_key";
+
+	public static final String TBL_DATA = "DataTbl";
+	public static final String DATA_NR = "nr";
+	public static final String DATA_DETAILS = "Dt";
 	
 	private static final String DATABASE_NAME = "events.db";
-	private static final int DATABASE_VERSION = 2;
+	private static final int DATABASE_VERSION = 5;
 
 	private static final String createTblChannels = "CREATE TABLE "+ TBL_CHANNELS + "( " 
     		+ TBL_ID + " integer primary key autoincrement, " 
@@ -41,6 +50,19 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
     		+ EVENT_DETAILS + " text, "
     		+ "FOREIGN KEY(" + EVENT_CHANNELS_KEY + ") REFERENCES " + TBL_CHANNELS + "(" + TBL_ID + "));";                 
 
+	private static final String createTblHash = "CREATE TABLE "+ TBL_HASH + "( " 
+    		+ TBL_ID + " integer primary key autoincrement, "
+    		+ HASH + " integer unique not null, "
+    		+ HASH_DATA_KEY + " integer, "
+	        + "FOREIGN KEY(" + HASH_DATA_KEY + ") REFERENCES " + TBL_DATA + "(" + TBL_ID + "));";                 
+	private static final String createIndexTblHash = "CREATE UNIQUE INDEX " + IDX_HASH + " ON "+ TBL_HASH + "(" + HASH + ");";
+	
+	private static final String createTblData = "CREATE TABLE "+ TBL_DATA + "( " 
+    		+ TBL_ID + " integer primary key autoincrement, "
+    		+ DATA_NR + " integer , "
+    		+ DATA_DETAILS + " text not null);";                 
+
+	
 	
 	public DatabaseOpenHelper(Context context ) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -55,8 +77,10 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {		
 		// TODO Auto-generated method stub
 		db.execSQL(createTblChannels);		
-		db.execSQL(createTblEvents);		
-		
+		db.execSQL(createTblEvents);	
+		db.execSQL(createTblData);			
+		db.execSQL(createTblHash);		
+		db.execSQL(createIndexTblHash);	
 	}
 
 	@Override
@@ -66,6 +90,8 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	            + newVersion + ", which will destroy all old data");
 	    db.execSQL("DROP TABLE IF EXISTS " + TBL_CHANNELS);
 	    db.execSQL("DROP TABLE IF EXISTS " + TBL_EVENT);
+	    db.execSQL("DROP TABLE IF EXISTS " + TBL_HASH);
+	    db.execSQL("DROP TABLE IF EXISTS " + TBL_DATA);
 	    onCreate(db);
 	  }
 

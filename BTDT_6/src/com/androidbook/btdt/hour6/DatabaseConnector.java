@@ -43,6 +43,11 @@ public class DatabaseConnector {
 		database.execSQL("DELETE FROM " + DatabaseOpenHelper.TBL_CHANNELS);
 		close();
 	}
+	public void deleteAllEvents() {
+		open();
+		database.execSQL("DELETE FROM " + DatabaseOpenHelper.TBL_EVENT);
+		close();
+	}
 
 	public void updateContact(long id, String name, String cap, String code) {
 		ContentValues editCon = new ContentValues();
@@ -84,6 +89,30 @@ public class DatabaseConnector {
 		open();
 		long rowId = database.insertOrThrow(DatabaseOpenHelper.TBL_EVENT,
 				null, newEvent);
+		close();
+		return rowId;
+	}
+
+	public long insertHash( long ha_da_key, long ha_ha) {
+		ContentValues newHash = new ContentValues();
+		newHash.put(DatabaseOpenHelper.HASH_DATA_KEY , ha_da_key);
+		newHash.put(DatabaseOpenHelper.HASH, ha_ha);
+
+		open();
+		long rowId = database.insertOrThrow(DatabaseOpenHelper.TBL_HASH,
+				null, newHash);
+		close();
+		return rowId;
+	}
+	
+	public long insertData( long da_nr, String da_dt) {
+		ContentValues newData = new ContentValues();
+		newData.put(DatabaseOpenHelper.DATA_NR , da_nr);
+		newData.put(DatabaseOpenHelper.DATA_DETAILS, da_dt);
+
+		open();
+		long rowId = database.insertOrThrow(DatabaseOpenHelper.TBL_DATA,
+				null, newData);
 		close();
 		return rowId;
 	}

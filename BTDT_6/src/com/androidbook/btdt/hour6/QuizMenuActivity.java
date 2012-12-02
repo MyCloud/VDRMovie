@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.CharBuffer;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+import java.util.zip.CRC32;
 
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
@@ -208,6 +209,8 @@ public class QuizMenuActivity extends QuizActivity {
 		@Override
 		protected void onPostExecute(Boolean result) {
 			// TODO Auto-generated method stub
+			Log.d(DEBUG_TAG, "onPostExecute -- dialog");
+			pleaseWaitDialog.dismiss();
 			super.onPostExecute(result);
 		}
 
@@ -230,6 +233,8 @@ public class QuizMenuActivity extends QuizActivity {
 		@Override
 		protected void onProgressUpdate(String... values) {
 			// TODO Auto-generated method stub
+			Log.d(DEBUG_TAG, "onProgressUpdate -- dialog " + values);
+			//setProgressPercent(Integer.parseInt((Sting()) values);
 			super.onProgressUpdate(values);
 		}
 
@@ -247,9 +252,12 @@ public class QuizMenuActivity extends QuizActivity {
 			try {
 				// datasource.open();
 				datasource.deleteAllChannels();
+				datasource.deleteAllEvents();
 				int type;
+				int toChannel = 20;
 				Boolean endOfSession = false;
 				String data = new String();
+				CRC32 checkSum = new CRC32();
 				String sendSting = new String();
 				Socket s = new Socket("192.168.2.13", 6419);
 				OutputStream os = s.getOutputStream();
@@ -260,12 +268,14 @@ public class QuizMenuActivity extends QuizActivity {
 				byte[] buffer = new byte[250];
 				// delete all channels for now the easy way.
 
-				datasource.deleteAllChannels();
-				for (int channel = 1; channel < 20; channel++) {
+				//datasource.deleteAllChannels();
+				for (int channel = 1; channel < toChannel; channel++) {
 					// for all channel that need to be collected
 					// for now its the first 30 channels
-					long cur_Id = 0;
-					sendSting = "LSTE " + channel + " NOW"; // currently
+					long cur_Id = -1;
+					long cur_event_Id = -1;
+					publishProgress(Integer.toString((int) ((channel / (float) toChannel) * 100)));
+					sendSting = "LSTE " + channel ; //+ " NOW"; // currently
 															// only
 															// the
 															// now
@@ -308,7 +318,7 @@ public class QuizMenuActivity extends QuizActivity {
 								} else if (dataObj[0].contentEquals("215-T")
 										& Ev_time > 0 & Ev_dr > 0) {
 									// Title info
-									if (dataObj[2].isEmpty()) {
+									if (dataObj.length < 3) {
 										Ev_tt = dataObj[1];
 
 									} else {
@@ -318,23 +328,30 @@ public class QuizMenuActivity extends QuizActivity {
 								} else if (dataObj[0].contentEquals("215-D")
 										& !Ev_tt.isEmpty() ) {
 									// Title info
-									if (dataObj[2].isEmpty()) {
+									if (dataObj.length < 3) {
 										Ev_dt = dataObj[1];
 
 									} else {
 										Ev_dt = dataObj[1] + " " + dataObj[2]; // cat
 																				// together
 									}
+								} else if (dataObj[0].contentEquals("215-e")
+										& !Ev_tt.isEmpty() ) {
 									// write event data
-									cur_Id = datasource.insertEvent( 
+									cur_event_Id = datasource.insertEvent( 
 											 Ev_ch_key,
 											 Ev_nr,
 											 Ev_time, 
 											 Ev_dr,
 											 Ev_tt,
 											 Ev_dt );
-									Log.d(DEBUG_TAG, Long.toString(cur_Id) + " " + data );
-
+									//Log.d(DEBUG_TAG, Long.toString(cur_event_Id) + " " + data );
+									
+									checkSum.reset();
+									checkSum.update(Ev_tt.getBytes());
+									Log.d(DEBUG_TAG, String.valueOf(checkSum.getValue()) );
+									datasource.insertHash(0, checkSum.getValue());
+									
 								}
 								if (dataObj[0].contentEquals("215")) {
 									// Last event data record quit connection
@@ -348,28 +365,30 @@ public class QuizMenuActivity extends QuizActivity {
 										// channel
 								endOfSession = true;
 								break;
+							case 554: // Transaction failed
+							case 550: // Requested action not taken
 							case 250: // Requested VDR action okay, completed
 							case 354: // Start sending EPG data
 							case 451: // Requested action aborted: local error
 										// in processing
-							case 500: // Syntax error, command unrecognized
-							case 501: // Syntax error in parameters or arguments
 							case 502: // Command not implemented
 							case 504: // Command parameter not implemented
 								Log.d(DEBUG_TAG, data.toString());
-								break;
-							case 550: // Requested action not taken
 								endOfSession = true;
 								break;
-							case 554: // Transaction failed
-								Log.d(DEBUG_TAG, data.toString());
-								break;
 
+							case 500: // Syntax error, command unrecognized
+							case 501: // Syntax error in parameters or arguments
+								dos.write(sendSting.getBytes());
+								dos.write(rl);
+								Log.d(DEBUG_TAG, "Try again same command "+ data.toString());
+
+								break;
 							default:
-								Log.d(DEBUG_TAG, data.toString());
+								Log.d(DEBUG_TAG, "Default case "+ data.toString());
 								break;
 							}
-							Log.d(DEBUG_TAG, data.toString());
+							//Log.d(DEBUG_TAG, data.toString());
 						} catch (Exception NumberFormatException) {
 							// TODO: handle exception
 							Log.d(DEBUG_TAG, data.toString());
@@ -391,6 +410,7 @@ public class QuizMenuActivity extends QuizActivity {
 						e);
 
 			}
+			
 			datasource.close();
 
 			return result;
