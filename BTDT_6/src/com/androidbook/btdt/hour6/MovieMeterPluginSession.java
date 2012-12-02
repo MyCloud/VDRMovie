@@ -1,24 +1,34 @@
 package com.androidbook.btdt.hour6;
 
-/**
- * The MovieMeterPluginSession communicates with XML-RPC webservice of www.moviemeter.nl.
- * 
- * The session is stored in a file, since the webservice accepts a maximum of 100 sessions per IP-address and
- * 50 requests per session. So when you rerun the applications, it tries to reuse the session. 
- * 
- * Version 0.1 : Initial release
- * Version 0.2 : Rewrote some log lines
- * Version 0.3 (18-06-2009) : New API key needed for MovieMeter.nl
- * Version 0.4 : Moved API key to properties file
- * @author RdeTuinman
- *
- */
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
+
+import org.apache.xmlrpc.XmlRpcException;
+import org.apache.xmlrpc.client.XmlRpcClient;
+import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
+
+import android.util.Log;
+
+
+
 public class MovieMeterPluginSession {
 
     public static String SESSION_FILENAME = "./temp/moviemeter.session";
-    private static String MOVIEMETER_API_KEY = PropertiesUtil.getProperty("API_KEY_MovieMeter");
     
-    protected static Logger logger = Logger.getLogger("moviejukebox");
+    private static String MOVIEMETER_API_KEY = "zqe4bx1rmhxy5gq1z1cwgfn0k2v5y0tm";
+//    private static String MOVIEMETER_API_KEY = PropertiesUtil.getProperty("API_KEY_MovieMeter");
+    
+    //protected static Logger logger = Logger.getLogger("moviejukebox");
     private String key;
     private Integer timestamp;
     private Integer counter;
@@ -38,7 +48,7 @@ public class MovieMeterPluginSession {
             final Writer eResult = new StringWriter();
             final PrintWriter printWriter = new PrintWriter(eResult);
             error.printStackTrace(printWriter);
-            logger.severe("MovieMeterPluginSession: " + eResult.toString());
+            Log.d("MovieMeterPluginSession: " , eResult.toString());
         }
     }
 
@@ -49,7 +59,7 @@ public class MovieMeterPluginSession {
     public MovieMeterPluginSession() throws XmlRpcException {
         init();
 
-        logger.finest("MovieMeterPluginSession: Getting stored session");
+        Log.d("MovieMeterPluginSession:", "Getting stored session");
         // Read previous session
         FileReader fread;        
         try
@@ -67,7 +77,7 @@ public class MovieMeterPluginSession {
         } catch (IOException error) {
         }
 
-        logger.finest("MovieMeterPluginSession: Stored session: " + getKey());
+        Log.d("MovieMeterPluginSession:" ," Stored session: " + getKey());
 
         if (!isValid()) {
             createNewSession(MOVIEMETER_API_KEY);
@@ -87,12 +97,12 @@ public class MovieMeterPluginSession {
         try {
             session = (HashMap) client.execute("api.startSession", params);
         } catch (Exception error) {
-            logger.warning("MovieMeterPluginSession: Unable to contact website");
+            Log.d("MovieMeterPluginSession:"," Unable to contact website");
         }
         
         if (session != null) {
             if (session.size() > 0) {
-                logger.finest("MovieMeterPluginSession: Created new session with moviemeter.nl");
+                Log.d("MovieMeterPluginSession:"," Created new session with moviemeter.nl");
                 setKey((String) session.get("session_key"));
                 setTimestamp((Integer) session.get("valid_till"));
                 setCounter(0);
@@ -123,9 +133,9 @@ public class MovieMeterPluginSession {
             films = (Object[]) client.execute("film.search", params);
             increaseCounter();
             if (films != null && films.length>0) {
-                logger.finest("MovieMeterPluginSession: MovieMeterPlugin: Search for " + movieName + " returned " + films.length + " results");
+                Log.d("MovieMeterPluginSession:", " MovieMeterPlugin: Search for " + movieName + " returned " + films.length + " results");
                 for (int i=0; i<films.length; i++){
-                    logger.fine("Film " + i + ": " + films[i]);
+                    Log.d("Film ",  i + ": " + films[i]);
                 }
                 // Choose first result
                 result = (HashMap) films[0];
@@ -134,7 +144,7 @@ public class MovieMeterPluginSession {
             final Writer eResult = new StringWriter();
             final PrintWriter printWriter = new PrintWriter(eResult);
             error.printStackTrace(printWriter);
-            logger.severe("MovieMeterPluginSession: " + eResult.toString());
+            Log.d("MovieMeterPluginSession: ",   eResult.toString());
         }
 
         return result;
@@ -159,17 +169,18 @@ public class MovieMeterPluginSession {
             films = (Object[]) client.execute("film.search", params);
             increaseCounter();
             if (films != null && films.length>0) {
-                logger.finest("MovieMeterPluginSession: Searching for " + movieName + " returned " + films.length + " results");
+                Log.d("MovieMeterPluginSession:"," Searching for " + movieName + " returned " + films.length + " results");
 
-                if (StringTools.isValidString(year)) {
+//                if (StringTools.isValidString(year)) {
+               /* if (false) {
                     for (int i=0; i<films.length; i++){
                         HashMap film = (HashMap) films[i];
                         if (film.get("year").toString().equals(year)) {
                             // Probably best match
                             return film;
                         }
-                    }
-                }
+                    } 
+                } */
                 // Choose first result
                 result = (HashMap) films[0];
             }
@@ -177,7 +188,7 @@ public class MovieMeterPluginSession {
             final Writer eResult = new StringWriter();
             final PrintWriter printWriter = new PrintWriter(eResult);
             error.printStackTrace(printWriter);
-            logger.severe("MovieMeterPluginSession: " + eResult.toString());
+            Log.d("MovieMeterPluginSession: " ,  eResult.toString());
         }
 
         return result;
@@ -223,7 +234,7 @@ public class MovieMeterPluginSession {
             final Writer eResult = new StringWriter();
             final PrintWriter printWriter = new PrintWriter(eResult);
             error.printStackTrace(printWriter);
-            logger.severe("MovieMeterPluginSession: " + eResult.toString());
+            Log.d("MovieMeterPluginSession: " , eResult.toString());
         }
 
         return result;
@@ -259,13 +270,13 @@ public class MovieMeterPluginSession {
 
             return true;
         } catch (XmlRpcException error) {
-            logger.finest("MovieMeterPluginSession: " + error.getMessage());
+            Log.d("MovieMeterPluginSession: " , error.getMessage());
             return false;
         } catch (MalformedURLException error) {
             final Writer eResult = new StringWriter();
             final PrintWriter printWriter = new PrintWriter(eResult);
             error.printStackTrace(printWriter);
-            logger.severe("MovieMeterPluginSession: " + eResult.toString());
+            Log.d("MovieMeterPluginSession: " , eResult.toString());
         }
         return false;
     }
@@ -285,9 +296,9 @@ public class MovieMeterPluginSession {
             new PrintStream(fout).println (getKey() + "," + getTimestamp() + "," + getCounter());
             fout.close();
         } catch (FileNotFoundException ignore) {
-            logger.finest("MovieMeterPluginSession: " + ignore.getMessage());
+            Log.d("MovieMeterPluginSession: " , ignore.getMessage());
         } catch (IOException error) {
-            logger.severe("MovieMeterPluginSession: " + error.getMessage());
+            Log.d("MovieMeterPluginSession: ", error.getMessage());
         }        
     }
 
