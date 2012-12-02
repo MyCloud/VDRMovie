@@ -16,6 +16,7 @@ import android.content.ComponentCallbacks;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.SQLException;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -198,6 +199,8 @@ public class QuizMenuActivity extends QuizActivity {
 
 		// Called when the user exits the action mode
 		public void onDestroyActionMode(ActionMode mode) {
+			datasource.close();
+
 			mActionMode = null;
 		}
 	};
@@ -247,12 +250,13 @@ public class QuizMenuActivity extends QuizActivity {
 			long Ev_time = 0;
 			int Ev_dr = 0;
 			String Ev_tt = "";
-			String Ev_dt = "";
+			long Ev_hsh_key = 0;
 
 			try {
-				// datasource.open();
+				datasource.open();
 				datasource.deleteAllChannels();
 				datasource.deleteAllEvents();
+				datasource.deleteAllHash();
 				int type;
 				int toChannel = 20;
 				Boolean endOfSession = false;
@@ -314,7 +318,7 @@ public class QuizMenuActivity extends QuizActivity {
 									Ev_time = Long.parseLong(eventObj[0]);
 									Ev_dr = Integer.parseInt(eventObj[1]);
 									Ev_tt = "";
-									Ev_dt = "";
+									Ev_hsh_key = 0;
 								} else if (dataObj[0].contentEquals("215-T")
 										& Ev_time > 0 & Ev_dr > 0) {
 									// Title info
@@ -328,30 +332,35 @@ public class QuizMenuActivity extends QuizActivity {
 								} else if (dataObj[0].contentEquals("215-D")
 										& !Ev_tt.isEmpty() ) {
 									// Title info
-									if (dataObj.length < 3) {
-										Ev_dt = dataObj[1];
-
-									} else {
-										Ev_dt = dataObj[1] + " " + dataObj[2]; // cat
-																				// together
-									}
 								} else if (dataObj[0].contentEquals("215-e")
 										& !Ev_tt.isEmpty() ) {
 									// write event data
-									cur_event_Id = datasource.insertEvent( 
-											 Ev_ch_key,
-											 Ev_nr,
-											 Ev_time, 
-											 Ev_dr,
-											 Ev_tt,
-											 Ev_dt );
-									//Log.d(DEBUG_TAG, Long.toString(cur_event_Id) + " " + data );
 									
 									checkSum.reset();
 									checkSum.update(Ev_tt.getBytes());
 									Log.d(DEBUG_TAG, String.valueOf(checkSum.getValue()) );
-									datasource.insertHash(0, checkSum.getValue());
-									
+						
+									Cursor c = datasource.getOneHash( checkSum.getValue() );
+									if ( c != null ) {
+										if ( c.getCount() < 1) {
+											// hash not found
+											Log.d(DEBUG_TAG, "NEW HASH " + String.valueOf(checkSum.getValue()) );
+											Ev_hsh_key = datasource.insertHash(0, checkSum.getValue());
+										} else {
+											if (c.moveToFirst() ) {
+												Ev_hsh_key = c.getLong(c.getColumnIndex(DatabaseOpenHelper.TBL_ID));
+											}												
+										}																				
+										cur_event_Id = datasource.insertEvent( 
+												 Ev_ch_key,
+												 Ev_nr,
+												 Ev_time, 
+												 Ev_dr,
+												 Ev_tt,
+												 Ev_hsh_key );
+										Log.d(DEBUG_TAG, Long.toString(cur_event_Id) + " " + data );
+
+									}
 								}
 								if (dataObj[0].contentEquals("215")) {
 									// Last event data record quit connection
@@ -391,10 +400,12 @@ public class QuizMenuActivity extends QuizActivity {
 							//Log.d(DEBUG_TAG, data.toString());
 						} catch (Exception NumberFormatException) {
 							// TODO: handle exception
-							Log.d(DEBUG_TAG, data.toString());
+							Log.d(DEBUG_TAG, data.toString() + NumberFormatException.getMessage() );
 							endOfSession = true;
 							// break out of while loop and go no next channel
 							break;
+						//} catch (Exception SQLiteException) {
+							
 						}
 					} while (!endOfSession);
 				}

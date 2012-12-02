@@ -31,22 +31,27 @@ public class DatabaseConnector {
 		newChannel.put(DatabaseOpenHelper.CHANNELS_NAME, name);
 		newChannel.put(DatabaseOpenHelper.CHANNELS_SERVICE, service);
 
-		open();
+		//open();
 		long rowId = database.insertOrThrow(DatabaseOpenHelper.TBL_CHANNELS,
 				null, newChannel);
-		close();
+		//close();
 		return rowId;
 	}
 
 	public void deleteAllChannels() {
-		open();
+		//open();
 		database.execSQL("DELETE FROM " + DatabaseOpenHelper.TBL_CHANNELS);
-		close();
+		//close();
 	}
 	public void deleteAllEvents() {
-		open();
+		//open();
 		database.execSQL("DELETE FROM " + DatabaseOpenHelper.TBL_EVENT);
-		close();
+		//close();
+	}
+	public void deleteAllHash() {
+		//open();
+		database.execSQL("DELETE FROM " + DatabaseOpenHelper.TBL_HASH);
+		//close();
 	}
 
 	public void updateContact(long id, String name, String cap, String code) {
@@ -77,19 +82,19 @@ public class DatabaseConnector {
 	}
 
 	public long insertEvent(long ev_ch_key, int ev_nr, long ev_time, int ev_dr,
-			String ev_tt, String ev_dt) {
+			String ev_tt, long ev_hsh_key) {
 		ContentValues newEvent = new ContentValues();
 		newEvent.put(DatabaseOpenHelper.EVENT_CHANNELS_KEY , ev_ch_key);
 		newEvent.put(DatabaseOpenHelper.EVENT_NR, ev_nr);
 		newEvent.put(DatabaseOpenHelper.EVENT_TIME, ev_time);
 		newEvent.put(DatabaseOpenHelper.EVENT_DURATION, ev_dr);
 		newEvent.put(DatabaseOpenHelper.EVENT_TITLE, ev_tt);
-		newEvent.put(DatabaseOpenHelper.EVENT_DETAILS, ev_dt);
+		newEvent.put(DatabaseOpenHelper.EVENT_HASH_KEY, ev_hsh_key);
 
-		open();
+		//open();
 		long rowId = database.insertOrThrow(DatabaseOpenHelper.TBL_EVENT,
 				null, newEvent);
-		close();
+		//close();
 		return rowId;
 	}
 
@@ -98,10 +103,10 @@ public class DatabaseConnector {
 		newHash.put(DatabaseOpenHelper.HASH_DATA_KEY , ha_da_key);
 		newHash.put(DatabaseOpenHelper.HASH, ha_ha);
 
-		open();
+		//open();
 		long rowId = database.insertOrThrow(DatabaseOpenHelper.TBL_HASH,
 				null, newHash);
-		close();
+		//close();
 		return rowId;
 	}
 	
@@ -110,10 +115,21 @@ public class DatabaseConnector {
 		newData.put(DatabaseOpenHelper.DATA_NR , da_nr);
 		newData.put(DatabaseOpenHelper.DATA_DETAILS, da_dt);
 
-		open();
+		//open();
 		long rowId = database.insertOrThrow(DatabaseOpenHelper.TBL_DATA,
 				null, newData);
-		close();
+		//close();
 		return rowId;
 	}
+
+	public Cursor getOneHash(long value) {
+		//open();
+
+		Cursor c = database.query(DatabaseOpenHelper.TBL_HASH, null, 
+				DatabaseOpenHelper.HASH + "=" + Long.toString(value), null, null, null,
+				null);
+		//close();
+		return c;
+	}
+
 }
