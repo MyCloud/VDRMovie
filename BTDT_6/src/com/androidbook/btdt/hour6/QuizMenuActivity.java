@@ -5,11 +5,14 @@ import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.URI;
 import java.nio.CharBuffer;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import java.util.zip.CRC32;
 
-import org.apache.xmlrpc.XmlRpcException;
+import org.xmlrpc.android.XMLRPCClient;
+
+
 
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
@@ -246,6 +249,7 @@ public class QuizMenuActivity extends QuizActivity {
 		@Override
 		protected Boolean doInBackground(Object... params) {
 			// TODO Auto-generated method stub
+
 			MovieMeterPluginSession session = null;
 			boolean result = false;
 			long Ev_ch_key = 0;
@@ -255,21 +259,8 @@ public class QuizMenuActivity extends QuizActivity {
 			String Ev_tt = "";
 			long Ev_hsh_key = 0;
 
-	//	       try {
-		            try {
-						session = new MovieMeterPluginSession();
-					} catch (XmlRpcException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-		//        } catch (XmlRpcException error) {
-		            //final Writer eResult = new StringWriter();
-		            //final PrintWriter printWriter = new PrintWriter(eResult);
-		            //error.printStackTrace(printWriter);
-		  //          Log.d("MovieMeterPlugin: " , error.toString() );
-		    //    }
-			
-			
+
+    		session = new MovieMeterPluginSession();
 			try {
 				datasource.open();
 				datasource.deleteAllChannels();
@@ -363,7 +354,8 @@ public class QuizMenuActivity extends QuizActivity {
 										if ( c.getCount() < 1) {
 											// hash not found
 											//HashMap filmInfo = null;
-											session.getMovieDetailsByTitleAndYear(Ev_tt , "");
+											//session.getMovieDetailsByTitleAndYear(Ev_tt , "");
+											session.getMovieByTitle(Ev_tt);
 											Log.d(DEBUG_TAG, "NEW HASH " + String.valueOf(checkSum.getValue()) );
 											Ev_hsh_key = datasource.insertHash(0, checkSum.getValue());
 											

@@ -1,6 +1,5 @@
 package com.androidbook.btdt.hour6;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.os.Bundle;
@@ -17,10 +16,10 @@ public class QuizActivity extends Activity {
 		Date now = new Date();
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_quiz_splash);
-		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		SharedPreferences settings = getSharedPreferences( getString(R.string.pref_file) , 0);
 	    // read last date if null than use current date
 		String last = settings.getString("lastDate", now.toString());
-	    Log.i(PREFS_NAME, last );
+	    //Log.i(PREFS_NAME, last );
 	}
 
 	@Override
@@ -41,7 +40,7 @@ public class QuizActivity extends Activity {
 		// TODO Auto-generated method stub
 		Date now = new Date();
 		// save all settings
-		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		SharedPreferences settings = getSharedPreferences(getString(R.string.pref_file), 0);
 		SharedPreferences.Editor prefEditor = settings.edit();
 		prefEditor.putString("LastDate", now.toString());
 		prefEditor.commit();

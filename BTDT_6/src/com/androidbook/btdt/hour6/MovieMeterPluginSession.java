@@ -1,5 +1,7 @@
 package com.androidbook.btdt.hour6;
 
+
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -10,20 +12,22 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 
-import org.apache.xmlrpc.XmlRpcException;
-import org.apache.xmlrpc.client.XmlRpcClient;
-import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
+import org.xmlrpc.android.XMLRPCClient;
+import org.xmlrpc.android.XMLRPCException;
 
+import android.content.SharedPreferences;
 import android.util.Log;
-
 
 
 public class MovieMeterPluginSession {
 
-    public static String SESSION_FILENAME = "./temp/moviemeter.session";
+    public static String SESSION_FILENAME = "moviemeter.session";
+	private XMLRPCClient client;
+	private URI uri;
     
     private static String MOVIEMETER_API_KEY = "zqe4bx1rmhxy5gq1z1cwgfn0k2v5y0tm";
 //    private static String MOVIEMETER_API_KEY = PropertiesUtil.getProperty("API_KEY_MovieMeter");
@@ -32,31 +36,24 @@ public class MovieMeterPluginSession {
     private String key;
     private Integer timestamp;
     private Integer counter;
-    private XmlRpcClientConfigImpl config;
-    private XmlRpcClient client;
+    //private XmlRpcClientConfigImpl config;
+    
 
     /**
     * Creates the XmlRpcClient
     */
     private void init() {
-        try {
-            config = new XmlRpcClientConfigImpl();
-            config.setServerURL(new URL("http://www.moviemeter.nl/ws"));
-            client = new XmlRpcClient();
-            client.setConfig(config);
-        } catch (MalformedURLException error) {
-            final Writer eResult = new StringWriter();
-            final PrintWriter printWriter = new PrintWriter(eResult);
-            error.printStackTrace(printWriter);
-            Log.d("MovieMeterPluginSession: " , eResult.toString());
-        }
+
+		
+    	uri = URI.create("http://www.moviemeter.nl/ws");
+		client = new XMLRPCClient(uri);
     }
 
     /**
      * Creates a new session to www.moviemeter.nl or if a session exists on disk, it is checked and resumed if valid. 
      * @throws XmlRpcException
      */
-    public MovieMeterPluginSession() throws XmlRpcException {
+    public MovieMeterPluginSession() {
         init();
 
         Log.d("MovieMeterPluginSession:", "Getting stored session");
@@ -90,13 +87,13 @@ public class MovieMeterPluginSession {
      * @throws XmlRpcException
      */
     @SuppressWarnings("rawtypes")
-    private void createNewSession(String API_KEY) throws XmlRpcException {
+    private void createNewSession(String API_KEY) {
         HashMap session = null;
         Object[] params = new Object[]{API_KEY};
         
         try {
-            session = (HashMap) client.execute("api.startSession", params);
-        } catch (Exception error) {
+            session = (HashMap) client.call("api.startSession", params);
+        } catch (XMLRPCException error) {
             Log.d("MovieMeterPluginSession:"," Unable to contact website");
         }
         
@@ -110,8 +107,6 @@ public class MovieMeterPluginSession {
                 // see http://wiki.moviemeter.nl/index.php/API for more info
                 saveSessionToFile();
             }
-        } else {
-            throw new XmlRpcException("api.startSession returned null");
         }
     }
 
@@ -130,7 +125,7 @@ public class MovieMeterPluginSession {
             if (!isValid()) {
                 createNewSession(MOVIEMETER_API_KEY);
             }
-            films = (Object[]) client.execute("film.search", params);
+          films = (Object[]) client.call("film.search", params);
             increaseCounter();
             if (films != null && films.length>0) {
                 Log.d("MovieMeterPluginSession:", " MovieMeterPlugin: Search for " + movieName + " returned " + films.length + " results");
@@ -140,7 +135,7 @@ public class MovieMeterPluginSession {
                 // Choose first result
                 result = (HashMap) films[0];
             }
-        } catch (XmlRpcException error) {
+        } catch (XMLRPCException error) {
             final Writer eResult = new StringWriter();
             final PrintWriter printWriter = new PrintWriter(eResult);
             error.printStackTrace(printWriter);
@@ -166,7 +161,7 @@ public class MovieMeterPluginSession {
             if (!isValid()) {
                 createNewSession(MOVIEMETER_API_KEY);
             }
-            films = (Object[]) client.execute("film.search", params);
+            films = (Object[]) client.call("film.search", params);
             increaseCounter();
             if (films != null && films.length>0) {
                 Log.d("MovieMeterPluginSession:"," Searching for " + movieName + " returned " + films.length + " results");
@@ -184,7 +179,7 @@ public class MovieMeterPluginSession {
                 // Choose first result
                 result = (HashMap) films[0];
             }
-        } catch (XmlRpcException error) {
+        } catch (XMLRPCException error) {
             final Writer eResult = new StringWriter();
             final PrintWriter printWriter = new PrintWriter(eResult);
             error.printStackTrace(printWriter);
@@ -228,9 +223,9 @@ public class MovieMeterPluginSession {
             if (!isValid()) {
                 createNewSession(MOVIEMETER_API_KEY);
             }
-            result = (HashMap) client.execute("film.retrieveDetails", params);
+            result = (HashMap) client.call("film.retrieveDetails", params);
             increaseCounter();
-        } catch (XmlRpcException error) {
+        } catch (XMLRPCException error) {
             final Writer eResult = new StringWriter();
             final PrintWriter printWriter = new PrintWriter(eResult);
             error.printStackTrace(printWriter);
@@ -259,26 +254,22 @@ public class MovieMeterPluginSession {
         }
 
         try {
-            XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
-            config.setServerURL(new URL("http://www.moviemeter.nl/ws"));
-            XmlRpcClient client = new XmlRpcClient();
-            client.setConfig(config);
-
-            Object[] params = new Object[]{getKey(), new String("")};
-            client.execute("film.search", params);
+        	init();
+            //XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
+            //config.setServerURL(new URL("http://www.moviemeter.nl/ws"));
+            //XmlRpcClient client = new XmlRpcClient();
+            //client.setConfig(config);
+            Object[] params = new Object[]{MOVIEMETER_API_KEY};
+            
+       
+            HashMap session = (HashMap) client.call("api.startSession", params);
             increaseCounter();
 
             return true;
-        } catch (XmlRpcException error) {
+        } catch (XMLRPCException error) {
             Log.d("MovieMeterPluginSession: " , error.getMessage());
             return false;
-        } catch (MalformedURLException error) {
-            final Writer eResult = new StringWriter();
-            final PrintWriter printWriter = new PrintWriter(eResult);
-            error.printStackTrace(printWriter);
-            Log.d("MovieMeterPluginSession: " , eResult.toString());
-        }
-        return false;
+        } 
     }
 
     private void increaseCounter() {

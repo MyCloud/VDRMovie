@@ -101,9 +101,10 @@ public final class R {
         public static final int app_version_info=0x7f08000a;
         public static final int game=0x7f080005;
         public static final int help=0x7f080001;
-        public static final int help_settings=0x7f08000b;
+        public static final int help_settings=0x7f08000c;
         public static final int menu=0x7f080002;
         public static final int menu_settings=0x7f080007;
+        public static final int pref_file=0x7f08000b;
         public static final int scores=0x7f080006;
         public static final int settings=0x7f080004;
         public static final int splash=0x7f080003;
