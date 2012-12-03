@@ -3,6 +3,7 @@ package com.androidbook.btdt.hour6;
 
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -11,15 +12,18 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.xmlrpc.android.XMLRPCClient;
 import org.xmlrpc.android.XMLRPCException;
 
-import android.content.SharedPreferences;
+import android.R.string;
+import android.os.Environment;
 import android.util.Log;
 
 
@@ -29,7 +33,7 @@ public class MovieMeterPluginSession {
 	private XMLRPCClient client;
 	private URI uri;
     
-    private static String MOVIEMETER_API_KEY = "zqe4bx1rmhxy5gq1z1cwgfn0k2v5y0tm";
+    public String MOVIEMETER_API_KEY = "zqe4bx1rmhxy5gq1z1cwgfn0k2v5y0tm";
 //    private static String MOVIEMETER_API_KEY = PropertiesUtil.getProperty("API_KEY_MovieMeter");
     
     //protected static Logger logger = Logger.getLogger("moviejukebox");
@@ -61,7 +65,8 @@ public class MovieMeterPluginSession {
         FileReader fread;        
         try
         {
-            fread = new FileReader (SESSION_FILENAME);
+        	fread = new FileReader(Environment.getExternalStorageDirectory() + "/" + SESSION_FILENAME);
+
             String line = new BufferedReader(fread).readLine();
 
             String[] savedSession = line.split(",");
@@ -89,8 +94,11 @@ public class MovieMeterPluginSession {
     @SuppressWarnings("rawtypes")
     private void createNewSession(String API_KEY) {
         HashMap session = null;
-        Object[] params = new Object[]{API_KEY};
-        
+
+        //String ssn = "unknown";
+        Object params = API_KEY ;
+
+        //testObjec(params);        
         try {
             session = (HashMap) client.call("api.startSession", params);
         } catch (XMLRPCException error) {
@@ -109,7 +117,42 @@ public class MovieMeterPluginSession {
             }
         }
     }
-
+    /*
+    private void testObjec( Object object)
+    {
+	if (object instanceof Integer || object instanceof Short || object instanceof Byte) {
+        Log.d("MovieMeterPluginSession:"," Integer");
+	} else
+	if (object instanceof Long) {
+        Log.d("MovieMeterPluginSession:"," Integer");
+	} else
+	if (object instanceof Double || object instanceof Float) {
+        Log.d("MovieMeterPluginSession:"," Integer");
+	} else
+	if (object instanceof Boolean) {
+        Log.d("MovieMeterPluginSession:"," Integer");
+	} else
+	if (object instanceof String) {
+        Log.d("MovieMeterPluginSession:"," Integer");
+	} else
+	if (object instanceof Date || object instanceof Calendar) {
+        Log.d("MovieMeterPluginSession:"," Integer");
+	} else
+	if (object instanceof byte[] ){
+        Log.d("MovieMeterPluginSession:"," Integer");
+	} else
+	if (object instanceof List) {
+        Log.d("MovieMeterPluginSession:"," Integer");
+	} else
+	if (object instanceof Object[]) {
+        Log.d("MovieMeterPluginSession:"," Integer");
+	} else
+	if (object instanceof Map) {
+        Log.d("MovieMeterPluginSession:"," Integer");
+	} 
+}*/
+    
+    
     /**
      * Searches www.moviemeter.nl for the movieName 
      * @param movieName
@@ -120,12 +163,14 @@ public class MovieMeterPluginSession {
 
         HashMap result = null;
         Object[] films = null;
-        Object[] params = new Object[]{getKey(), movieName};
+        //Object[] params = new Object[]{getKey(), movieName};
+        Object params1 = getKey();
+        Object params2 = movieName;
         try {
             if (!isValid()) {
                 createNewSession(MOVIEMETER_API_KEY);
             }
-          films = (Object[]) client.call("film.search", params);
+          films = (Object[]) client.call("film.search", params1, params2);
             increaseCounter();
             if (films != null && films.length>0) {
                 Log.d("MovieMeterPluginSession:", " MovieMeterPlugin: Search for " + movieName + " returned " + films.length + " results");
@@ -255,14 +300,15 @@ public class MovieMeterPluginSession {
 
         try {
         	init();
-            //XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
+        	//XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
             //config.setServerURL(new URL("http://www.moviemeter.nl/ws"));
             //XmlRpcClient client = new XmlRpcClient();
             //client.setConfig(config);
-            Object[] params = new Object[]{MOVIEMETER_API_KEY};
-            
-       
-            HashMap session = (HashMap) client.call("api.startSession", params);
+            Object params1 = getKey();
+            Object params2 = "";
+
+            //Object[] params = new Object[]{getKey(), new String("")};
+            client.call("film.search", params1, params2);
             increaseCounter();
 
             return true;
@@ -283,7 +329,8 @@ public class MovieMeterPluginSession {
     private void saveSessionToFile() {
         FileOutputStream fout;
         try {
-            fout = new FileOutputStream(SESSION_FILENAME);
+        	//fout = new File(Environment.getExternalStorageDirectory(), SESSION_FILENAME);
+            fout = new FileOutputStream(Environment.getExternalStorageDirectory() + "/" + SESSION_FILENAME);
             new PrintStream(fout).println (getKey() + "," + getTimestamp() + "," + getCounter());
             fout.close();
         } catch (FileNotFoundException ignore) {

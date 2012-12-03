@@ -257,6 +257,7 @@ public class QuizMenuActivity extends QuizActivity {
 			long Ev_time = 0;
 			int Ev_dr = 0;
 			String Ev_tt = "";
+			String Ev_dt = "";
 			long Ev_hsh_key = 0;
 
 
@@ -340,7 +341,16 @@ public class QuizMenuActivity extends QuizActivity {
 									}
 								} else if (dataObj[0].contentEquals("215-D")
 										& !Ev_tt.isEmpty() ) {
+
 									// Title info
+									if (dataObj.length < 3) {
+										Ev_dt = dataObj[1];
+
+									} else {
+										Ev_dt = dataObj[1] + " " + dataObj[2]; // cat
+																				// together
+									}
+
 								} else if (dataObj[0].contentEquals("215-e")
 										& !Ev_tt.isEmpty() ) {
 									// write event data
@@ -355,7 +365,8 @@ public class QuizMenuActivity extends QuizActivity {
 											// hash not found
 											//HashMap filmInfo = null;
 											//session.getMovieDetailsByTitleAndYear(Ev_tt , "");
-											session.getMovieByTitle(Ev_tt);
+//											session.getMovieByTitle(Ev_tt);
+											session.getMovieByTitle("Fame");
 											Log.d(DEBUG_TAG, "NEW HASH " + String.valueOf(checkSum.getValue()) );
 											Ev_hsh_key = datasource.insertHash(0, checkSum.getValue());
 											
@@ -365,7 +376,10 @@ public class QuizMenuActivity extends QuizActivity {
 											if (c.moveToFirst() ) {
 												Ev_hsh_key = c.getLong(c.getColumnIndex(DatabaseOpenHelper.TBL_ID));
 											}												
-										}																				
+										}	
+							    		//EVENT_REGIE + " text, " 
+							    		//EVENT_GENRE + " text, " 
+										
 										cur_event_Id = datasource.insertEvent( 
 												 Ev_ch_key,
 												 Ev_nr,

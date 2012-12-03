@@ -20,6 +20,8 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	public static final String EVENT_TIME = "time";
 	public static final String EVENT_DURATION = "dr";
 	public static final String EVENT_TITLE = "tt";
+	public static final String EVENT_REGIE = "rt";
+	public static final String EVENT_GENRE = "gt";
 	public static final String EVENT_HASH_KEY = "hsh_key";
 
 	public static final String TBL_HASH = "HashTbl";
@@ -47,6 +49,8 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
     		+ EVENT_TIME + " integer not null, "
     		+ EVENT_DURATION + " integer not null, "
     		+ EVENT_TITLE + " text, "
+    		+ EVENT_REGIE + " text, " 
+    		+ EVENT_GENRE + " text, " 
     		+ EVENT_HASH_KEY + " integer not null, "
     		+ "FOREIGN KEY(" + EVENT_CHANNELS_KEY + ") REFERENCES " + TBL_CHANNELS + "(" + TBL_ID + "), "
     		+ "FOREIGN KEY(" + EVENT_HASH_KEY + ") REFERENCES " + TBL_HASH + "(" + TBL_ID + ")"
