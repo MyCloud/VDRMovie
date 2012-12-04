@@ -134,4 +134,12 @@ public class DatabaseConnector {
 		return c;
 	}
 
+	public Cursor getOneChannel(int channel) {
+		// TODO Auto-generated method stub
+		Cursor c = database.query(DatabaseOpenHelper.TBL_CHANNELS, null, 
+				DatabaseOpenHelper.CHANNELS_NUM + "=" + Integer.toString(channel), null, null, null,
+				null);
+		return c;
+	}
+
 }

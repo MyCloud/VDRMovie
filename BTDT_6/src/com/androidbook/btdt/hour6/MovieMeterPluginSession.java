@@ -3,7 +3,7 @@ package com.androidbook.btdt.hour6;
 
 
 import java.io.BufferedReader;
-import java.io.File;
+
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -13,16 +13,14 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URI;
-import java.util.Calendar;
-import java.util.Date;
+
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
 
 import org.xmlrpc.android.XMLRPCClient;
 import org.xmlrpc.android.XMLRPCException;
 
-import android.R.string;
+
 import android.os.Environment;
 import android.util.Log;
 
@@ -227,7 +225,8 @@ public class MovieMeterPluginSession {
 				// Choose first result
 				result = (HashMap) films[index_best];
 				Log.d("MovieMeterPluginSession:", "Title: " + result.get("title").toString() +
-						"Sim: " + result.get("similarity").toString());
+						" Sim: " + result.get("similarity").toString() + " Request:" + params2.toString() + " TI:" + Integer.toString(films.length) + 
+						" CUR:" + Integer.toString(index_best) + " W:"  + Integer.toString(weight_best) );
 
 			}
 		} catch (XMLRPCException error) {

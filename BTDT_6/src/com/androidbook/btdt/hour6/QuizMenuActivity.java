@@ -271,7 +271,7 @@ public class QuizMenuActivity extends QuizActivity {
 				datasource.deleteAllEvents();
 				datasource.deleteAllHash();
 				int type;
-				int toChannel = 20;
+				int toChannel = 3900;
 				Boolean endOfSession = false;
 				String data = new String();
 				CRC32 checkSum = new CRC32();
@@ -293,6 +293,8 @@ public class QuizMenuActivity extends QuizActivity {
 					long cur_event_Id = -1;
 					publishProgress(Integer.toString((int) ((channel / (float) toChannel) * 100)));
 					sendSting = "LSTE " + channel ; //+ " NOW"; // currently
+
+//					sendSting = "LSTR " + channel ; //+ " NOW"; // currently
 															// only
 															// the
 															// now
@@ -315,15 +317,14 @@ public class QuizMenuActivity extends QuizActivity {
 								break;
 							case 215: // EPG data record
 								String dataObj[] = data.split(" ", 3);
+								
 								if (dataObj[0].contentEquals("215-C")) {
-									// Channel record store in database
-									cur_Id = datasource.insertChannel(channel,
-											dataObj[2], dataObj[1]);
-									Log.d(DEBUG_TAG, Long.toString(cur_Id) + " " + data );
+									// new channel record store in database
+									cur_Id = insertChannel(channel, dataObj[2], dataObj[1]);
 									break;
 								} else if (dataObj[0].contentEquals("215-E")
 										& cur_Id >= 0) {
-									// Event info
+									// Event info									
 									Ev_ch_key = cur_Id;
 									Ev_nr = Integer.parseInt(dataObj[1]);
 									String eventObj[] = dataObj[2]
@@ -353,10 +354,7 @@ public class QuizMenuActivity extends QuizActivity {
 									Ev_rft = "";
 									Ev_rlt = "";
 									Ev_gt = dataObj[1]; // genre
-									// remove string Film from this string
-									// if (dataObj[1].contains("film")) {
-										dataObj[1] = dataObj[1].replaceAll("Film|film", "");
-									// }
+									dataObj[1] = dataObj[1].replaceAll("Film|film", "");
 									
 									Ev_gt = Character.toUpperCase(dataObj[1].charAt(0)) + dataObj[1].substring(1);
 									
@@ -390,12 +388,12 @@ public class QuizMenuActivity extends QuizActivity {
 											if (!Ev_rlt.isEmpty()) {
 												filmInfo = session.getMovieByTitleRegieGenre(Ev_tt, Ev_rft, Ev_rlt, Ev_gt);
 												if ( filmInfo != null)
-													Log.d(DEBUG_TAG, "NEW HASH " + String.valueOf(checkSum.getValue()) );
+													Log.d(DEBUG_TAG, "NEW FILM " + String.valueOf(checkSum.getValue()) );
 											}
 												
 //											session.getMovieByTitle(Ev_tt);
 											//////session.getMovieByTitle("Fame");
-											Log.d(DEBUG_TAG, "NEW HASH " + String.valueOf(checkSum.getValue()) );
+											//Log.d(DEBUG_TAG, "NEW HASH " + String.valueOf(checkSum.getValue()) );
 											Ev_hsh_key = datasource.insertHash(0, checkSum.getValue());
 										} else {
 											if (c.moveToFirst() ) {
@@ -452,6 +450,7 @@ public class QuizMenuActivity extends QuizActivity {
 								break;
 							}
 							//Log.d(DEBUG_TAG, data.toString());
+							
 						} catch (Exception NumberFormatException) {
 							// TODO: handle exception
 							Log.d(DEBUG_TAG, data.toString() + NumberFormatException.getMessage() );
@@ -479,6 +478,22 @@ public class QuizMenuActivity extends QuizActivity {
 			datasource.close();
 
 			return result;
+		}
+
+		private long insertChannel(int channel, String name, String service) {
+			// TODO Auto-generated method stub
+			Cursor c = datasource.getOneChannel( channel );
+			if ( c != null ) {
+				if ( c.getCount() < 1) {
+					// channel not found
+					return datasource.insertChannel(channel, name, service);
+				} else {
+					if (c.moveToFirst() ) {
+						return c.getLong(c.getColumnIndex(DatabaseOpenHelper.TBL_ID));
+					}												
+				}
+			}
+			return 0;
 		}
 
 	}
