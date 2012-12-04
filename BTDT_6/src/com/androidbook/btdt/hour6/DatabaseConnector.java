@@ -82,13 +82,15 @@ public class DatabaseConnector {
 	}
 
 	public long insertEvent(long ev_ch_key, int ev_nr, long ev_time, int ev_dr,
-			String ev_tt, long ev_hsh_key) {
+			String ev_tt, String ev_gt,String ev_rt, long ev_hsh_key) {
 		ContentValues newEvent = new ContentValues();
 		newEvent.put(DatabaseOpenHelper.EVENT_CHANNELS_KEY , ev_ch_key);
 		newEvent.put(DatabaseOpenHelper.EVENT_NR, ev_nr);
 		newEvent.put(DatabaseOpenHelper.EVENT_TIME, ev_time);
 		newEvent.put(DatabaseOpenHelper.EVENT_DURATION, ev_dr);
 		newEvent.put(DatabaseOpenHelper.EVENT_TITLE, ev_tt);
+		newEvent.put(DatabaseOpenHelper.EVENT_GENRE, ev_gt);
+		newEvent.put(DatabaseOpenHelper.EVENT_REGIE, ev_rt);
 		newEvent.put(DatabaseOpenHelper.EVENT_HASH_KEY, ev_hsh_key);
 
 		//open();

@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.URI;
 import java.nio.CharBuffer;
+import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import java.util.zip.CRC32;
 
@@ -257,7 +258,9 @@ public class QuizMenuActivity extends QuizActivity {
 			long Ev_time = 0;
 			int Ev_dr = 0;
 			String Ev_tt = "";
-			String Ev_dt = "";
+			String Ev_gt = "";
+			String Ev_rft = "";
+			String Ev_rlt = "";
 			long Ev_hsh_key = 0;
 
 
@@ -283,7 +286,7 @@ public class QuizMenuActivity extends QuizActivity {
 				// delete all channels for now the easy way.
 
 				//datasource.deleteAllChannels();
-				for (int channel = 1; channel < toChannel; channel++) {
+				for (int channel = 4; channel < toChannel; channel++) {
 					// for all channel that need to be collected
 					// for now its the first 30 channels
 					long cur_Id = -1;
@@ -341,16 +344,34 @@ public class QuizMenuActivity extends QuizActivity {
 									}
 								} else if (dataObj[0].contentEquals("215-D")
 										& !Ev_tt.isEmpty() ) {
-
 									// Title info
-									if (dataObj.length < 3) {
-										Ev_dt = dataObj[1];
-
-									} else {
-										Ev_dt = dataObj[1] + " " + dataObj[2]; // cat
-																				// together
+									// genre is mostely the first word
+									// regie is mostely the first 2 words behind Regie:
+									
+									int regie = 0;
+									
+									Ev_rft = "";
+									Ev_rlt = "";
+									Ev_gt = dataObj[1]; // genre
+									// remove string Film from this string
+									// if (dataObj[1].contains("film")) {
+										dataObj[1] = dataObj[1].replaceAll("Film|film", "");
+									// }
+									
+									Ev_gt = Character.toUpperCase(dataObj[1].charAt(0)) + dataObj[1].substring(1);
+									
+									String eventObj[] = dataObj[dataObj.length-1].split("[ \\.]");
+									for ( int i = 0; eventObj.length > i; i++ ) {
+										if ( eventObj[i].equals("Regie:")) {											
+											regie = 2;
+											continue;
+										}
+										if ( regie > 1 ) 
+											Ev_rft = eventObj[i];
+										if ( regie > 0 ) 
+											Ev_rlt = eventObj[i];
+										regie--;										
 									}
-
 								} else if (dataObj[0].contentEquals("215-e")
 										& !Ev_tt.isEmpty() ) {
 									// write event data
@@ -363,22 +384,24 @@ public class QuizMenuActivity extends QuizActivity {
 									if ( c != null ) {
 										if ( c.getCount() < 1) {
 											// hash not found
-											//HashMap filmInfo = null;
+											HashMap filmInfo = null;
 											//session.getMovieDetailsByTitleAndYear(Ev_tt , "");
+
+											if (!Ev_rlt.isEmpty()) {
+												filmInfo = session.getMovieByTitleRegieGenre(Ev_tt, Ev_rft, Ev_rlt, Ev_gt);
+												if ( filmInfo != null)
+													Log.d(DEBUG_TAG, "NEW HASH " + String.valueOf(checkSum.getValue()) );
+											}
+												
 //											session.getMovieByTitle(Ev_tt);
-											session.getMovieByTitle("Fame");
+											//////session.getMovieByTitle("Fame");
 											Log.d(DEBUG_TAG, "NEW HASH " + String.valueOf(checkSum.getValue()) );
 											Ev_hsh_key = datasource.insertHash(0, checkSum.getValue());
-											
-											
-											
 										} else {
 											if (c.moveToFirst() ) {
 												Ev_hsh_key = c.getLong(c.getColumnIndex(DatabaseOpenHelper.TBL_ID));
 											}												
 										}	
-							    		//EVENT_REGIE + " text, " 
-							    		//EVENT_GENRE + " text, " 
 										
 										cur_event_Id = datasource.insertEvent( 
 												 Ev_ch_key,
@@ -386,6 +409,8 @@ public class QuizMenuActivity extends QuizActivity {
 												 Ev_time, 
 												 Ev_dr,
 												 Ev_tt,
+												 Ev_gt,
+												 Ev_rft + " " + Ev_rlt,
 												 Ev_hsh_key );
 										Log.d(DEBUG_TAG, Long.toString(cur_event_Id) + " " + data );
 

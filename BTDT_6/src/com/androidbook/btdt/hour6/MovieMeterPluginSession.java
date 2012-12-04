@@ -189,6 +189,56 @@ public class MovieMeterPluginSession {
 
         return result;
     }
+    
+    @SuppressWarnings("rawtypes")
+	public HashMap getMovieByTitleRegieGenre(String movieName, String regie_f,
+			String regie_l, String genre) {
+
+		HashMap result = null;
+		Object[] films = null;
+		Object params1 = getKey();
+		Object params2 = movieName;
+		int weight_best = 0;
+		int index_best = 0;
+		try {
+			if (!isValid()) {
+				createNewSession(MOVIEMETER_API_KEY);
+			}
+			films = (Object[]) client.call("film.search", params1, params2);
+			increaseCounter();
+			if (films != null && films.length > 0) {
+				Log.d("MovieMeterPluginSession:", " Searching for " + movieName
+						+ " returned " + films.length + " results");
+				for (int i = (films.length - 1); i >= 0; i--) {
+					int weight = 0;
+					HashMap film = (HashMap) films[i];
+					if ( !regie_l.isEmpty() & film.get("directors_text").toString().contains(regie_l))
+						weight += 4;
+					if ( !regie_f.isEmpty() & film.get("directors_text").toString().contains(regie_f))
+						weight += 2;
+					if ( !genre.isEmpty() & film.get("genres_text").toString().contains(genre))
+						weight += 1;
+					if (weight >= weight_best) {
+						weight_best = weight;
+						index_best = i;
+					}
+				}
+
+				// Choose first result
+				result = (HashMap) films[index_best];
+				Log.d("MovieMeterPluginSession:", "Title: " + result.get("title").toString() +
+						"Sim: " + result.get("similarity").toString());
+
+			}
+		} catch (XMLRPCException error) {
+			final Writer eResult = new StringWriter();
+			final PrintWriter printWriter = new PrintWriter(eResult);
+			error.printStackTrace(printWriter);
+			Log.d("MovieMeterPluginSession: ", eResult.toString());
+		}
+
+		return result;
+	}
 
     /**
      * Searches www.moviemeter.nl for the movieName and matches the year. If there is no match on year, the first result is returned
