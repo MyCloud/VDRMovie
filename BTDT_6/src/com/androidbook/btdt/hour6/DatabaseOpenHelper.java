@@ -34,7 +34,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	public static final String DATA_DETAILS = "Dt";
 	
 	private static final String DATABASE_NAME = "events.db";
-	private static final int DATABASE_VERSION = 18;
+	private static final int DATABASE_VERSION = 19;
 
 	private static final String createTblChannels = "CREATE TABLE "+ TBL_CHANNELS + "( " 
     		+ TBL_ID + " integer primary key autoincrement, " 
@@ -43,7 +43,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
     		+ CHANNELS_SERVICE + " text unique not null);";                 
 
 	private static final String createTblEvents = "CREATE TABLE "+ TBL_EVENT + "( " 
-    		+ TBL_ID + " integer primary key autoincrement, " 
+//    		+ TBL_ID + " integer primary key autoincrement, " 
     		+ EVENT_CHANNELS_KEY + " integer not null, "
     		+ EVENT_NR + " integer not null, "
     		+ EVENT_TIME + " integer not null, "
@@ -53,7 +53,8 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
     		+ EVENT_GENRE + " text, " 
     		+ EVENT_HASH_KEY + " integer not null, "
     		+ "FOREIGN KEY(" + EVENT_CHANNELS_KEY + ") REFERENCES " + TBL_CHANNELS + "(" + TBL_ID + "), "
-    		+ "FOREIGN KEY(" + EVENT_HASH_KEY + ") REFERENCES " + TBL_HASH + "(" + TBL_ID + ")"
+    		+ "FOREIGN KEY(" + EVENT_HASH_KEY + ") REFERENCES " + TBL_HASH + "(" + TBL_ID + "), "
+    		+ "primary key ( " + EVENT_CHANNELS_KEY + ", " + EVENT_NR + " ) "
     		+ ");";                 
 
 	private static final String createTblHash = "CREATE TABLE "+ TBL_HASH + "( " 

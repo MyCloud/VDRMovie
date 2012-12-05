@@ -269,10 +269,10 @@ public class QuizMenuActivity extends QuizActivity {
 			try {
 				datasource.open();
 				//datasource.deleteAllChannels();
-				datasource.deleteAllEvents();
-				datasource.deleteAllHash();
+				//datasource.deleteAllEvents();
+				//datasource.deleteAllHash();
 				int type;
-				int toChannel = 4;
+				int toChannel = 40;
 				Boolean endOfSession = false;
 				String data = new String();
 				CRC32 checkSum = new CRC32();
@@ -303,7 +303,7 @@ public class QuizMenuActivity extends QuizActivity {
 
 					
 					publishProgress(Integer.toString((int) ((channel / (float) toChannel) * 100)));
-					sendSting = "LSTE " + channel + " NOW"; // currently
+					sendSting = "LSTE " + channel ; //+ " NOW"; // currently
 
 //					sendSting = "LSTR " + channel ; //+ " NOW"; // currently
 															// only
@@ -393,43 +393,46 @@ public class QuizMenuActivity extends QuizActivity {
 								} else if (dataObj[0].contentEquals("215-e")
 										& !Ev_tt.isEmpty() ) {
 									// write event data
-									
-									checkSum.reset();
-									checkSum.update(Ev_tt.getBytes());
-						
-									Cursor c = datasource.getOneHash( checkSum.getValue() );
-									if ( c != null ) {
-										if ( c.getCount() < 1) {
-											// hash not found
-											HashMap filmInfo = null;
-											//session.getMovieDetailsByTitleAndYear(Ev_tt , "");
-
-											if (!Ev_rlt.isEmpty()) {
-												filmInfo = session.getMovieByTitleRegieGenre(Ev_tt, Ev_rft, Ev_rlt, Ev_gt);
-												if ( filmInfo != null)
-													Log.d(DEBUG_TAG, "NEW FILM " + String.valueOf(checkSum.getValue()) );
-											}
-												
-//											session.getMovieByTitle(Ev_tt);
-											//////session.getMovieByTitle("Fame");
-											//Log.d(DEBUG_TAG, "NEW HASH " + String.valueOf(checkSum.getValue()) );
-											Ev_hsh_key = datasource.insertHash(0, checkSum.getValue());
-										} else {
-											if (c.moveToFirst() ) {
-												Ev_hsh_key = c.getLong(c.getColumnIndex(DatabaseOpenHelper.TBL_ID));
-											}												
-										}	
-										
-										cur_event_Id = datasource.insertEvent( 
-												 Ev_ch_key,
-												 Ev_nr,
-												 Ev_time, 
-												 Ev_dr,
-												 Ev_tt,
-												 Ev_gt,
-												 Ev_rft + " " + Ev_rlt,
-												 Ev_hsh_key );
-
+									Ev_hsh_key = datasource.findHashKeyEvent( Ev_ch_key, Ev_nr );
+									if (Ev_hsh_key <=0 ) { 
+											
+										checkSum.reset();
+										checkSum.update(Ev_tt.getBytes());
+							
+										Cursor c = datasource.getOneHash( checkSum.getValue() );
+										if ( c != null ) {
+											if ( c.getCount() < 1) {
+												// hash not found
+												HashMap filmInfo = null;
+												//session.getMovieDetailsByTitleAndYear(Ev_tt , "");
+	
+												if (!Ev_rlt.isEmpty()) {
+													filmInfo = session.getMovieByTitleRegieGenre(Ev_tt, Ev_rft, Ev_rlt, Ev_gt);
+													if ( filmInfo != null)
+														Log.d(DEBUG_TAG, "NEW FILM " + String.valueOf(checkSum.getValue()) );
+												}
+													
+	//											session.getMovieByTitle(Ev_tt);
+												//////session.getMovieByTitle("Fame");
+												//Log.d(DEBUG_TAG, "NEW HASH " + String.valueOf(checkSum.getValue()) );
+												Ev_hsh_key = datasource.insertHash(0, checkSum.getValue());
+											} else {
+												if (c.moveToFirst() ) {
+													Ev_hsh_key = c.getLong(c.getColumnIndex(DatabaseOpenHelper.TBL_ID));
+												}												
+											}	
+											
+											datasource.insertEventNoCheck( 
+													 Ev_ch_key,
+													 Ev_nr,
+													 Ev_time, 
+													 Ev_dr,
+													 Ev_tt,
+													 Ev_gt,
+													 Ev_rft + " " + Ev_rlt,
+													 Ev_hsh_key );
+	
+										}
 									}
 								}
 								if (dataObj[0].contentEquals("215")) {

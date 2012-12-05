@@ -117,6 +117,36 @@ public class DatabaseConnector {
 
 	public long insertEvent(long ev_ch_key, int ev_nr, long ev_time, int ev_dr,
 			String ev_tt, String ev_gt,String ev_rt, long ev_hsh_key) {
+
+		// first check if same event is in database
+		Cursor c = getOneEventChKeyEvNr( ev_ch_key, ev_nr );
+		if ( c != null ) {
+			if ( c.getCount() < 1) {
+				// new event
+				ContentValues newEvent = new ContentValues();
+				newEvent.put(DatabaseOpenHelper.EVENT_CHANNELS_KEY , ev_ch_key);
+				newEvent.put(DatabaseOpenHelper.EVENT_NR, ev_nr);
+				newEvent.put(DatabaseOpenHelper.EVENT_TIME, ev_time);
+				newEvent.put(DatabaseOpenHelper.EVENT_DURATION, ev_dr);
+				newEvent.put(DatabaseOpenHelper.EVENT_TITLE, ev_tt);
+				newEvent.put(DatabaseOpenHelper.EVENT_GENRE, ev_gt);
+				newEvent.put(DatabaseOpenHelper.EVENT_REGIE, ev_rt);
+				newEvent.put(DatabaseOpenHelper.EVENT_HASH_KEY, ev_hsh_key);
+				return database.insertOrThrow(DatabaseOpenHelper.TBL_EVENT,
+						null, newEvent);
+			} else {
+				if (c.moveToFirst() ) {
+					// return current HASH					
+					return c.getLong(c.getColumnIndex(DatabaseOpenHelper.EVENT_HASH_KEY));				
+				}
+			}
+		}
+		return -1;
+	}
+
+	public long insertEventNoCheck(long ev_ch_key, int ev_nr, long ev_time, int ev_dr,
+			String ev_tt, String ev_gt,String ev_rt, long ev_hsh_key) {
+		// new event
 		ContentValues newEvent = new ContentValues();
 		newEvent.put(DatabaseOpenHelper.EVENT_CHANNELS_KEY , ev_ch_key);
 		newEvent.put(DatabaseOpenHelper.EVENT_NR, ev_nr);
@@ -126,12 +156,16 @@ public class DatabaseConnector {
 		newEvent.put(DatabaseOpenHelper.EVENT_GENRE, ev_gt);
 		newEvent.put(DatabaseOpenHelper.EVENT_REGIE, ev_rt);
 		newEvent.put(DatabaseOpenHelper.EVENT_HASH_KEY, ev_hsh_key);
-
-		//open();
-		long rowId = database.insertOrThrow(DatabaseOpenHelper.TBL_EVENT,
+		return database.insertOrThrow(DatabaseOpenHelper.TBL_EVENT,
 				null, newEvent);
-		//close();
-		return rowId;
+	}
+
+	private Cursor getOneEventChKeyEvNr(long ev_ch_key, int ev_nr) {
+		Cursor c = database.query(DatabaseOpenHelper.TBL_EVENT, null, 
+				DatabaseOpenHelper.EVENT_CHANNELS_KEY + "=" + Long.toString(ev_ch_key) + " AND " +
+				DatabaseOpenHelper.EVENT_NR + "=" + Integer.toString(ev_nr), null, null, null,
+				null);
+		return c;
 	}
 
 	public long insertHash( long ha_da_key, long ha_ha) {
@@ -179,7 +213,7 @@ public class DatabaseConnector {
 	public Cursor getOneChannelService( String service) {
 		// TODO Auto-generated method stub
 		Cursor c = database.query(DatabaseOpenHelper.TBL_CHANNELS, null, 
-				DatabaseOpenHelper.CHANNELS_SERVICE + "=" + service.toString(), null, null, null,
+				DatabaseOpenHelper.CHANNELS_SERVICE + "='" + service.toString() + "'", null, null, null,
 				null);
 		return c;
 	}
@@ -189,4 +223,16 @@ public class DatabaseConnector {
 		
 	}
 
+	public long findHashKeyEvent(long ev_ch_key, int ev_nr) {
+		Cursor c = getOneEventChKeyEvNr( ev_ch_key, ev_nr );
+		if ( c != null ) {
+			if ( c.getCount() == 1) {
+				if (c.moveToFirst() ) {
+					// return current HASH					
+					return c.getLong(c.getColumnIndex(DatabaseOpenHelper.EVENT_HASH_KEY));				
+				}
+			}
+		}
+		return -1;
+	}
 }
