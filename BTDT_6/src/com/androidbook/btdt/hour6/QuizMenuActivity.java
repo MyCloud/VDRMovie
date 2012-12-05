@@ -261,38 +261,49 @@ public class QuizMenuActivity extends QuizActivity {
 			String Ev_gt = "";
 			String Ev_rft = "";
 			String Ev_rlt = "";
+			String Ev_st = "";
 			long Ev_hsh_key = 0;
 
 
     		session = new MovieMeterPluginSession();
 			try {
 				datasource.open();
-				datasource.deleteAllChannels();
+				//datasource.deleteAllChannels();
 				datasource.deleteAllEvents();
 				datasource.deleteAllHash();
 				int type;
-				int toChannel = 3900;
+				int toChannel = 4;
 				Boolean endOfSession = false;
 				String data = new String();
 				CRC32 checkSum = new CRC32();
 				String sendSting = new String();
-				Socket s = new Socket("192.168.2.13", 6419);
-				OutputStream os = s.getOutputStream();
-				InputStream is = s.getInputStream();
-				DataInputStream dis = new DataInputStream(is);
-				DataOutputStream dos = new DataOutputStream(os);
+//				Socket s = new Socket("192.168.2.13", 6419);
+//				OutputStream os = s.getOutputStream();
+//				InputStream is = s.getInputStream();
+//				DataInputStream dis = new DataInputStream(is);
+//				DataOutputStream dos = new DataOutputStream(os);
 				byte[] rl = new byte[] { 13, 10 };
 				byte[] buffer = new byte[250];
 				// delete all channels for now the easy way.
 
 				//datasource.deleteAllChannels();
-				for (int channel = 4; channel < toChannel; channel++) {
+				for (int channel = 1; channel < toChannel; channel++) {
 					// for all channel that need to be collected
 					// for now its the first 30 channels
+
+					
 					long cur_Id = -1;
 					long cur_event_Id = -1;
+					Socket s = new Socket("192.168.2.13", 6419);
+					
+					OutputStream os = s.getOutputStream();
+					InputStream is = s.getInputStream();
+					DataInputStream dis = new DataInputStream(is);
+					DataOutputStream dos = new DataOutputStream(os);
+
+					
 					publishProgress(Integer.toString((int) ((channel / (float) toChannel) * 100)));
-					sendSting = "LSTE " + channel ; //+ " NOW"; // currently
+					sendSting = "LSTE " + channel + " NOW"; // currently
 
 //					sendSting = "LSTR " + channel ; //+ " NOW"; // currently
 															// only
@@ -307,6 +318,8 @@ public class QuizMenuActivity extends QuizActivity {
 					Ev_time = -1;
 					Ev_dr = -1;
 					endOfSession = false;
+					Log.d(DEBUG_TAG, "TI: channel " + Integer.toString(channel));
+
 					do {
 						try {
 							data = dis.readLine();
@@ -320,7 +333,7 @@ public class QuizMenuActivity extends QuizActivity {
 								
 								if (dataObj[0].contentEquals("215-C")) {
 									// new channel record store in database
-									cur_Id = insertChannel(channel, dataObj[2], dataObj[1]);
+									cur_Id = datasource.insertChannel(channel, dataObj[2], dataObj[1]);
 									break;
 								} else if (dataObj[0].contentEquals("215-E")
 										& cur_Id >= 0) {
@@ -332,7 +345,11 @@ public class QuizMenuActivity extends QuizActivity {
 									Ev_time = Long.parseLong(eventObj[0]);
 									Ev_dr = Integer.parseInt(eventObj[1]);
 									Ev_tt = "";
+									Ev_gt = "";
+									Ev_rft = "";
+									Ev_rlt = "";
 									Ev_hsh_key = 0;
+									
 								} else if (dataObj[0].contentEquals("215-T")
 										& Ev_time > 0 & Ev_dr > 0) {
 									// Title info
@@ -343,6 +360,11 @@ public class QuizMenuActivity extends QuizActivity {
 										Ev_tt = dataObj[1] + " " + dataObj[2]; // cat
 																				// together
 									}
+									
+								} else if (dataObj[0].contentEquals("215-S")
+										& Ev_time > 0 & Ev_dr > 0) {
+									// Sub Title info
+									Ev_st = dataObj[1];
 								} else if (dataObj[0].contentEquals("215-D")
 										& !Ev_tt.isEmpty() ) {
 									// Title info
@@ -351,10 +373,8 @@ public class QuizMenuActivity extends QuizActivity {
 									
 									int regie = 0;
 									
-									Ev_rft = "";
-									Ev_rlt = "";
 									Ev_gt = dataObj[1]; // genre
-									dataObj[1] = dataObj[1].replaceAll("Film|film", "");
+									dataObj[1] = dataObj[1].replaceAll("Film|film|\\.", "");
 									
 									Ev_gt = Character.toUpperCase(dataObj[1].charAt(0)) + dataObj[1].substring(1);
 									
@@ -376,7 +396,6 @@ public class QuizMenuActivity extends QuizActivity {
 									
 									checkSum.reset();
 									checkSum.update(Ev_tt.getBytes());
-									Log.d(DEBUG_TAG, String.valueOf(checkSum.getValue()) );
 						
 									Cursor c = datasource.getOneHash( checkSum.getValue() );
 									if ( c != null ) {
@@ -410,7 +429,6 @@ public class QuizMenuActivity extends QuizActivity {
 												 Ev_gt,
 												 Ev_rft + " " + Ev_rlt,
 												 Ev_hsh_key );
-										Log.d(DEBUG_TAG, Long.toString(cur_event_Id) + " " + data );
 
 									}
 								}
@@ -457,17 +475,22 @@ public class QuizMenuActivity extends QuizActivity {
 							endOfSession = true;
 							// break out of while loop and go no next channel
 							break;
-						//} catch (Exception SQLiteException) {
-							
 						}
+						
 					} while (!endOfSession);
+					sendSting = "QUIT";
+					dos.write(sendSting.getBytes());
+					dos.write(rl);
+					data = dis.readLine();
+					s.close();
+
 				}
-				sendSting = "QUIT";
-				dos.write(sendSting.getBytes());
-				dos.write(rl);
-				data = dis.readLine();
-				Log.d(DEBUG_TAG, data.toString());
-				s.close();
+//				sendSting = "QUIT";
+//				dos.write(sendSting.getBytes());
+//				dos.write(rl);
+//				data = dis.readLine();
+//				Log.d(DEBUG_TAG, data.toString());
+//				s.close();
 
 			} catch (Exception e) {
 				Log.e(DEBUG_TAG, "Unexpected failure in collecting event data",
@@ -478,22 +501,6 @@ public class QuizMenuActivity extends QuizActivity {
 			datasource.close();
 
 			return result;
-		}
-
-		private long insertChannel(int channel, String name, String service) {
-			// TODO Auto-generated method stub
-			Cursor c = datasource.getOneChannel( channel );
-			if ( c != null ) {
-				if ( c.getCount() < 1) {
-					// channel not found
-					return datasource.insertChannel(channel, name, service);
-				} else {
-					if (c.moveToFirst() ) {
-						return c.getLong(c.getColumnIndex(DatabaseOpenHelper.TBL_ID));
-					}												
-				}
-			}
-			return 0;
 		}
 
 	}

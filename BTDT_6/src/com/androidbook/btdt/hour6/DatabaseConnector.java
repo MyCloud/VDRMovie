@@ -26,17 +26,44 @@ public class DatabaseConnector {
 	}
 
 	public long insertChannel(int num, String name, String service) {
+		
 		ContentValues newChannel = new ContentValues();
 		newChannel.put(DatabaseOpenHelper.CHANNELS_NUM, num);
 		newChannel.put(DatabaseOpenHelper.CHANNELS_NAME, name);
 		newChannel.put(DatabaseOpenHelper.CHANNELS_SERVICE, service);
 
-		//open();
-		long rowId = database.insertOrThrow(DatabaseOpenHelper.TBL_CHANNELS,
-				null, newChannel);
-		//close();
-		return rowId;
+		// first check if same num is in database
+		Cursor c = getOneChannelNum(num);
+		if ( c != null ) {
+			if ( c.getCount() < 1) {
+				// channel num not found
+				// now check is same service in in table
+				c = getOneChannelService(service);
+				if ( c != null & c.getCount() < 1) {
+					// new record
+					return database.insertOrThrow(DatabaseOpenHelper.TBL_CHANNELS,
+							null, newChannel);
+				}
+			} else {
+				// there is a channel with same num
+				if (c.moveToFirst() ) {
+					// if name or service is different
+					if( service.contentEquals(c.getString(c.getColumnIndex(DatabaseOpenHelper.CHANNELS_SERVICE)))) {
+						// same service
+						if( name.contentEquals(c.getString(c.getColumnIndex(DatabaseOpenHelper.CHANNELS_NAME)))) {
+							// and same name return channel id
+							return c.getLong(c.getColumnIndex(DatabaseOpenHelper.TBL_ID));
+						}
+					}
+				}
+			}
+		}
+		// delete found id
+		deleteChannelId( c.getLong(c.getColumnIndex(DatabaseOpenHelper.TBL_ID)));
+		// insert new channel recursive
+		return insertChannel(num, name, service );
 	}
+
 
 	public void deleteAllChannels() {
 		//open();
@@ -75,10 +102,17 @@ public class DatabaseConnector {
 				null);
 	}
 
-	public void deleteContact(long id) {
-		open();
-		database.delete("country", "_id=" + id, null);
-		close();
+	public void deleteChannelId(long id) {
+		// delete all events related to this channel id
+		deleteEventsChannelId(id);
+		database.delete(DatabaseOpenHelper.TBL_CHANNELS, "_id=" + id, null);
+		
+	}
+
+	private void deleteEventsChannelId(long id) {
+		// de
+		// delete all events that have this channel id
+		database.delete(DatabaseOpenHelper.TBL_EVENT, DatabaseOpenHelper.EVENT_CHANNELS_KEY+ "=" + id, null);		
 	}
 
 	public long insertEvent(long ev_ch_key, int ev_nr, long ev_time, int ev_dr,
@@ -134,12 +168,25 @@ public class DatabaseConnector {
 		return c;
 	}
 
-	public Cursor getOneChannel(int channel) {
+	public Cursor getOneChannelNum(int num) {
 		// TODO Auto-generated method stub
 		Cursor c = database.query(DatabaseOpenHelper.TBL_CHANNELS, null, 
-				DatabaseOpenHelper.CHANNELS_NUM + "=" + Integer.toString(channel), null, null, null,
+				DatabaseOpenHelper.CHANNELS_NUM + "=" + Integer.toString(num), null, null, null,
 				null);
 		return c;
+	}
+
+	public Cursor getOneChannelService( String service) {
+		// TODO Auto-generated method stub
+		Cursor c = database.query(DatabaseOpenHelper.TBL_CHANNELS, null, 
+				DatabaseOpenHelper.CHANNELS_SERVICE + "=" + service.toString(), null, null, null,
+				null);
+		return c;
+	}
+
+	public void deleteChannelNum(int num) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
