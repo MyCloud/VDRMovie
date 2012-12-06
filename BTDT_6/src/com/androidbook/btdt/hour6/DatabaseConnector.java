@@ -229,4 +229,20 @@ public class DatabaseConnector {
 		}
 		return -1;
 	}
+
+	public long getCannelIdService(String service) {
+		Cursor c = database.query(DatabaseOpenHelper.TBL_CHANNELS, null, 
+				DatabaseOpenHelper.CHANNELS_SERVICE + "='" + service + "'", null, null, null,
+				null);
+		if ( c != null ) {
+			if ( c.getCount() == 1) {
+				if (c.moveToFirst() ) {
+					// return current HASH					
+					return c.getLong(c.getColumnIndex(DatabaseOpenHelper.TBL_ID));				
+				}
+			}
+		}
+		return -1;
+		
+	}
 }
