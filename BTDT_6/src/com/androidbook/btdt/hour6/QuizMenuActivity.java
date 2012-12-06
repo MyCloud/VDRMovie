@@ -409,7 +409,6 @@ public class QuizMenuActivity extends QuizActivity {
 				 * 
 				 * }
 				 */
-				do {
 					// for all recordings in database
 					String recording = new String();
 					boolean endRecordings = false;
@@ -535,7 +534,7 @@ public class QuizMenuActivity extends QuizActivity {
 									} else if (dataObj[0]
 											.contentEquals("215")
 											& !Ev_tt.isEmpty()) {
-										// write event data
+										// write event data in rec file
 										Ev_hsh_key = datasource
 												.findHashKeyEvent(Ev_ch_key,
 														Ev_nr);
@@ -621,6 +620,7 @@ public class QuizMenuActivity extends QuizActivity {
 								case 504: // Command parameter not implemented
 									Log.d(DEBUG_TAG, data.toString());
 									endOfSession = true;
+									endRecordings = true;
 									break;
 
 								case 500: // Syntax error, command unrecognized
@@ -655,7 +655,6 @@ public class QuizMenuActivity extends QuizActivity {
 					dos.write(rl);
 					data = dis.readLine();
 					s.close();
-				} while (!endOfSession);
 
 				// sendSting = "QUIT";
 				// dos.write(sendSting.getBytes());
