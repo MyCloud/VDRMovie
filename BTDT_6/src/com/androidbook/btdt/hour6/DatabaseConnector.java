@@ -27,10 +27,6 @@ public class DatabaseConnector {
 
 	public long insertChannel(int num, String name, String service) {
 		
-		ContentValues newChannel = new ContentValues();
-		newChannel.put(DatabaseOpenHelper.CHANNELS_NUM, num);
-		newChannel.put(DatabaseOpenHelper.CHANNELS_NAME, name);
-		newChannel.put(DatabaseOpenHelper.CHANNELS_SERVICE, service);
 
 		// first check if same num is in database
 		Cursor c = getOneChannelNum(num);
@@ -41,9 +37,15 @@ public class DatabaseConnector {
 				c = getOneChannelService(service);
 				if ( c != null & c.getCount() < 1) {
 					// new record
+					ContentValues newChannel = new ContentValues();
+					newChannel.put(DatabaseOpenHelper.CHANNELS_NUM, num);
+					newChannel.put(DatabaseOpenHelper.CHANNELS_NAME, name);
+					newChannel.put(DatabaseOpenHelper.CHANNELS_SERVICE, service);
 					return database.insertOrThrow(DatabaseOpenHelper.TBL_CHANNELS,
 							null, newChannel);
 				}
+				c.moveToFirst();
+				
 			} else {
 				// there is a channel with same num
 				if (c.moveToFirst() ) {
@@ -116,24 +118,15 @@ public class DatabaseConnector {
 	}
 
 	public long insertEvent(long ev_ch_key, int ev_nr, long ev_time, int ev_dr,
-			String ev_tt, String ev_gt,String ev_rt, long ev_hsh_key) {
+			String ev_tt, String ev_st, String ev_gt,String ev_rt, long ev_hsh_key) {
 
 		// first check if same event is in database
 		Cursor c = getOneEventChKeyEvNr( ev_ch_key, ev_nr );
 		if ( c != null ) {
 			if ( c.getCount() < 1) {
 				// new event
-				ContentValues newEvent = new ContentValues();
-				newEvent.put(DatabaseOpenHelper.EVENT_CHANNELS_KEY , ev_ch_key);
-				newEvent.put(DatabaseOpenHelper.EVENT_NR, ev_nr);
-				newEvent.put(DatabaseOpenHelper.EVENT_TIME, ev_time);
-				newEvent.put(DatabaseOpenHelper.EVENT_DURATION, ev_dr);
-				newEvent.put(DatabaseOpenHelper.EVENT_TITLE, ev_tt);
-				newEvent.put(DatabaseOpenHelper.EVENT_GENRE, ev_gt);
-				newEvent.put(DatabaseOpenHelper.EVENT_REGIE, ev_rt);
-				newEvent.put(DatabaseOpenHelper.EVENT_HASH_KEY, ev_hsh_key);
-				return database.insertOrThrow(DatabaseOpenHelper.TBL_EVENT,
-						null, newEvent);
+				return insertEventNoCheck ( ev_ch_key, ev_nr, ev_time, ev_dr,
+							ev_tt, ev_st, ev_gt,ev_rt, ev_hsh_key);
 			} else {
 				if (c.moveToFirst() ) {
 					// return current HASH					
@@ -145,7 +138,7 @@ public class DatabaseConnector {
 	}
 
 	public long insertEventNoCheck(long ev_ch_key, int ev_nr, long ev_time, int ev_dr,
-			String ev_tt, String ev_gt,String ev_rt, long ev_hsh_key) {
+			String ev_tt, String Ev_st, String ev_gt,String ev_rt, long ev_hsh_key) {
 		// new event
 		ContentValues newEvent = new ContentValues();
 		newEvent.put(DatabaseOpenHelper.EVENT_CHANNELS_KEY , ev_ch_key);
@@ -153,6 +146,7 @@ public class DatabaseConnector {
 		newEvent.put(DatabaseOpenHelper.EVENT_TIME, ev_time);
 		newEvent.put(DatabaseOpenHelper.EVENT_DURATION, ev_dr);
 		newEvent.put(DatabaseOpenHelper.EVENT_TITLE, ev_tt);
+		newEvent.put(DatabaseOpenHelper.EVENT_STITLE, ev_tt);
 		newEvent.put(DatabaseOpenHelper.EVENT_GENRE, ev_gt);
 		newEvent.put(DatabaseOpenHelper.EVENT_REGIE, ev_rt);
 		newEvent.put(DatabaseOpenHelper.EVENT_HASH_KEY, ev_hsh_key);
