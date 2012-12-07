@@ -110,7 +110,7 @@ public class DatabaseConnector {
 		database.delete(DatabaseOpenHelper.TBL_CHANNELS, "_id=" + id, null);
 		
 	}
-
+	
 	private void deleteEventsChannelId(long id) {
 		// de
 		// delete all events that have this channel id
@@ -150,6 +150,24 @@ public class DatabaseConnector {
 		newEvent.put(DatabaseOpenHelper.EVENT_GENRE, ev_gt);
 		newEvent.put(DatabaseOpenHelper.EVENT_REGIE, ev_rt);
 		newEvent.put(DatabaseOpenHelper.EVENT_HASH_KEY, ev_hsh_key);
+		return database.insertOrThrow(DatabaseOpenHelper.TBL_EVENT,
+				null, newEvent);
+	}
+
+	public long insertRecNoCheck(long ev_ch_key, int ev_nr, long ev_time, int ev_dr,
+			String ev_tt, String Ev_st, String ev_gt,String ev_rt, int ev_wt, long ev_hsh_key) {
+		// new event
+		ContentValues newEvent = new ContentValues();
+		newEvent.put(DatabaseOpenHelper.REC_CHANNELS_KEY , ev_ch_key);
+		newEvent.put(DatabaseOpenHelper.REC_E_NR, ev_nr);
+		newEvent.put(DatabaseOpenHelper.REC_E_TIME, ev_time);
+		newEvent.put(DatabaseOpenHelper.REC_E_DURATION, ev_dr);
+		newEvent.put(DatabaseOpenHelper.REC_E_TITLE, ev_tt);
+		newEvent.put(DatabaseOpenHelper.REC_E_STITLE, ev_tt);
+		newEvent.put(DatabaseOpenHelper.REC_E_GENRE, ev_gt);
+		newEvent.put(DatabaseOpenHelper.REC_E_REGIE, ev_rt);
+		newEvent.put(DatabaseOpenHelper.REC_WATCH, ev_wt);
+		newEvent.put(DatabaseOpenHelper.REC_HASH_KEY, ev_hsh_key);
 		return database.insertOrThrow(DatabaseOpenHelper.TBL_EVENT,
 				null, newEvent);
 	}
@@ -245,4 +263,28 @@ public class DatabaseConnector {
 		return -1;
 		
 	}
+
+	public long findHashKeyRec(long ev_ch_key, int ev_nr) {
+		Cursor c = getOneRecChKeyEvNr( ev_ch_key, ev_nr );
+		if ( c != null ) {
+			if ( c.getCount() == 1) {
+				if (c.moveToFirst() ) {
+					// return current HASH					
+					return c.getLong(c.getColumnIndex(DatabaseOpenHelper.EVENT_HASH_KEY));				
+				}
+			}
+		}
+		return -1;
+	}
+
+	private Cursor getOneRecChKeyEvNr(long ev_ch_key, int ev_nr) {
+		Cursor c = database.query(DatabaseOpenHelper.TBL_REC, null, 
+				DatabaseOpenHelper.REC_CHANNELS_KEY + "=" + Long.toString(ev_ch_key) + " AND " +
+				DatabaseOpenHelper.REC_E_NR + "=" + Integer.toString(ev_nr), null, null, null,
+				null);
+		return c;
+	}
 }
+
+
+

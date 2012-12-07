@@ -1,9 +1,8 @@
 package com.androidbook.btdt.hour6;
 
-import android.app.ActionBar;
+
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;

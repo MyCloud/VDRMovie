@@ -19,7 +19,7 @@ public class QuizActivity extends Activity {
 		SharedPreferences settings = getSharedPreferences( getString(R.string.pref_file) , 0);
 	    // read last date if null than use current date
 		String last = settings.getString("lastDate", now.toString());
-	    //Log.i(PREFS_NAME, last );
+	   Log.i(PREFS_NAME, last );
 	}
 
 	@Override

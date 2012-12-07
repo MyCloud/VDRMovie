@@ -17,7 +17,6 @@ import android.text.format.Time;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.DatePicker;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,6 +46,7 @@ public class QuizHelpActivity extends QuizActivity {
         }
 		
 	}
+	@SuppressWarnings("deprecation")
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// TODO Auto-generated method stub
 		switch (item.getItemId()) {
@@ -80,7 +80,8 @@ public class QuizHelpActivity extends QuizActivity {
      * @throws IOException
      *             Thrown on read failure from the input
      */
-    public String inputStreamToString(InputStream is) throws IOException {
+    @SuppressWarnings("deprecation")
+	public String inputStreamToString(InputStream is) throws IOException {
         StringBuffer sBuffer = new StringBuffer();
         DataInputStream dataIO = new DataInputStream(is);
         String strLine = null;
@@ -94,6 +95,7 @@ public class QuizHelpActivity extends QuizActivity {
 
         return sBuffer.toString();
     }
+	@SuppressWarnings("deprecation")
 	@Override
 	protected Dialog onCreateDialog(int id, Bundle args) {
 		// TODO Auto-generated method stub
@@ -120,6 +122,7 @@ public class QuizHelpActivity extends QuizActivity {
 	
 		return super.onCreateDialog(id, args);
 	}
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void onPrepareDialog(int id, Dialog dialog, Bundle args) {
 		// TODO Auto-generated method stub
