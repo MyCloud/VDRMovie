@@ -47,7 +47,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	public static final String DATA_DETAILS = "Dt";
 	
 	private static final String DATABASE_NAME = "events.db";
-	private static final int DATABASE_VERSION = 22;
+	private static final int DATABASE_VERSION = 26;
 
 	private static final String createTblChannels = "CREATE TABLE "+ TBL_CHANNELS + "( " 
     		+ TBL_ID + " integer primary key autoincrement, " 
@@ -56,7 +56,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
     		+ CHANNELS_SERVICE + " text unique not null);";                 
 
 	private static final String createTblEvents = "CREATE TABLE "+ TBL_EVENT + "( " 
-//    		+ TBL_ID + " integer primary key autoincrement, " 
+//    		+ TBL_ID + " integer primary key auto increment, " 
     		+ EVENT_CHANNELS_KEY + " integer not null, "
     		+ EVENT_NR + " integer not null, "
     		+ EVENT_TIME + " integer not null, "

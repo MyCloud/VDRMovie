@@ -263,7 +263,7 @@ public class QuizMenuActivity extends QuizActivity {
 				// datasource.deleteAllEvents();
 				// datasource.deleteAllHash();
 				int type;
-				int toChannel = 14;
+				int toChannel = 20;
 				Boolean endOfSession = false;
 				String data = new String();
 				CRC32 checkSum = new CRC32();
@@ -294,7 +294,7 @@ public class QuizMenuActivity extends QuizActivity {
 							.toString((int) ((channel / (float) toChannel) * 100)));
 					// sendSting = "LSTE " + channel ; //+ " NOW"; // currently
 
-					sendSting = "LSTR " + channel; // + " NOW"; // currently
+					sendSting = "LSTE " + channel; // + " NOW"; // currently
 																// only
 																// the
 																// now
@@ -384,7 +384,8 @@ public class QuizMenuActivity extends QuizActivity {
 										regie--;
 									}
 								} else if (dataObj[0].contentEquals("215-e")
-										& !Ev_tt.isEmpty()) {
+										& !Ev_tt.isEmpty() 
+										& (!Ev_st.isEmpty() | !Ev_gt.isEmpty())  ) {
 									// write event data
 									Ev_hsh_key = datasource.findHashKeyEvent(Ev_ch_key,
 											Ev_nr);
@@ -606,7 +607,8 @@ public class QuizMenuActivity extends QuizActivity {
 										regie--;
 									}
 								} else if (dataObj[0].contentEquals("215")
-										& !Ev_tt.isEmpty()) {
+										& !Ev_tt.isEmpty() 
+										& (!Ev_st.isEmpty() | !Ev_gt.isEmpty())  ) {
 									// write event data in rec file
 									Ev_hsh_key = datasource.findHashKeyRec(Ev_ch_key,
 											Ev_nr);
@@ -701,7 +703,7 @@ public class QuizMenuActivity extends QuizActivity {
 								Log.d(DEBUG_TAG, "Default case " + data.toString());
 								break;
 							}
-							Log.d(DEBUG_TAG, data.toString());
+							// Log.d(DEBUG_TAG, data.toString());
 						} while (!endOfSession);
 
 					} catch (Exception NumberFormatException) {

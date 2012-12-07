@@ -138,7 +138,7 @@ public class DatabaseConnector {
 	}
 
 	public long insertEventNoCheck(long ev_ch_key, int ev_nr, long ev_time, int ev_dr,
-			String ev_tt, String Ev_st, String ev_gt,String ev_rt, long ev_hsh_key) {
+			String ev_tt, String ev_st, String ev_gt,String ev_rt, long ev_hsh_key) {
 		// new event
 		ContentValues newEvent = new ContentValues();
 		newEvent.put(DatabaseOpenHelper.EVENT_CHANNELS_KEY , ev_ch_key);
@@ -146,7 +146,7 @@ public class DatabaseConnector {
 		newEvent.put(DatabaseOpenHelper.EVENT_TIME, ev_time);
 		newEvent.put(DatabaseOpenHelper.EVENT_DURATION, ev_dr);
 		newEvent.put(DatabaseOpenHelper.EVENT_TITLE, ev_tt);
-		newEvent.put(DatabaseOpenHelper.EVENT_STITLE, ev_tt);
+		newEvent.put(DatabaseOpenHelper.EVENT_STITLE, ev_st);
 		newEvent.put(DatabaseOpenHelper.EVENT_GENRE, ev_gt);
 		newEvent.put(DatabaseOpenHelper.EVENT_REGIE, ev_rt);
 		newEvent.put(DatabaseOpenHelper.EVENT_HASH_KEY, ev_hsh_key);
@@ -155,7 +155,7 @@ public class DatabaseConnector {
 	}
 
 	public long insertRecNoCheck(long ev_ch_key, int ev_nr, long ev_time, int ev_dr,
-			String ev_tt, String Ev_st, String ev_gt,String ev_rt, int ev_wt, long ev_hsh_key) {
+			String ev_tt, String ev_st, String ev_gt,String ev_rt, int ev_wt, long ev_hsh_key) {
 		// new event
 		ContentValues newEvent = new ContentValues();
 		newEvent.put(DatabaseOpenHelper.REC_CHANNELS_KEY , ev_ch_key);
@@ -163,12 +163,12 @@ public class DatabaseConnector {
 		newEvent.put(DatabaseOpenHelper.REC_E_TIME, ev_time);
 		newEvent.put(DatabaseOpenHelper.REC_E_DURATION, ev_dr);
 		newEvent.put(DatabaseOpenHelper.REC_E_TITLE, ev_tt);
-		newEvent.put(DatabaseOpenHelper.REC_E_STITLE, ev_tt);
+		newEvent.put(DatabaseOpenHelper.REC_E_STITLE, ev_st);
 		newEvent.put(DatabaseOpenHelper.REC_E_GENRE, ev_gt);
 		newEvent.put(DatabaseOpenHelper.REC_E_REGIE, ev_rt);
 		newEvent.put(DatabaseOpenHelper.REC_WATCH, ev_wt);
 		newEvent.put(DatabaseOpenHelper.REC_HASH_KEY, ev_hsh_key);
-		return database.insertOrThrow(DatabaseOpenHelper.TBL_EVENT,
+		return database.insertOrThrow(DatabaseOpenHelper.TBL_REC,
 				null, newEvent);
 	}
 
