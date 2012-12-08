@@ -367,21 +367,23 @@ public class QuizMenuActivity extends QuizActivity {
 									dataObj[1] = dataObj[1].replaceAll("Film|film|\\.",
 											"");
 
-									Ev_gt = Character.toUpperCase(dataObj[1].charAt(0))
-											+ dataObj[1].substring(1);
-
-									String eventObj[] = dataObj[dataObj.length - 1]
-											.split("[ \\.]");
-									for (int i = 0; eventObj.length > i; i++) {
-										if (eventObj[i].equals("Regie:")) {
-											regie = 2;
-											continue;
+									if (dataObj[1].length() > 2) {
+										Ev_gt = Character.toUpperCase(dataObj[1].charAt(0))
+												+ dataObj[1].substring(1);
+	
+										String eventObj[] = dataObj[dataObj.length - 1]
+												.split("[ \\.]");
+										for (int i = 0; eventObj.length > i; i++) {
+											if (eventObj[i].equals("Regie:")) {
+												regie = 2;
+												continue;
+											}
+											if (regie > 1)
+												Ev_rft = eventObj[i];
+											if (regie > 0)
+												Ev_rlt = eventObj[i];
+											regie--;
 										}
-										if (regie > 1)
-											Ev_rft = eventObj[i];
-										if (regie > 0)
-											Ev_rlt = eventObj[i];
-										regie--;
 									}
 								} else if (dataObj[0].contentEquals("215-e")
 										& !Ev_tt.isEmpty() 
@@ -590,21 +592,23 @@ public class QuizMenuActivity extends QuizActivity {
 									dataObj[1] = dataObj[1].replaceAll("Film|film|\\.",
 											"");
 
-									Ev_gt = Character.toUpperCase(dataObj[1].charAt(0))
-											+ dataObj[1].substring(1);
-
-									String eventObj[] = dataObj[dataObj.length - 1]
-											.split("[ \\.]");
-									for (int i = 0; eventObj.length > i; i++) {
-										if (eventObj[i].equals("Regie:")) {
-											regie = 2;
-											continue;
+									if (dataObj[1].length() > 2) {
+										Ev_gt = Character.toUpperCase(dataObj[1].charAt(0))
+												+ dataObj[1].substring(1);
+	
+										String eventObj[] = dataObj[dataObj.length - 1]
+												.split("[ \\.]");
+										for (int i = 0; eventObj.length > i; i++) {
+											if (eventObj[i].equals("Regie:")) {
+												regie = 2;
+												continue;
+											}
+											if (regie > 1)
+												Ev_rft = eventObj[i];
+											if (regie > 0)
+												Ev_rlt = eventObj[i];
+											regie--;
 										}
-										if (regie > 1)
-											Ev_rft = eventObj[i];
-										if (regie > 0)
-											Ev_rlt = eventObj[i];
-										regie--;
 									}
 								} else if (dataObj[0].contentEquals("215")
 										& !Ev_tt.isEmpty() 
