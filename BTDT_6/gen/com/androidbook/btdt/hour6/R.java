@@ -15,6 +15,7 @@ public final class R {
     }
     public static final class array {
         public static final int action_list=0x7f090000;
+        public static final int view_events=0x7f090001;
     }
     public static final class attr {
     }

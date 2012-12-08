@@ -32,4 +32,11 @@
         <item >Earth</item>
         
     </string-array>
+    <string-array name="view_events">
+        <item >Now</item>
+        <item >Next</item><item >Shedule</item>
+        <item >Recordings</item>
+        <item >Timers</item>
+        
+    </string-array>
 </resources>
