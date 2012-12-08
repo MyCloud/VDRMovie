@@ -139,6 +139,9 @@ public class QuizMenuActivity extends QuizActivity {
 		case R.id.help_settings:
 			Toast.makeText(this, "Menu item 2 selected", Toast.LENGTH_SHORT)
 					.show();
+			startActivity(new Intent(QuizMenuActivity.this, QuizEventsActivity.class));
+			QuizMenuActivity.this.finish();
+
 			break;
 		case android.R.id.home:
 			Intent intent = new Intent(this, QuizSplashActivity.class);
@@ -263,7 +266,7 @@ public class QuizMenuActivity extends QuizActivity {
 				// datasource.deleteAllEvents();
 				// datasource.deleteAllHash();
 				int type;
-				int toChannel = 20;
+				int toChannel = 1;
 				Boolean endOfSession = false;
 				String data = new String();
 				CRC32 checkSum = new CRC32();
@@ -498,7 +501,7 @@ public class QuizMenuActivity extends QuizActivity {
 				// for all recordings in database
 				boolean endRecordings = false;
 				endOfSession = false;
-				int recNr = 1;
+				int recNr = 400;
 				int Ev_wt = -1;
 
 				long cur_Id = -1;
