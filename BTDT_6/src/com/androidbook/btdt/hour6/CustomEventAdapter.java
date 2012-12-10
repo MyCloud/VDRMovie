@@ -20,7 +20,7 @@ public class CustomEventAdapter extends CursorAdapter {
 	public void bindView(View view, Context context, Cursor cursor) {
 
 
-        TextView textViewTitle = (TextView) view.findViewById(R.id.title);
+        TextView textViewTitle = (TextView) view.findViewById(R.id.tv_person_name);
 
         textViewTitle.setText(cursor.getString(cursor.getColumnIndex(cursor.getColumnName(1))));
 
@@ -29,7 +29,7 @@ public class CustomEventAdapter extends CursorAdapter {
 
  
 
-        TextView textViewDetails = (TextView) view.findViewById(R.id.details);
+        TextView textViewDetails = (TextView) view.findViewById(R.id.tv_person_pin);
         textViewDetails.setText(cursor.getString(cursor.getColumnIndex(cursor.getColumnName(2))));
         
     }
@@ -39,7 +39,7 @@ public class CustomEventAdapter extends CursorAdapter {
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
       LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
-      View retView = inflater.inflate(R.layout.activity_quiz_event_row, parent, false);
+      View retView = inflater.inflate(R.layout.single_row_item, parent, false);
 
       return retView;
    }

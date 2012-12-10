@@ -75,13 +75,15 @@ public final class R {
         public static final int TextView_HelpText=0x7f0c0003;
         public static final int actionbanner=0x7f0c0005;
         public static final int details=0x7f0c0001;
-        public static final int help_settings=0x7f0c0013;
+        public static final int help_settings=0x7f0c0015;
         public static final int icon=0x7f0c0000;
         public static final int list_events=0x7f0c0007;
-        public static final int menu_settings=0x7f0c0012;
+        public static final int menu_settings=0x7f0c0014;
         public static final int myView2=0x7f0c0006;
         public static final int title=0x7f0c0002;
-        public static final int toast=0x7f0c0014;
+        public static final int toast=0x7f0c0016;
+        public static final int tv_person_name=0x7f0c0012;
+        public static final int tv_person_pin=0x7f0c0013;
     }
     public static final class layout {
         public static final int activity_quiz_event_row=0x7f030000;
@@ -92,6 +94,7 @@ public final class R {
         public static final int activity_quiz_scores=0x7f030005;
         public static final int activity_quiz_settings=0x7f030006;
         public static final int activity_quiz_splash=0x7f030007;
+        public static final int single_row_item=0x7f030008;
     }
     public static final class menu {
         public static final int activity_quiz_splash=0x7f0b0000;

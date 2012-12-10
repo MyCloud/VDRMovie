@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 public class DatabaseConnector {
 
@@ -76,9 +77,12 @@ public class DatabaseConnector {
    }
 	public Cursor getNowChannels () 
 	{
-		  String buildSQL = "select * from ChannelsTbl";
+		Cursor c;   
+		String buildSQL = "select * from ChannelsTbl";
 
-		  return database.rawQuery(buildSQL, null);
+		c = database.rawQuery(buildSQL, null);
+		Log.d("testing", "aantal rows: " + c.getCount() );
+		return c;
    }
 //	select ch_key, dr, gt, nr, hsh_key, rt, st, time, tt 
 //	  from EventTbl 

@@ -55,9 +55,9 @@ public class QuizEventsActivity extends QuizActivity {
        // Database query can be a time consuming task ..
        // so its safe to call database query in another thread
 
-       Thread thread = new Thread() {
+//       Thread thread = new Thread() {
 
-           public void run() {
+  //         public void run() {
 
 
          	  datasource.open();
@@ -68,15 +68,15 @@ public class QuizEventsActivity extends QuizActivity {
 
                listView.setAdapter(customAdapter);
 
-           }
+ //          }
 
 
 
-       };
+  //     };
 
 
 
-       thread.start();
+    //   thread.start();
 
 
 
