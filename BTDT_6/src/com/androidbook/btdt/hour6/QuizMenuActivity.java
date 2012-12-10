@@ -60,8 +60,8 @@ public class QuizMenuActivity extends QuizActivity {
 		}
 
 		// Start loading the questions in the background
-		downloader = new GuidTask();
-		downloader.execute("test", "test2");
+//		downloader = new GuidTask();
+//		downloader.execute("test", "test2");
 
 		// actionBar.setSelectedNavigationItem(2);
 		// ActionBar.OnNavigationListener
@@ -266,7 +266,7 @@ public class QuizMenuActivity extends QuizActivity {
 				// datasource.deleteAllEvents();
 				// datasource.deleteAllHash();
 				int type;
-				int toChannel = 1;
+				int toChannel = 3;
 				Boolean endOfSession = false;
 				String data = new String();
 				CRC32 checkSum = new CRC32();

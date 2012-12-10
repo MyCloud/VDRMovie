@@ -66,15 +66,28 @@ public class DatabaseConnector {
 		return insertChannel(num, name, service );
 	}
 
+	public Cursor getNowEvents () 
+	{
+		  String buildSQL = "select ch_key, _id, dr, gt, nr, hsh_key, rt, st, time, tt "
+				  + "from EventTbl where time = ( select max(time) from EventTbl as f " 
+				  + "where f.ch_key = EventTbl.ch_key and f.time < 1355170800 ) ";
 
-	//select ch_key, dr, gt, nr, hsh_key, rt, st, time, tt 
-	//  from EventTbl 
-	//  where time = (
-	//      select max(time) 
-	//        from EventTbl as f 
-	//        where f.ch_key = EventTbl.ch_key and
-	//        f.time < 1354908900
-	//  );
+		  return database.rawQuery(buildSQL, null);
+   }
+	public Cursor getNowChannels () 
+	{
+		  String buildSQL = "select * from ChannelsTbl";
+
+		  return database.rawQuery(buildSQL, null);
+   }
+//	select ch_key, dr, gt, nr, hsh_key, rt, st, time, tt 
+//	  from EventTbl 
+//	  where time = (
+//	      select max(time) 
+//	        from EventTbl as f 
+//	        where f.ch_key = EventTbl.ch_key and
+//	        f.time < 1354908900
+//	  );
 	
 	
 	

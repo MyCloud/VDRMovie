@@ -5,6 +5,7 @@ import java.util.Calendar;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
+import android.content.Intent;
 import android.database.SQLException;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,11 +13,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.CursorAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
 public class QuizEventsActivity extends QuizActivity {
 
 	private DatabaseConnector datasource;
+   private CustomEventAdapter customAdapter;
+
 
 	@SuppressLint("NewApi")
 	@Override
@@ -24,6 +29,7 @@ public class QuizEventsActivity extends QuizActivity {
 		// TODO Auto-generated method stub
 
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_quiz_overview);
 		ActionBar actionBar = getActionBar();
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
 			actionBar.setHomeButtonEnabled(true);
@@ -41,28 +47,70 @@ public class QuizEventsActivity extends QuizActivity {
 			throw new Error("Error copying database");
 
 		}
-		    Calendar c = Calendar.getInstance();
-		    c.set(Calendar.YEAR, 2012);
-		    c.set(Calendar.MONTH, 12);
-		    c.set(Calendar.DAY_OF_MONTH,8);
-		    c.set(Calendar.HOUR, 17);
-		    c.set(Calendar.MINUTE, 2);
-		    c.set(Calendar.SECOND, 17);
-		    c.set(Calendar.MILLISECOND, 0);
+      final ListView listView = (ListView) findViewById(R.id.list_events);
+
+
+      
+
+       // Database query can be a time consuming task ..
+       // so its safe to call database query in another thread
+
+       Thread thread = new Thread() {
+
+           public void run() {
+
+
+         	  datasource.open();
+
+               customAdapter = new CustomEventAdapter(QuizEventsActivity.this, datasource.getNowChannels(), CursorAdapter.NO_SELECTION);
+
+
+
+               listView.setAdapter(customAdapter);
+
+           }
+
+
+
+       };
+
+
+
+       thread.start();
+
+
+
+		
+		
+		
+		
+		
+		
+		
+		
+//		    Calendar c = Calendar.getInstance();
+//		    c.set(Calendar.YEAR, 2012);
+//		    c.set(Calendar.MONTH, 12);
+//		    c.set(Calendar.DAY_OF_MONTH,8);
+//		    c.set(Calendar.HOUR, 17);
+//		    c.set(Calendar.MINUTE, 2);
+//		    c.set(Calendar.SECOND, 17);
+//		    c.set(Calendar.MILLISECOND, 0);
 		    //java.util.Date time = new java.util.Date(timeStamp);
 
-		    Log.d("datum", " dit dus: " + Long.toString(c.getTimeInMillis() / 1000L) );
-		    c.set(Calendar.YEAR, 1970);
-		    c.set(Calendar.MONTH, 1);
-		    c.set(Calendar.DAY_OF_MONTH,1);
-		    c.set(Calendar.HOUR, 0);
-		    c.set(Calendar.MINUTE, 0);
-		    c.set(Calendar.SECOND, 1354982537);
-		    c.set(Calendar.MILLISECOND, 0);
+//		    Log.d("datum", " dit dus: " + Long.toString(c.getTimeInMillis() / 1000L) );
+//		    c.set(Calendar.YEAR, 1970);
+//		    c.set(Calendar.MONTH, 1);
+//		    c.set(Calendar.DAY_OF_MONTH,1);
+//		    c.set(Calendar.HOUR, 0);
+//		    c.set(Calendar.MINUTE, 0);
+//		    c.set(Calendar.SECOND, 1354982537);
+//		    c.set(Calendar.MILLISECOND, 0);
 
-		    Log.d("datum", " dit dus:" + Long.toString(c.getTimeInMillis() / 1000L) );
+//		    Log.d("datum", " dit dus:" + Long.toString(c.getTimeInMillis() / 1000L) );
 
 	}
+
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

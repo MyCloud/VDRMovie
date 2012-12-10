@@ -24,7 +24,7 @@ public class CustomEventAdapter extends CursorAdapter {
 
         textViewTitle.setText(cursor.getString(cursor.getColumnIndex(cursor.getColumnName(1))));
 
-        ImageView imageViewIcon = (ImageView) view.findViewById(R.id.icon);
+        //ImageView imageViewIcon = (ImageView) view.findViewById(R.id.icon);
        // imageViewIcon.setImageURI(cursor.getString(cursor.getColumnIndex(cursor.getColumnName(1))));
 
  
