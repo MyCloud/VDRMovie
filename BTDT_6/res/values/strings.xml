@@ -27,9 +27,9 @@
     <string name="pref_file">MyPrefsFile</string>
     <string name="help_settings">Help</string>
     <string-array name="action_list">
-        <item >Mercury</item>
-        <item >Venus</item>
-        <item >Earth</item>
+        <item >Mercury\ntest1</item>
+        <item >Venus\ntest2</item>
+        <item >Earth \n \r \\l \\n test4</item>
         
     </string-array>
     <string-array name="view_events">

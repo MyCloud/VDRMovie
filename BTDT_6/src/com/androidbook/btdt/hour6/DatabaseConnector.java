@@ -67,6 +67,18 @@ public class DatabaseConnector {
 	}
 
 
+	//select ch_key, dr, gt, nr, hsh_key, rt, st, time, tt 
+	//  from EventTbl 
+	//  where time = (
+	//      select max(time) 
+	//        from EventTbl as f 
+	//        where f.ch_key = EventTbl.ch_key and
+	//        f.time < 1354908900
+	//  );
+	
+	
+	
+	
 	public void deleteAllChannels() {
 		//open();
 		database.execSQL("DELETE FROM " + DatabaseOpenHelper.TBL_CHANNELS);

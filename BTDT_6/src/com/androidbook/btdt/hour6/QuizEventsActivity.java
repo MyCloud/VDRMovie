@@ -1,11 +1,14 @@
 package com.androidbook.btdt.hour6;
 
+import java.util.Calendar;
+
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.database.SQLException;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -38,6 +41,26 @@ public class QuizEventsActivity extends QuizActivity {
 			throw new Error("Error copying database");
 
 		}
+		    Calendar c = Calendar.getInstance();
+		    c.set(Calendar.YEAR, 2012);
+		    c.set(Calendar.MONTH, 12);
+		    c.set(Calendar.DAY_OF_MONTH,8);
+		    c.set(Calendar.HOUR, 17);
+		    c.set(Calendar.MINUTE, 2);
+		    c.set(Calendar.SECOND, 17);
+		    c.set(Calendar.MILLISECOND, 0);
+		    //java.util.Date time = new java.util.Date(timeStamp);
+
+		    Log.d("datum", " dit dus: " + Long.toString(c.getTimeInMillis() / 1000L) );
+		    c.set(Calendar.YEAR, 1970);
+		    c.set(Calendar.MONTH, 1);
+		    c.set(Calendar.DAY_OF_MONTH,1);
+		    c.set(Calendar.HOUR, 0);
+		    c.set(Calendar.MINUTE, 0);
+		    c.set(Calendar.SECOND, 1354982537);
+		    c.set(Calendar.MILLISECOND, 0);
+
+		    Log.d("datum", " dit dus:" + Long.toString(c.getTimeInMillis() / 1000L) );
 
 	}
 
@@ -45,6 +68,7 @@ public class QuizEventsActivity extends QuizActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// TODO Auto-generated method stub
 		// Define the contextual action mode
+		setContentView(R.layout.activity_quiz_overview);
 
 		/** Create an array adapter to populate dropdownlist */
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
