@@ -19,11 +19,14 @@ public class DatabaseConnector {
 	public void open() throws SQLException {
 		// open database in reading/writing mode
 		database = dbOpenHelper.getWritableDatabase();
+		  Log.d(" DatabaseConnector", "open" );
 	}
 
 	public void close() {
-		if (database != null)
+		if (database != null) {
+			  Log.d(" DatabaseConnector", "close" );
 			database.close();
+		}
 	}
 
 	public long insertChannel(int num, String name, String service) {
@@ -69,10 +72,12 @@ public class DatabaseConnector {
 
 	public Cursor getNowEvents () 
 	{
-		  String buildSQL = "select ch_key, _id, dr, gt, nr, hsh_key, rt, st, time, tt "
+		long unixTime = System.currentTimeMillis() / 1000L;
+		  String buildSQL = "select ch_key _id, ch_key, dr, gt, nr, hsh_key, rt, st, time, tt "
 				  + "from EventTbl where time = ( select max(time) from EventTbl as f " 
-				  + "where f.ch_key = EventTbl.ch_key and f.time < 1355170800 ) ";
-
+				  + "where f.ch_key = EventTbl.ch_key and f.time < " + Long.toString(unixTime) + " ); ";
+		  Log.d(" DatabaseConnector", "unixtime:" + unixTime );
+		  
 		  return database.rawQuery(buildSQL, null);
    }
 	public Cursor getNowChannels () 

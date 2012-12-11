@@ -90,7 +90,7 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 			// datasource.deleteAllEvents();
 			// datasource.deleteAllHash();
 			int type;
-			int toChannel = 3;
+			int toChannel = 20;
 			Boolean endOfSession = false;
 			String data = new String();
 			CRC32 checkSum = new CRC32();

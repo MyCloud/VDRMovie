@@ -43,6 +43,7 @@ public class MainVDRActivity extends FragmentActivity implements
 	private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
 	private DownloadVDR downloader;
     private CustomEventAdapter customAdapter;
+	private DatabaseConnector datasource;
 
 	ProgressDialog pleaseWaitDialog;
 
@@ -68,7 +69,7 @@ public class MainVDRActivity extends FragmentActivity implements
 
 
 		/** Defining Navigation listener */
-		OnNavigationListener navigationListener = new OnNavigationListener() {
+/*		OnNavigationListener navigationListener = new OnNavigationListener() {
 
 			@Override
 			public boolean onNavigationItemSelected(int itemPosition, long itemId) {
@@ -78,16 +79,17 @@ public class MainVDRActivity extends FragmentActivity implements
 				return false;
 			}
 		};
-			
+*/			
 
 		/**
 		 * Setting dropdown items and item navigation listener for the actionbar
 		 */
-		actionBar.setListNavigationCallbacks(adapter, navigationListener);
-		actionBar.setSelectedNavigationItem(2);
+		actionBar.setListNavigationCallbacks(adapter, this);
+		actionBar.setSelectedNavigationItem(0);
 
 		// Start loading the questions in the background
-		net.go2mycloud.vdrmovie.DatabaseConnector datasource;
+		downloader = new DownloadVDR(this.getBaseContext());
+		
 		//downloader.execute("test", "test2");
 		// open database need to make sure the context is not gone while assess
 		// database
@@ -111,12 +113,15 @@ public class MainVDRActivity extends FragmentActivity implements
 
          	  datasource.open();
 
-               customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getNowChannels(), CursorAdapter.NO_SELECTION);
+//               customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getNowEvents(), CursorAdapter.NO_SELECTION);
 
 
 
-              listView.setAdapter(customAdapter);
-		
+  //            listView.setAdapter(customAdapter);
+              //datasource.close();
+  //         }
+   //    };
+    //   thread.start();
 		
 
 	}
@@ -203,43 +208,15 @@ public class MainVDRActivity extends FragmentActivity implements
 	}
 
 	@Override
-	public boolean onNavigationItemSelected(int position, long id) {
-		// When the given dropdown item is selected, show its contents in the
-		// container view.
-		Fragment fragment = new DummySectionFragment();
-		Bundle args = new Bundle();
-		args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
-		fragment.setArguments(args);
-		getSupportFragmentManager().beginTransaction()
-				.replace(R.id.container, fragment).commit();
-		return true;
+	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+		Toast.makeText(getBaseContext(), "You selected : " + itemPosition,
+				Toast.LENGTH_SHORT).show();
+		getActionBar().setSelectedNavigationItem(itemPosition);
+        customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getNowEvents(), CursorAdapter.NO_SELECTION);
+		final ListView listView = (ListView) findViewById(R.id.list_events);
+
+        listView.setAdapter(customAdapter);
+
+		return false;
 	}
-
-	/**
-	 * A dummy fragment representing a section of the app, but that simply
-	 * displays dummy text.
-	 */
-	public static class DummySectionFragment extends Fragment {
-		/**
-		 * The fragment argument representing the section number for this
-		 * fragment.
-		 */
-		public static final String ARG_SECTION_NUMBER = "section_number";
-
-		public DummySectionFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			// Create a new TextView and set its text to the fragment's section
-			// number argument value.
-			TextView textView = new TextView(getActivity());
-			textView.setGravity(Gravity.CENTER);
-			textView.setText(Integer.toString(getArguments().getInt(
-					ARG_SECTION_NUMBER)));
-			return textView;
-		}
-	}
-
 }

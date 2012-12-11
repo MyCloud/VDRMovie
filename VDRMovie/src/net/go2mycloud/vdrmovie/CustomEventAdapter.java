@@ -24,7 +24,7 @@ public class CustomEventAdapter extends CursorAdapter {
 
         TextView textViewTitle = (TextView) view.findViewById(R.id.title);
 
-        textViewTitle.setText(cursor.getString(cursor.getColumnIndex(cursor.getColumnName(1))));
+        textViewTitle.setText(cursor.getString(cursor.getColumnIndex(cursor.getColumnName(9))));
 
         //ImageView imageViewIcon = (ImageView) view.findViewById(R.id.icon);
        // imageViewIcon.setImageURI(cursor.getString(cursor.getColumnIndex(cursor.getColumnName(1))));
@@ -32,7 +32,7 @@ public class CustomEventAdapter extends CursorAdapter {
  
 
         TextView textViewDetails = (TextView) view.findViewById(R.id.details);
-        textViewDetails.setText(cursor.getString(cursor.getColumnIndex(cursor.getColumnName(2))));
+        textViewDetails.setText(cursor.getString(cursor.getColumnIndex(cursor.getColumnName(3))));
         
     }
 		
