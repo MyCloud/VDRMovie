@@ -3,18 +3,25 @@ package net.go2mycloud.vdrmovie;
 
 import android.annotation.TargetApi;
 import android.app.ActionBar;
+import android.app.ProgressDialog;
 import android.app.ActionBar.OnNavigationListener;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.DialogInterface.OnCancelListener;
 import android.os.Build;
 //import android.support.v4.app.Fragment;
 //import android.support.v4.app.FragmentActivity;
 //import android.support.v4.app.NavUtils;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 //import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +37,10 @@ public class MainVDRActivity extends FragmentActivity implements
 	 * current dropdown position.
 	 */
 	private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
+	private DownloadVDR downloader;
+	ProgressDialog pleaseWaitDialog;
 
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -70,6 +80,9 @@ public class MainVDRActivity extends FragmentActivity implements
 		actionBar.setListNavigationCallbacks(adapter, navigationListener);
 		actionBar.setSelectedNavigationItem(2);
 
+		// Start loading the questions in the background
+		downloader = new DownloadVDR(this.getBaseContext());
+		//downloader.execute("test", "test2");
 		
 		
 
@@ -87,6 +100,48 @@ public class MainVDRActivity extends FragmentActivity implements
 		} else {
 			return this;
 		}
+	}
+
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// TODO Auto-generated method stub
+		switch (item.getItemId()) {
+		case R.id.menu_settings:
+			Toast.makeText(this, "Menu settings", Toast.LENGTH_SHORT).show();
+			// The animation has ended, transition to the Main Menu screen
+			//startActivity(new Intent(QuizMenuActivity.this, QuizHelpActivity.class));
+			//QuizMenuActivity.this.finish();
+			break;
+		case R.id.menu_update:
+			Toast.makeText(this, "Menu update", Toast.LENGTH_SHORT).show();
+			pleaseWaitDialog = ProgressDialog.show(MainVDRActivity.this,
+					"VDR Guid", "Downloading VDR Guid data", true, true);
+			pleaseWaitDialog.setOnCancelListener(new OnCancelListener() {
+				public void onCancel(DialogInterface dialog) {
+					Log.d("onOptionsItemSelected" , "onCancel ");
+					downloader.cancel(true);
+				}
+			});
+			if(downloader.getStatus() == AsyncTask.Status.FINISHED ) {
+				downloader = new DownloadVDR(this.getBaseContext());
+			}
+			if(downloader.getStatus() == AsyncTask.Status.PENDING){
+				downloader.execute("");
+			}
+
+			break;
+		case android.R.id.home:
+			//Intent intent = new Intent(this, QuizSplashActivity.class);
+			//intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			//startActivity(intent);
+			break;
+		default:
+			break;
+		}
+
+		return super.onOptionsItemSelected(item);
+
 	}
 
 	@Override
@@ -109,6 +164,8 @@ public class MainVDRActivity extends FragmentActivity implements
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.activity_main_vdr, menu);
+//		return super.onCreateOptionsMenu(menu);
+
 		return true;
 	}
 

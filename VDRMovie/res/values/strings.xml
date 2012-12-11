@@ -14,5 +14,6 @@
         <item >Timers</item>
         <item >Records</item>
     </string-array>
+        <string name="menu_update">Update Events</string>
 
 </resources>
