@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">VDR Movie</string>
+    <string name="title_section3">Section 3</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section1">Section 1</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string-array name="MainMenu">
+        <item >Now</item>
+        <item >Next</item>
+        <item >Sheduled</item>
+        <item >Timers</item>
+        <item >Records</item>
+    </string-array>
+
+</resources>
