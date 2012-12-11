@@ -15,7 +15,7 @@ import android.support.v4.app.FragmentActivity;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
+//import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -72,14 +72,7 @@ public class MainVDRActivity extends FragmentActivity implements
 
 		
 		
-		//actionBar.setListNavigationCallbacks(
-		// Specify a SpinnerAdapter to populate the dropdown list.
-		//		new ArrayAdapter<String>(getActionBarThemedContextCompat(),
-		//				android.R.layout.simple_list_item_1,
-		//				android.R.id.text1, new String[] {
-		//						getString(R.string.title_section1),
-		//						getString(R.string.title_section2),
-		//						getString(R.string.title_section3), }), this);
+
 	}
 
 	/**
