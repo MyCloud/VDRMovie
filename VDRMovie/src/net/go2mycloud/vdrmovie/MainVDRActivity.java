@@ -1,6 +1,7 @@
 package net.go2mycloud.vdrmovie;
 
 
+
 import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.ProgressDialog;
@@ -11,12 +12,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
+import android.database.SQLException;
 import android.os.Build;
 //import android.support.v4.app.Fragment;
 //import android.support.v4.app.FragmentActivity;
 //import android.support.v4.app.NavUtils;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.widget.CursorAdapter;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -26,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,6 +42,8 @@ public class MainVDRActivity extends FragmentActivity implements
 	 */
 	private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
 	private DownloadVDR downloader;
+    private CustomEventAdapter customAdapter;
+
 	ProgressDialog pleaseWaitDialog;
 
 	
@@ -81,8 +87,35 @@ public class MainVDRActivity extends FragmentActivity implements
 		actionBar.setSelectedNavigationItem(2);
 
 		// Start loading the questions in the background
-		downloader = new DownloadVDR(this.getBaseContext());
+		net.go2mycloud.vdrmovie.DatabaseConnector datasource;
 		//downloader.execute("test", "test2");
+		// open database need to make sure the context is not gone while assess
+		// database
+		try {
+			datasource = new DatabaseConnector(this.getBaseContext());
+		} catch (SQLException e) {
+			throw new Error("Error copying database");
+		}
+		final ListView listView = (ListView) findViewById(R.id.list_events);
+
+
+      
+
+       // Database query can be a time consuming task ..
+       // so its safe to call database query in another thread
+
+//       Thread thread = new Thread() {
+
+  //         public void run() {
+      //Looper.prepare();
+
+         	  datasource.open();
+
+               customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getNowChannels(), CursorAdapter.NO_SELECTION);
+
+
+
+              listView.setAdapter(customAdapter);
 		
 		
 
