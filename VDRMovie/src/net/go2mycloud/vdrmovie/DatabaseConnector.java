@@ -76,10 +76,21 @@ public class DatabaseConnector {
 		  String buildSQL = "select ch_key _id, ch_key, dr, gt, nr, hsh_key, rt, st, time, tt "
 				  + "from EventTbl where time = ( select max(time) from EventTbl as f " 
 				  + "where f.ch_key = EventTbl.ch_key and f.time < " + Long.toString(unixTime) + " ); ";
-		  Log.d(" DatabaseConnector", "unixtime:" + unixTime );
+		  Log.d(" DatabaseConnector", "getNowEvents unixtime:" + unixTime );
 		  
 		  return database.rawQuery(buildSQL, null);
    }
+	public Cursor getNextEvents() {
+		long unixTime = System.currentTimeMillis() / 1000L;
+		  String buildSQL = "select ch_key _id, ch_key, dr, gt, nr, hsh_key, rt, st, time, tt "
+				  + "from EventTbl where time = ( select min(time) from EventTbl as f " 
+				  + "where f.ch_key = EventTbl.ch_key and f.time >= " + Long.toString(unixTime) + " ); ";
+		  Log.d(" DatabaseConnector", "getNextEvents unixtime:" + unixTime );
+		  
+		  return database.rawQuery(buildSQL, null);
+	}
+
+	
 	public Cursor getNowChannels () 
 	{
 		Cursor c;   
@@ -318,6 +329,7 @@ public class DatabaseConnector {
 				null);
 		return c;
 	}
+
 }
 
 

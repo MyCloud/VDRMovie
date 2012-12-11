@@ -325,7 +325,7 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 			// for all recordings in database
 			boolean endRecordings = false;
 			endOfSession = false;
-			int recNr = 400;
+			int recNr = 1;
 			int Ev_wt = -1;
 
 			long cur_Id = -1;
