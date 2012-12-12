@@ -29,6 +29,8 @@ import android.view.Window;
 //import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -67,7 +69,7 @@ public class MainVDRActivity extends FragmentActivity implements
 		/** Create an array adapter to populate dropdownlist */
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
 				getActionBarThemedContextCompat(), R.array.MainMenu, android.R.layout.simple_spinner_item);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		//? adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
 		/** Enabling dropdown list navigation for the action bar */
 //		getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
@@ -105,7 +107,15 @@ public class MainVDRActivity extends FragmentActivity implements
 		}
 		//final ListView listView = (ListView) findViewById(R.id.list_events);
 		listView = (ListView) findViewById(R.id.list_events);
-
+		listView.setOnItemClickListener(new OnItemClickListener() {
+			  @Override
+			  public void onItemClick(AdapterView<?> parent, View view,
+			    int position, long id) {
+			    Toast.makeText(getApplicationContext(),
+			      "Click ListItem Number " + position, Toast.LENGTH_LONG)
+			      .show();
+			  }
+			}); 
 
       
 
@@ -218,13 +228,19 @@ public class MainVDRActivity extends FragmentActivity implements
 		Toast.makeText(getBaseContext(), "You selected : " + itemPosition,
 				Toast.LENGTH_SHORT).show();
         if(itemPosition == 0) {
-    		customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getNowEvents(), CursorAdapter.NO_SELECTION);        	
+    		customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getNowEvents(), CursorAdapter.NO_SELECTION , itemPosition );        	
         }
         if(itemPosition == 1) {
-    		customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getNextEvents(), CursorAdapter.NO_SELECTION);        	
+    		customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getNextEvents(), CursorAdapter.NO_SELECTION, itemPosition);        	
         }
         if(itemPosition == 2) {
-    		//customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getSheduledEvents(), CursorAdapter.NO_SELECTION);        	
+    		//customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getSheduledEvents(), CursorAdapter.NO_SELECTION, itemPosition);      
+        }
+        if(itemPosition == 3) {
+    		customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getMovieEvents(), CursorAdapter.NO_SELECTION, itemPosition);      
+        }
+        if(itemPosition == 4) {
+    		customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getRecordedEvents(), CursorAdapter.NO_SELECTION, itemPosition);      
         }
         listView.setAdapter(customAdapter);
 		return false;

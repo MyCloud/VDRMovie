@@ -76,7 +76,7 @@ public class MovieMeterPluginSession {
         } catch (IOException error) {
         }
 
-        Log.d("MovieMeterPluginSession:" ," Stored session: " + getKey());
+        Log.d("MovieMeterPluginSession:" ," Stored session: " + getKey() + "Counter:" + getCounter());
 
         if (!isValid()) {
             createNewSession(MOVIEMETER_API_KEY);
@@ -221,7 +221,7 @@ public class MovieMeterPluginSession {
 					}
 				}
 
-				// Choose first result
+				// Choose best match result
 				result = (HashMap) films[index_best];
 				Log.d("MovieMeterPluginSession:", "Title: " + result.get("title").toString() +
 						" Sim: " + result.get("similarity").toString() + " Request:" + params2.toString() + " TI:" + Integer.toString(films.length) + 
@@ -311,12 +311,13 @@ public class MovieMeterPluginSession {
     public HashMap getMovieDetailsById(Integer moviemeterId) {
 
         HashMap result = null;
-        Object[] params = new Object[]{getKey(), moviemeterId};
+		Object params1 = getKey();
+		Object params2 = moviemeterId;
         try {
             if (!isValid()) {
                 createNewSession(MOVIEMETER_API_KEY);
             }
-            result = (HashMap) client.call("film.retrieveDetails", params);
+            result = (HashMap) client.call("film.retrieveDetails", params1, params2);
             increaseCounter();
         } catch (XMLRPCException error) {
             final Writer eResult = new StringWriter();

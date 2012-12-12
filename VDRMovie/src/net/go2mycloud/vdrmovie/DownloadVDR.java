@@ -3,9 +3,14 @@ package net.go2mycloud.vdrmovie;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.Socket;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.zip.CRC32;
 
@@ -15,6 +20,10 @@ import java.util.zip.CRC32;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Environment;
 import android.util.Log;
 
 
@@ -30,6 +39,42 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
         this.mContext = context;
     }
     
+	private void downloadFromUrl(String imageURL, String fileName) {
+	    try {
+	            // Connect to the URL
+	            URL myImageURL = new URL(imageURL);
+	            HttpURLConnection connection = (HttpURLConnection)myImageURL.openConnection();
+	            connection.setDoInput(true);
+	            connection.connect();
+	            InputStream input = connection.getInputStream();
+
+	            // Get the bitmap
+	            Bitmap myBitmap = BitmapFactory.decodeStream(input);
+
+	            // Save the bitmap to the file
+	            String path = Environment.getExternalStorageDirectory().toString();
+
+	            OutputStream fOut = null;
+	            File file = new File(path, fileName);
+	            Log.i("help", file.getAbsolutePath());
+	            Log.i("help", file.toString());
+	            Log.i("help", file.length() + "");
+	            //System.out.println("THIS IS A TEST OF SYSTEM.OUT.PRINTLN()");
+	            fOut = new FileOutputStream(file);
+
+	            myBitmap.compress(Bitmap.CompressFormat.JPEG, 85, fOut);
+	            fOut.flush();
+	            fOut.close();
+	            System.out.println("file Path: " + file.getAbsolutePath());
+	            Log.i("help2", file.getAbsolutePath());
+	            Log.i("help2", file.toString());
+	            Log.i("help2", file.length() + "");
+
+	        } catch (IOException e) {}
+	}
+	
+	
+	
 	@Override
 	protected void onPostExecute(Boolean result) {
 		// TODO Auto-generated method stub
@@ -81,6 +126,7 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 		String Ev_rft = "";
 		String Ev_rlt = "";
 		String Ev_st = "";
+		String Ev_dt = "";
 		long Ev_hsh_key = 0;
 
 		session = new MovieMeterPluginSession();
@@ -90,7 +136,7 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 			// datasource.deleteAllEvents();
 			// datasource.deleteAllHash();
 			int type;
-			int toChannel = 20;
+			int toChannel = 19;
 			Boolean endOfSession = false;
 			String data = new String();
 			CRC32 checkSum = new CRC32();
@@ -105,7 +151,7 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 			// delete all channels for now the easy way.
 
 			// datasource.deleteAllChannels();
-			for (int channel = 1; channel <= toChannel; channel++) {
+			for (int channel = 5; channel <= toChannel; channel++) {
 				// for all channel that need to be collected
 				// for now its the first 30 channels
 
@@ -165,6 +211,7 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 								Ev_gt = "";
 								Ev_rft = "";
 								Ev_rlt = "";
+								Ev_dt = "";
 								Ev_hsh_key = 0;
 
 							} else if (dataObj[0].contentEquals("215-T")
@@ -189,7 +236,17 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 								// regie is mostely the first 2 words behind Regie:
 
 								int regie = 0;
+								if (dataObj.length < 3) {
+									Ev_dt = dataObj[1];
 
+								} else {
+									Ev_dt = dataObj[1] + " " + dataObj[2]; // cat
+									// together
+								}
+
+								
+								
+								
 								Ev_gt = dataObj[1]; // genre
 								dataObj[1] = dataObj[1].replaceAll("Film|film|\\.",
 										"");
@@ -222,6 +279,9 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 
 									checkSum.reset();
 									checkSum.update(Ev_tt.getBytes());
+									checkSum.update(Ev_rft.getBytes());
+									checkSum.update(Ev_rlt.getBytes());
+									checkSum.update(Ev_gt.getBytes());
 
 									Cursor c = datasource.getOneHash(checkSum
 											.getValue());
@@ -229,6 +289,8 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 										if (c.getCount() < 1) {
 											// hash not found
 											HashMap filmInfo = null;
+											String idFilm = "0";
+											long Data_Id = 0;
 											// session.getMovieDetailsByTitleAndYear(Ev_tt
 											// , "");
 
@@ -236,18 +298,31 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 												filmInfo = session
 														.getMovieByTitleRegieGenre(Ev_tt,
 																Ev_rft, Ev_rlt, Ev_gt);
-												if (filmInfo != null)
+												if (filmInfo != null) {
 													Log.d(DEBUG_TAG,
-															"NEW FILM "
-																	+ String.valueOf(checkSum
-																			.getValue()));
-											}
+																"NEW FILM "
+																		+ String.valueOf(checkSum
+																				.getValue()));
+													idFilm = filmInfo.get("filmId").toString();
+													filmInfo = session.getMovieDetailsById( Integer.parseInt(idFilm));
+													downloadFromUrl(filmInfo.get("thumbnail").toString(), "VDR_TH_" + idFilm + ".jpg");
+													//idFilm = filmInfo.get("filmId").toString();
+												}
 
+											}
+											
 											// session.getMovieByTitle(Ev_tt);
 											// ////session.getMovieByTitle("Fame");
 											// Log.d(DEBUG_TAG, "NEW HASH " +
 											// String.valueOf(checkSum.getValue()) );
-											Ev_hsh_key = datasource.insertHash(0,
+											if (idFilm.contentEquals("0")) {
+												// no movie found use the data from VDR
+												Data_Id = datasource.insertData(0, Ev_dt);
+											} else {
+												Data_Id = datasource.insertData(Integer.parseInt(idFilm), filmInfo.toString());
+											}
+											
+											Ev_hsh_key = datasource.insertHash(Data_Id,
 													checkSum.getValue());
 										} else {
 											if (c.moveToFirst()) {
@@ -388,6 +463,7 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 								Ev_gt = "";
 								Ev_rft = "";
 								Ev_rlt = "";
+								Ev_dt = "";
 								Ev_wt = -1;
 								Ev_hsh_key = 0;
 
@@ -414,6 +490,13 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 								// behind Regie:
 
 								int regie = 0;
+								if (dataObj.length < 3) {
+									Ev_dt = dataObj[1];
+
+								} else {
+									Ev_dt = dataObj[1] + " " + dataObj[2]; // cat
+									// together
+								}
 
 								Ev_gt = dataObj[1]; // genre
 								dataObj[1] = dataObj[1].replaceAll("Film|film|\\.",
@@ -447,6 +530,10 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 
 									checkSum.reset();
 									checkSum.update(Ev_tt.getBytes());
+									checkSum.update(Ev_rft.getBytes());
+									checkSum.update(Ev_rlt.getBytes());
+									checkSum.update(Ev_gt.getBytes());
+
 
 									Cursor c = datasource.getOneHash(checkSum
 											.getValue());
@@ -454,6 +541,8 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 										if (c.getCount() < 1) {
 											// hash not found
 											HashMap filmInfo = null;
+											String idFilm = "0";
+											long Data_Id = 0;
 											// session.getMovieDetailsByTitleAndYear(Ev_tt
 											// , "");
 
@@ -461,20 +550,31 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 												filmInfo = session
 														.getMovieByTitleRegieGenre(Ev_tt,
 																Ev_rft, Ev_rlt, Ev_gt);
-												if (filmInfo != null)
+												if (filmInfo != null) {
 													Log.d(DEBUG_TAG,
-															"NEW FILM "
-																	+ String.valueOf(checkSum
-																			.getValue()));
-											}
+																"NEW FILM "
+																		+ String.valueOf(checkSum
+																				.getValue()));
+													idFilm = filmInfo.get("filmId").toString();
+													filmInfo = session.getMovieDetailsById( Integer.parseInt(idFilm));
+													downloadFromUrl(filmInfo.get("thumbnail").toString(), "VDR_TH_" + idFilm + ".jpg");
+													//idFilm = filmInfo.get("filmId").toString();
+												}
 
+											}
+											
 											// session.getMovieByTitle(Ev_tt);
 											// ////session.getMovieByTitle("Fame");
-											// Log.d(DEBUG_TAG,
-											// "NEW HASH " +
-											// String.valueOf(checkSum.getValue())
-											// );
-											Ev_hsh_key = datasource.insertHash(0,
+											// Log.d(DEBUG_TAG, "NEW HASH " +
+											// String.valueOf(checkSum.getValue()) );
+											if (idFilm.contentEquals("0")) {
+												// no movie found use the data from VDR
+												Data_Id = datasource.insertData(0, Ev_dt);
+											} else {
+												Data_Id = datasource.insertData(Integer.parseInt(idFilm), filmInfo.toString());
+											}
+											
+											Ev_hsh_key = datasource.insertHash(Data_Id,
 													checkSum.getValue());
 										} else {
 											if (c.moveToFirst()) {

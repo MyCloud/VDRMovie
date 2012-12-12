@@ -89,6 +89,26 @@ public class DatabaseConnector {
 		  
 		  return database.rawQuery(buildSQL, null);
 	}
+	public Cursor getMovieEvents() {
+
+		String buildSQL = "select EventTbl.ch_key _id, EventTbl.ch_key, EventTbl.dr, EventTbl.gt, EventTbl.nr, EventTbl.hsh_key, EventTbl.rt, EventTbl.st, EventTbl.time, " + 
+	  "EventTbl.tt, DataTbl.nr " +
+	  "from EventTbl, HashTbl ,DataTbl " +
+	  "where EventTbl.hsh_key = HashTbl._id and HashTbl.data_key = DataTbl._id and DataTbl.nr > 0";
+		  return database.rawQuery(buildSQL, null);
+
+	}	
+	
+	public Cursor getRecordedEvents() {
+		String buildSQL = "select RecordingsTbl._id, RecordingsTbl.ch_key, RecordingsTbl.dr, RecordingsTbl.gt, RecordingsTbl.nr, RecordingsTbl.hsh_key, RecordingsTbl.rt, RecordingsTbl.st, RecordingsTbl.time, " +  
+				  "RecordingsTbl.tt, DataTbl.nr "+ 
+				  "from RecordingsTbl, HashTbl ,DataTbl " +
+				  "where RecordingsTbl.hsh_key = HashTbl._id and HashTbl.data_key = DataTbl._id and DataTbl.nr > 0 order by RecordingsTbl.tt";	  
+
+		
+		//String buildSQL = "select * from RecordingsTbl ORDER BY tt";		  
+		  return database.rawQuery(buildSQL, null);
+	}
 
 	
 	public Cursor getNowChannels () 

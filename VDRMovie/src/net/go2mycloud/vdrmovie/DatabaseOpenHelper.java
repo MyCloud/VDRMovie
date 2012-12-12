@@ -121,6 +121,13 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	}
 
 	@Override
+	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		// TODO Auto-generated method stub
+		onUpgrade(db, oldVersion, newVersion);
+		//super.onDowngrade(db, oldVersion, newVersion);
+	}
+
+	@Override
 	  public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 	    Log.w(DatabaseOpenHelper.class.getName(),
 	        "Upgrading database from version " + oldVersion + " to "
