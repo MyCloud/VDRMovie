@@ -5,7 +5,7 @@ import android.app.Activity;
 import android.os.Bundle;
 
 
-public class Detail_Event_VDR_Activity extends Activity {
+public class DetailEventVDRActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

@@ -112,7 +112,7 @@ public class MainVDRActivity extends Activity implements OnNavigationListener {
 			  public void onItemClick(AdapterView<?> parent, View view,
 			    int position, long id) {
 				  // open detail window with selected event
-					startActivity(new Intent(MainVDRActivity.this, Detail_Event_VDR_Activity.class));
+					startActivity(new Intent(MainVDRActivity.this, DetailEventVDRActivity.class));
 					MainVDRActivity.this.finish();
 				  
 			    //Toast.makeText(getApplicationContext(),

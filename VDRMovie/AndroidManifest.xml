@@ -29,7 +29,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="Detail_Event_VDR_Activity"></activity>
+        <activity android:name="net.go2mycloud.vdrmovie.DetailEventVDRActivity"></activity>
     </application>
 
 </manifest>
