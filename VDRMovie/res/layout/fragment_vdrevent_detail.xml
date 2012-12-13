@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/text_title_year_detail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:text="Medium Text"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <ImageView
+            android:id="@+id/image_thump_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/text_title_year_detail"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/ic_action_refresh" />
+
+        <RatingBar
+            android:id="@+id/rating_average_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/image_thump_detail"
+            android:layout_centerHorizontal="true"
+            android:focusable="false"
+            android:minHeight="40dip"
+            android:minWidth="100dip" />
+
+        <TextView
+            android:id="@+id/text_countries_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/rating_average_detail"
+            android:text="TextView" />
+        <TextView
+            android:id="@+id/text_genres_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/text_countries_detail"
+            android:text="TextView" />
+        <TextView
+            android:id="@+id/text_directors_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/text_genres_detail"
+            android:text="TextView" />
+        <TextView
+            android:id="@+id/text_actors_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/text_directors_detail"
+            android:text="TextView" />
+
+        <TextView
+            android:id="@+id/text_plot_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/text_actors_detail"
+            android:text="TextView" />
+        
+    </RelativeLayout>
+    
