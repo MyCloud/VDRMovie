@@ -112,8 +112,10 @@ public class MainVDRActivity extends Activity implements OnNavigationListener {
 			  public void onItemClick(AdapterView<?> parent, View view,
 			    int position, long id) {
 				  // open detail window with selected event
-					startActivity(new Intent(MainVDRActivity.this, DetailEventVDRActivity.class));
-					MainVDRActivity.this.finish();
+				  
+				  updateDetailEvent(parent, view, position, id);
+//					startActivity(new Intent(MainVDRActivity.this, DetailEventVDRActivity.class));
+//					MainVDRActivity.this.finish();
 				  
 			    //Toast.makeText(getApplicationContext(),
 			    //  "Click ListItem Number " + position, Toast.LENGTH_LONG)
@@ -159,7 +161,21 @@ public class MainVDRActivity extends Activity implements OnNavigationListener {
 			return this;
 		}
 	}
+	  public void updateDetailEvent(AdapterView<?> parent, View view, int position, long id) {
+		    DetailEventVDRFragment fragment = (DetailEventVDRFragment) getFragmentManager()
+		        .findFragmentById(R.id.detailFragment);
+		    if (fragment != null && fragment.isInLayout()) {
+		      fragment.updateEventInfo();
+		    } else {
+			      Intent intent = new Intent(this.getApplicationContext(),
+				          DetailEventVDRActivity.class);
+//			      Intent intent = new Intent(getActivity().getApplicationContext(),
+//				          DetailActivity.class);
+		      intent.putExtra("value", "2012");
+		      startActivity(intent);
 
+		    }
+		  }
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
