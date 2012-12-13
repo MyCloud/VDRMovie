@@ -4,6 +4,7 @@ package net.go2mycloud.vdrmovie;
 
 import android.annotation.TargetApi;
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.app.ActionBar.OnNavigationListener;
 import android.os.AsyncTask;
@@ -36,8 +37,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainVDRActivity extends FragmentActivity implements
-		ActionBar.OnNavigationListener {
+public class MainVDRActivity extends Activity implements OnNavigationListener {
 
 	/**
 	 * The serialization (saved instance state) Bundle key representing the
