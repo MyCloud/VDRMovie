@@ -68,7 +68,16 @@
             android:layout_alignParentRight="true"
             android:layout_below="@+id/text_directors_detail"
             android:text="TextView" />
-        
+
+        <TextView
+            android:id="@+id/text_plot_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/text_actors_detail"
+            android:text="TextView" />
         
     </RelativeLayout>
 

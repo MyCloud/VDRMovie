@@ -111,9 +111,13 @@ public class MainVDRActivity extends FragmentActivity implements
 			  @Override
 			  public void onItemClick(AdapterView<?> parent, View view,
 			    int position, long id) {
-			    Toast.makeText(getApplicationContext(),
-			      "Click ListItem Number " + position, Toast.LENGTH_LONG)
-			      .show();
+				  // open detail window with selected event
+					startActivity(new Intent(MainVDRActivity.this, Detail_Event_VDR_Activity.class));
+					MainVDRActivity.this.finish();
+				  
+			    //Toast.makeText(getApplicationContext(),
+			    //  "Click ListItem Number " + position, Toast.LENGTH_LONG)
+			    //  .show();
 			  }
 			}); 
 
