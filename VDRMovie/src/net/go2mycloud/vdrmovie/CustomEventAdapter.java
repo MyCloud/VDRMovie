@@ -86,8 +86,14 @@ public class CustomEventAdapter extends CursorAdapter {
         //}
         if( cursor.getInt(0) == (Selected +1 ) ) {
         	//textViewFocus.setText(">");
-        	focus = true;
-        }	
+        	imageViewFocus.setImageResource(R.drawable.status_rec);
+        	imageViewFocus.invalidate();
+        	imageViewFocus.refreshDrawableState();
+        } else {
+        	imageViewFocus.setImageResource(R.drawable.status_green);
+        	
+        }
+        	
         //imageViewIcon.setBackgroundColor(color);
         switch(Type){
         case 3: // Scheduled movies 

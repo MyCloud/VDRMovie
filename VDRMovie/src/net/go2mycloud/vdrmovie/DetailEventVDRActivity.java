@@ -23,12 +23,13 @@ public class DetailEventVDRActivity extends Activity {
 		ActionBar actionBar = getActionBar();
 		setContentView(R.layout.activity_detail_vdr);
 		actionBar.setDisplayHomeAsUpEnabled(true);
-
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
-			String s = extras.getString("value");
+			String s = extras.getString("position");
 			TextView view = (TextView) findViewById(R.id.text_title_year_detail);
 			view.setText(s);
+			this.findViewById(android.R.id.content);
+
 		}
 	}
 	

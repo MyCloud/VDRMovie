@@ -48,6 +48,9 @@ public class MainVDRActivity extends Activity implements OnNavigationListener {
 	private DownloadVDR downloader;
     private CustomEventAdapter customAdapter;
 	private DatabaseConnector datasource;
+	private DetailEventVDRView  detailEventVDRView;
+
+
 	ListView listView;
 	
 	ProgressDialog pleaseWaitDialog;
@@ -119,7 +122,10 @@ public class MainVDRActivity extends Activity implements OnNavigationListener {
 				  //customAdapter.getItem(position) getCursor(). setPosition();
 				  
 				  customAdapter.setSelected(position);
+
+			      listView.setAdapter(customAdapter);
 				  listView.setSelection(position);
+
 				  //Cursor cursor = ((AdapterView) parent).getCursor();
 				  //cursor.moveToPosition(position);
 				  updateDetailEvent(parent, view, position, id);
@@ -174,7 +180,7 @@ public class MainVDRActivity extends Activity implements OnNavigationListener {
 		    DetailEventVDRFragment fragment = (DetailEventVDRFragment) getFragmentManager()
 		        .findFragmentById(R.id.detailFragment);
 		    if (fragment != null && fragment.isInLayout()) {
-		      fragment.updateEventInfo(position);
+		      fragment.updateEventInfo(position, customAdapter);
 		    } else {
 			      Intent intent = new Intent(this.getApplicationContext(),
 				          DetailEventVDRActivity.class);
@@ -257,7 +263,7 @@ public class MainVDRActivity extends Activity implements OnNavigationListener {
 		Toast.makeText(getBaseContext(), "You selected : " + itemPosition,
 				Toast.LENGTH_SHORT).show();
 		if( customAdapter == null ) {
-    		customAdapter = new CustomEventAdapter(MainVDRActivity.this, null, CursorAdapter.NO_SELECTION , itemPosition );        	
+    		customAdapter = new CustomEventAdapter(MainVDRActivity.this, null, CursorAdapter.IGNORE_ITEM_VIEW_TYPE , itemPosition );        	
 		}
 		if(itemPosition == 0) {
 //    		customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getNowEvents(), CursorAdapter.NO_SELECTION , itemPosition );        	
@@ -284,6 +290,13 @@ public class MainVDRActivity extends Activity implements OnNavigationListener {
         	customAdapter.getCursor().moveToFirst();
         }
         listView.setAdapter(customAdapter);
+        
 		return false;
+	}
+	public String getCursorDetails() {
+		
+		
+		return null;
+		
 	}
 }

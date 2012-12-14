@@ -14,16 +14,25 @@ import android.view.ViewGroup;
 
 public class DetailEventVDRFragment extends Fragment {
 
+	private View view;
+//	private CustomEventAdapter viewCA;
+	private DetailEventVDRView detailEventVDRView;
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-	    View view = inflater.inflate(R.layout.fragment_vdrevent_detail,
+	    view = inflater.inflate(R.layout.fragment_vdrevent_detail,
 		        container, false);
 		    return view;
 	}
-
-	public void updateEventInfo(int position)
+	public void setViewCA( CustomEventAdapter customAdapter )
 	{
+//		viewCA = customAdapter;
+        detailEventVDRView = new DetailEventVDRView( view, customAdapter );		
+	}
+
+	public void updateEventInfo(int position )
+	{
+		detailEventVDRView.setDetails(position);
 		Log.d("DetailEventVDRFragment","updateEventInfo position" + position  );
 	}
 }

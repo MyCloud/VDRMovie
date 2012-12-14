@@ -8,12 +8,11 @@
     
        <ImageView
            android:id="@+id/focus"
-           android:layout_width="40dip"
+           android:layout_width="32dip"
            android:layout_height="fill_parent"
            android:layout_alignParentBottom="true"
            android:layout_alignParentTop="true"
-           android:layout_marginRight="0dip"
-           android:src="@drawable/focus" />
+           android:layout_marginRight="0dip" />
     
     <ImageView
         android:id="@+id/icon"
