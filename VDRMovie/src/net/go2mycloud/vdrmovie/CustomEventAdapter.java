@@ -79,11 +79,13 @@ public class CustomEventAdapter extends CursorAdapter {
 		TextView textViewTitle = (TextView) view.findViewById(R.id.title);
         TextView textViewDetails = (TextView) view.findViewById(R.id.details);
         ImageView imageViewIcon = (ImageView) view.findViewById(R.id.icon);
+        ImageView imageViewFocus = (ImageView) view.findViewById(R.id.focus);
         Uri uri;
         //if ( BackGroud == 0) {
         //	textViewDetails.getBackground();
         //}
         if( cursor.getInt(0) == (Selected +1 ) ) {
+        	//textViewFocus.setText(">");
         	focus = true;
         }	
         //imageViewIcon.setBackgroundColor(color);
