@@ -3,6 +3,17 @@
 
     android:layout_width="fill_parent"
     android:layout_height="50dip" >
+      <TextView  
+        android:id="@+id/cursor_focus"
+
+        android:layout_width="5dip"
+        android:layout_height="20dip" 
+        
+        android:layout_alignParentBottom="true"
+        
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:text=">" />
     
     <ImageView
         android:id="@+id/icon"
@@ -10,24 +21,23 @@
         android:layout_width="40dip"
         android:layout_height="fill_parent"
         
+        android:layout_toRightOf="@id/cursor_focus"
+        
         android:layout_alignParentTop="true"
         android:layout_alignParentBottom="true"
         android:layout_marginRight="2dip"
         
         android:src="@drawable/ic_action_refresh" />
 
-    <TextView  
+    <TextView
         android:id="@+id/details"
-
         android:layout_width="fill_parent"
-        android:layout_height="20dip" 
-        
-        android:layout_toRightOf="@id/icon"
+        android:layout_height="20dip"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        
-        android:singleLine="true"
+        android:layout_toRightOf="@id/icon"
         android:ellipsize="marquee"
+        android:singleLine="true"
         android:text="Simple application that shows how to use RelativeLayout" />
 
     <TextView
@@ -40,8 +50,7 @@
         android:layout_alignWithParentIfMissing="true"
         android:layout_toRightOf="@id/icon"
         android:gravity="center_vertical"
-        android:textStyle="bold"
-        
-        android:text="My Application" />
+        android:text="My Application"
+        android:textStyle="bold" />
 
 </RelativeLayout>

@@ -20,9 +20,9 @@ public class DetailEventVDRActivity extends Activity {
 			finish();
 			return;
 		}
-//		ActionBar actionBar = getActionBar();
+		ActionBar actionBar = getActionBar();
 		setContentView(R.layout.activity_detail_vdr);
-//		actionBar.setDisplayHomeAsUpEnabled(true);
+		actionBar.setDisplayHomeAsUpEnabled(true);
 
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {

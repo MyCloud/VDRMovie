@@ -22,8 +22,8 @@ public class DetailEventVDRFragment extends Fragment {
 		    return view;
 	}
 
-	public void updateEventInfo()
+	public void updateEventInfo(int position)
 	{
-		Log.d("DetailEventVDRFragment","updateEventInfo" );
+		Log.d("DetailEventVDRFragment","updateEventInfo position" + position  );
 	}
 }

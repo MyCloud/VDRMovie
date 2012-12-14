@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnCancelListener;
+import android.database.Cursor;
 import android.database.SQLException;
 import android.os.Build;
 //import android.support.v4.app.Fragment;
@@ -112,7 +113,15 @@ public class MainVDRActivity extends Activity implements OnNavigationListener {
 			  public void onItemClick(AdapterView<?> parent, View view,
 			    int position, long id) {
 				  // open detail window with selected event
+				  //Cursor c = ((SimpleCursorAdapter)l.getAdapter()).getCursor();
+				  //long c = (long)parent.getItemIdAtPosition(position);
+				  //(view)parent moveToPosition(position);
+				  //customAdapter.getItem(position) getCursor(). setPosition();
 				  
+				  customAdapter.setSelected(position);
+				  listView.setSelection(position);
+				  //Cursor cursor = ((AdapterView) parent).getCursor();
+				  //cursor.moveToPosition(position);
 				  updateDetailEvent(parent, view, position, id);
 //					startActivity(new Intent(MainVDRActivity.this, DetailEventVDRActivity.class));
 //					MainVDRActivity.this.finish();
@@ -165,7 +174,7 @@ public class MainVDRActivity extends Activity implements OnNavigationListener {
 		    DetailEventVDRFragment fragment = (DetailEventVDRFragment) getFragmentManager()
 		        .findFragmentById(R.id.detailFragment);
 		    if (fragment != null && fragment.isInLayout()) {
-		      fragment.updateEventInfo();
+		      fragment.updateEventInfo(position);
 		    } else {
 			      Intent intent = new Intent(this.getApplicationContext(),
 				          DetailEventVDRActivity.class);
@@ -247,20 +256,32 @@ public class MainVDRActivity extends Activity implements OnNavigationListener {
 	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
 		Toast.makeText(getBaseContext(), "You selected : " + itemPosition,
 				Toast.LENGTH_SHORT).show();
-        if(itemPosition == 0) {
-    		customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getNowEvents(), CursorAdapter.NO_SELECTION , itemPosition );        	
+		if( customAdapter == null ) {
+    		customAdapter = new CustomEventAdapter(MainVDRActivity.this, null, CursorAdapter.NO_SELECTION , itemPosition );        	
+		}
+		if(itemPosition == 0) {
+//    		customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getNowEvents(), CursorAdapter.NO_SELECTION , itemPosition );        	
+            customAdapter.swapCursor(datasource.getNowEvents());
         }
         if(itemPosition == 1) {
-    		customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getNextEvents(), CursorAdapter.NO_SELECTION, itemPosition);        	
-        }
+//    		customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getNextEvents(), CursorAdapter.NO_SELECTION, itemPosition);        	
+            customAdapter.swapCursor(datasource.getNextEvents());
+      }
         if(itemPosition == 2) {
     		//customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getSheduledEvents(), CursorAdapter.NO_SELECTION, itemPosition);      
         }
         if(itemPosition == 3) {
-    		customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getMovieEvents(), CursorAdapter.NO_SELECTION, itemPosition);      
+ //   		customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getMovieEvents(), CursorAdapter.NO_SELECTION, itemPosition);      
+            customAdapter.swapCursor(datasource.getMovieEvents());
         }
         if(itemPosition == 4) {
-    		customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getRecordedEvents(), CursorAdapter.NO_SELECTION, itemPosition);      
+ //   		customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getRecordedEvents(), CursorAdapter.NO_SELECTION, itemPosition);      
+            customAdapter.swapCursor(datasource.getRecordedEvents());
+        }
+        customAdapter.setType(itemPosition);
+        customAdapter.setSelected(0);
+        if( customAdapter.getCursor() != null ) {
+        	customAdapter.getCursor().moveToFirst();
         }
         listView.setAdapter(customAdapter);
 		return false;
