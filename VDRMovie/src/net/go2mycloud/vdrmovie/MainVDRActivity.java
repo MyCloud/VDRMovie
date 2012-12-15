@@ -123,18 +123,13 @@ public class MainVDRActivity extends Activity implements OnNavigationListener {
 				  
 				  customAdapter.setSelected(position);
 
-			      listView.setAdapter(customAdapter);
-				  listView.setSelection(position);
+			      //listView.setAdapter(customAdapter);
+				  //listView.setSelection(position);
 
 				  //Cursor cursor = ((AdapterView) parent).getCursor();
 				  //cursor.moveToPosition(position);
-				  updateDetailEvent(parent, view, position, id);
-//					startActivity(new Intent(MainVDRActivity.this, DetailEventVDRActivity.class));
-//					MainVDRActivity.this.finish();
 				  
-			    //Toast.makeText(getApplicationContext(),
-			    //  "Click ListItem Number " + position, Toast.LENGTH_LONG)
-			    //  .show();
+				  updateDetailEvent(parent, view, position, id);
 			  }
 			}); 
 
@@ -180,13 +175,15 @@ public class MainVDRActivity extends Activity implements OnNavigationListener {
 		    DetailEventVDRFragment fragment = (DetailEventVDRFragment) getFragmentManager()
 		        .findFragmentById(R.id.detailFragment);
 		    if (fragment != null && fragment.isInLayout()) {
-		      fragment.updateEventInfo(position, customAdapter);
+		    	fragment.setViewCA(customAdapter );	
+		      fragment.updateEventInfo(position);
 		    } else {
 			      Intent intent = new Intent(this.getApplicationContext(),
 				          DetailEventVDRActivity.class);
 //			      Intent intent = new Intent(getActivity().getApplicationContext(),
 //				          DetailActivity.class);
-		      intent.putExtra("value", "2012");
+		//	      intent.pu
+		 //     intent.putExtra("position", Integer.toString(position) );
 		      startActivity(intent);
 
 		    }
@@ -267,7 +264,7 @@ public class MainVDRActivity extends Activity implements OnNavigationListener {
 		}
 		if(itemPosition == 0) {
 //    		customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getNowEvents(), CursorAdapter.NO_SELECTION , itemPosition );        	
-            customAdapter.swapCursor(datasource.getNowEvents());
+   //         customAdapter.swapCursor(datasource.getNowEvents());
         }
         if(itemPosition == 1) {
 //    		customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getNextEvents(), CursorAdapter.NO_SELECTION, itemPosition);        	
@@ -299,4 +296,17 @@ public class MainVDRActivity extends Activity implements OnNavigationListener {
 		return null;
 		
 	}
+
+	public CustomEventAdapter getCustomAdapter() {
+		return customAdapter;
+	}
+
+	public DatabaseConnector getDatasource() {
+		return datasource;
+	}
+
+	public DetailEventVDRView getDetailEventVDRView() {
+		return detailEventVDRView;
+	}
+	
 }

@@ -1,12 +1,25 @@
 package net.go2mycloud.vdrmovie;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import android.content.Context;
+import android.content.res.AssetManager;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
 import android.util.Log;
 
 public class DatabaseOpenHelper extends SQLiteOpenHelper {
 
+	private Context context;
 	public static final String TBL_CHANNELS = "ChannelsTbl";
 	public static final String TBL_ID = "_id";
 	public static final String CHANNELS_NUM = "num";
@@ -35,6 +48,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	public static final String REC_E_GENRE = "gt";
 	public static final String REC_WATCH = "wt";	
 	public static final String REC_HASH_KEY = "hsh_key";
+	
 
 	
 	public static final String TBL_HASH = "HashTbl";
@@ -46,8 +60,34 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	public static final String DATA_NR = "nr";
 	public static final String DATA_DETAILS = "Dt";
 	
+	public static final String TBL_CURSOR = "CursorTbl";
+	public static final String C_CHANNELS_KEY = "ch_key";
+	public static final String C_TIME = "time";
+	public static final String C_DURATION = "dr";
+	public static final String C_TITLE = "tt";
+	public static final String C_STITLE = "st";
+	public static final String C_REGIE = "rt";
+	public static final String C_GENRE = "gt";
+	public static final String C_MOVIEM = "mm";
+	public static final String C_DATA_KEY = "data_key";
+	public static final String C_E_1 = "e1"; //Watched or TimerCreated
+	
+	public static final String createTblCursor = "CREATE TABLE "+ TBL_CURSOR + "( " 
+    		+ TBL_ID + " integer primary key autoincrement, " 
+    		+ C_CHANNELS_KEY + " integer not null, "
+    		+ C_TIME + " integer not null, "
+    		+ C_DURATION + " integer not null, "
+    		+ C_TITLE + " text, "
+    		+ C_STITLE + " text, "
+    		+ C_REGIE + " text, " 
+    		+ C_GENRE + " text, " 
+    		+ C_MOVIEM + " integer default 0, " 
+    		+ C_DATA_KEY + " integer not null, "
+    		+ C_E_1 + " integer default 0 " 
+    		+ ");";                 
+	
 	private static final String DATABASE_NAME = "events.db";
-	private static final int DATABASE_VERSION = 2;
+	private static final int DATABASE_VERSION = 3;
 
 	private static final String createTblChannels = "CREATE TABLE "+ TBL_CHANNELS + "( " 
     		+ TBL_ID + " integer primary key autoincrement, " 
@@ -102,6 +142,38 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	
 	public DatabaseOpenHelper(Context context ) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+
+		//Open your local db as the input stream
+		try {
+			    String inFileName = "/data/data/net.go2mycloud.vdrmovie/databases/events.db";
+			    File dbFile = new File(inFileName);
+			    FileInputStream fis;
+					fis = new FileInputStream(dbFile);
+
+			    String outFileName = Environment.getExternalStorageDirectory()+"/"+ DATABASE_VERSION  + "_events";
+			    //Open the empty db as the output stream
+			    OutputStream output;
+					output = new FileOutputStream(outFileName);
+			    //transfer bytes from the inputfile to the outputfile
+			    byte[] buffer = new byte[1024];
+			    int length;
+			    while ((length = fis.read(buffer))>0){
+			        output.write(buffer, 0, length);
+			    }
+			    //Close the streams
+			    output.flush();
+			    output.close();
+			    fis.close();
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		
+		
+		
 	}
 
 	/* public SQLiteDatabase getWritableDatabase() {
@@ -118,6 +190,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		db.execSQL(createTblHash);		
 		db.execSQL(createIndexTblHash);
 		db.execSQL(createTblRec);
+		db.execSQL(createTblCursor);
 	}
 
 	@Override
@@ -132,6 +205,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	    Log.w(DatabaseOpenHelper.class.getName(),
 	        "Upgrading database from version " + oldVersion + " to "
 	            + newVersion + ", which will destroy all old data");
+	    db.execSQL("DROP TABLE IF EXISTS " + TBL_CURSOR);
 	    db.execSQL("DROP TABLE IF EXISTS " + TBL_CHANNELS);
 	    db.execSQL("DROP TABLE IF EXISTS " + TBL_EVENT);
 	    db.execSQL("DROP TABLE IF EXISTS " + TBL_HASH);
@@ -139,5 +213,31 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	    db.execSQL("DROP TABLE IF EXISTS " + TBL_REC);
 	    onCreate(db);
 	  }
-
+	
+	private void executeSQLScript(SQLiteDatabase database, String dbname ) { 		
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		byte buf[] = new byte[1024];
+		int len;
+		AssetManager assetManager = context.getAssets();
+		InputStream inputStream = null;
+			try{
+		inputStream = assetManager.open(dbname);
+		while ((len = inputStream.read(buf)) != -1) {
+		outputStream.write(buf, 0, len);
+		}
+		outputStream.close();
+		inputStream.close();
+		
+		String[] createScript = outputStream.toString().split(";");
+		for (int i = 0; i < createScript.length; i++) {
+			String sqlStatement = createScript[i].trim();
+			if (sqlStatement.length() > 0) {
+				database.execSQL(sqlStatement + ";");
+			}
+		}
+		} catch (IOException e){
+		} catch (SQLException e) {
+		}
+	}
+	
 }

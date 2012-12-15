@@ -28,6 +28,7 @@ public class DetailEventVDRActivity extends Activity {
 			String s = extras.getString("position");
 			TextView view = (TextView) findViewById(R.id.text_title_year_detail);
 			view.setText(s);
+			//this.getApplicationContext().
 			this.findViewById(android.R.id.content);
 
 		}

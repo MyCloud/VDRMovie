@@ -70,15 +70,36 @@ public class DatabaseConnector {
 		return insertChannel(num, name, service );
 	}
 
+	private void cleanCursorTbl()
+	{
+		database.execSQL("TRUNCATE TABLE DatabaseOpenHelper.TBL_CURSOR" );
+		//database.execSQL("drop table " + DatabaseOpenHelper.TBL_CURSOR );
+		//database.execSQL(DatabaseOpenHelper.createTblCursor );
+
+	}
+	/*
+	 *    		+ C_CHANNELS_KEY + " integer not null, "
+    		+ C_TIME + " integer not null, "
+    		+ C_DURATION + " integer not null, "
+    		+ C_TITLE + " text, "
+    		+ C_STITLE + " text, "
+    		+ C_REGIE + " text, " 
+    		+ C_GENRE + " text, " 
+    		+ C_MOVIEM + " integer default 0, " 
+    		+ C_DATA_KEY + " integer not null, "
+    		+ C_E_1 + " integert default 0 " 
+    		+ ");";                 
+
+	 */
+	
+	
+	
 	public Cursor getNowEvents () 
 	{
+		cleanCursorTbl();
 		long unixTime = System.currentTimeMillis() / 1000L;
-		  String buildSQL = "select ch_key _id, ch_key, dr, gt, nr, hsh_key, rt, st, time, tt "
-				  + "from EventTbl where time = ( select max(time) from EventTbl as f " 
-				  + "where f.ch_key = EventTbl.ch_key and f.time < " + Long.toString(unixTime) + " ); ";
-		  Log.d(" DatabaseConnector", "getNowEvents unixtime:" + unixTime );
-		  
-		  return database.rawQuery(buildSQL, null);
+		String buildSQL = "insert into ? select ch_key, dr, tt, st, rt, gt, mm, data_key, rt, st, time, tt from EventTbl where time = ( select max(time) from EventTbl as f where f.ch_key = EventTbl.ch_key and f.time < ? );";
+		return database.rawQuery(buildSQL, new String [] { DatabaseOpenHelper.TBL_CURSOR, Long.toString(unixTime)} );
    }
 	public Cursor getNextEvents() {
 		long unixTime = System.currentTimeMillis() / 1000L;

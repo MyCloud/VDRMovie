@@ -53,24 +53,6 @@ public class CustomEventAdapter extends CursorAdapter {
 	}
 
 
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-		// TODO Auto-generated method stub
-		//return super.getView(position, convertView, parent);
-	     View view = super.getView(position, convertView, parent);
-
-	     Log.d("CustomEventAdapter", "getView Selected:" + Selected + " position :" + position + " type" + Type);
-	     
-	     //if ( position == Selected) {
-	    //	 TextView textViewTitle = (TextView) view.findViewById(R.id.title);
-	    //	 textViewTitle.setBackgroundColor(color.background_dark);
-	    //	 textViewTitle.refreshDrawableState();
-	     //      
-	     //}
-	     return view;
-
-	}
-
 
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
@@ -119,15 +101,15 @@ public class CustomEventAdapter extends CursorAdapter {
             textViewDetails.setText(cursor.getString(cursor.getColumnIndex(cursor.getColumnName(3))) + " Regie: " + cursor.getString(cursor.getColumnIndex(cursor.getColumnName(6))));
             break;
         }
-        if ( focus ) {
+ //       if ( focus ) {
 //        	textViewTitle.setBackgroundColor(color.background_light);
  //       	imageViewIcon.setImageState(new int[] { android.R.attr.state_checked }, true);
-        	Log.d("CustomEventAdapter", "focus position:" + Selected + " cursor :" + cursor.getPosition() + " type" + Type);
-        } else {
+ //       	Log.d("CustomEventAdapter", "focus position:" + Selected + " cursor :" + cursor.getPosition() + " type" + Type);
+   //     } else {
 //        	textViewTitle.setBackgroundColor(color.background_dark);
 //        	imageViewIcon.setImageState(new int[] {}, true);     	
-        	Log.d("CustomEventAdapter", "no focus position:" + Selected + " cursor :" + cursor.getPosition()  + " type" + Type);
-        }
+ //       	Log.d("CustomEventAdapter", "no focus position:" + Selected + " cursor :" + cursor.getPosition()  + " type" + Type);
+     //   }
 //        textViewTitle.refreshDrawableState();
         	
     }

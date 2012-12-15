@@ -16,7 +16,7 @@ public class DetailEventVDRFragment extends Fragment {
 
 	private View view;
 //	private CustomEventAdapter viewCA;
-	private DetailEventVDRView detailEventVDRView;
+	private DetailEventVDRView detailEventVDRView = null;
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -27,12 +27,17 @@ public class DetailEventVDRFragment extends Fragment {
 	public void setViewCA( CustomEventAdapter customAdapter )
 	{
 //		viewCA = customAdapter;
-        detailEventVDRView = new DetailEventVDRView( view, customAdapter );		
+		//this.getActivity().g
+		if ( detailEventVDRView == null) {
+			detailEventVDRView = new DetailEventVDRView( view, customAdapter );
+		}
 	}
 
 	public void updateEventInfo(int position )
 	{
-		detailEventVDRView.setDetails(position);
-		Log.d("DetailEventVDRFragment","updateEventInfo position" + position  );
+		if (detailEventVDRView != null ) {
+			detailEventVDRView.setDetails(position);
+			Log.d("DetailEventVDRFragment","updateEventInfo position" + position  );
+		}
 	}
 }
