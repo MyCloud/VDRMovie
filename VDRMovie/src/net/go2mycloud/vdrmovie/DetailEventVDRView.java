@@ -1,9 +1,13 @@
 package net.go2mycloud.vdrmovie;
 
+import java.util.HashMap;
+
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class DetailEventVDRView {
@@ -47,6 +51,22 @@ public class DetailEventVDRView {
         }
         else {
         	// use moviemeter info
+        	Uri uri= Uri.parse( "mnt/sdcard/VDR_TH_" + c.getString(c.getColumnIndex(DatabaseOpenHelper.C_MOVIEM))  + ".jpg");
+            ImageView imageViewIcon = (ImageView) DetailView.findViewById(R.id.image_thump_detail);
+			imageViewIcon.setImageURI(uri);
+    		c = datasource.getCursorDataDetails(c.getLong(c.getColumnIndex(DatabaseOpenHelper.C_DATA_KEY)));
+            if( c == null  ) {
+            	return;
+            }
+        	c.moveToFirst();
+			HashMap filmInfo = (HashMap) c.getClass(c.getColumnIndex(DatabaseOpenHelper.DATA_DETAILS));
+
+			idFilm = filmInfo.get("filmId").toString();
+
+        	
+        	
+           // imageViewIcon.setImageURI(cursor.getString(cursor.getColumnIndex(cursor.getColumnName(1))));
+            textViewDetails.setText(cursor.getString(cursor.getColumnIndex(cursor.getColumnName(3))) + " Regie: " + cursor.getString(cursor.getColumnIndex(cursor.getColumnName(6))));
         	
         }
         	
