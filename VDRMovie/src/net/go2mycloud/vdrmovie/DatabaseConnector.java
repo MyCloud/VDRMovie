@@ -385,6 +385,20 @@ public class DatabaseConnector {
 		return c;
 	}
 
+	public Cursor getCursorDetails(int position) {
+		// TODO Auto-generated method stub
+		return database.query(DatabaseOpenHelper.TBL_CURSOR, null, 
+				DatabaseOpenHelper.TBL_ID + "=" + position, null, null, null,
+				null);
+		
+	}
+
+	public Cursor getCursorDataDetails(long position) {
+		return database.query(DatabaseOpenHelper.TBL_DATA, null, 
+				DatabaseOpenHelper.TBL_ID + "=" + position, null, null, null,
+				null);
+	}
+
 }
 
 

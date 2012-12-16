@@ -6,10 +6,13 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 
 
-public class DetailEventVDRActivity extends Activity {
+public class DetailEventVDRActivity extends VDRActivity {
+
+	private DetailEventVDRView detailEventVDRView = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -26,10 +29,19 @@ public class DetailEventVDRActivity extends Activity {
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
 			String s = extras.getString("position");
-			TextView view = (TextView) findViewById(R.id.text_title_year_detail);
-			view.setText(s);
+			
+			//View view = (View) this.findViewById(R.id.detailFragment);
+
+		    //view = inflater.inflate(R.layout.fragment_vdrevent_detail,
+			//        container, false);
+
+			detailEventVDRView = new DetailEventVDRView( this.findViewById(R.id.detailFragment) );
+			detailEventVDRView.setDetails(Integer.parseInt(s), datasource);
+			
+			//TextView view = (TextView) findViewById(R.id.text_title_year_detail);
+			//view.setText(s);
 			//this.getApplicationContext().
-			this.findViewById(android.R.id.content);
+			//this.findViewById(android.R.id.content);
 
 		}
 	}

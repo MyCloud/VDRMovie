@@ -22,21 +22,14 @@ public class DetailEventVDRFragment extends Fragment {
 			Bundle savedInstanceState) {
 	    view = inflater.inflate(R.layout.fragment_vdrevent_detail,
 		        container, false);
+			detailEventVDRView = new DetailEventVDRView( view );	    	
 		    return view;
 	}
-	public void setViewCA( CustomEventAdapter customAdapter )
-	{
-//		viewCA = customAdapter;
-		//this.getActivity().g
-		if ( detailEventVDRView == null) {
-			detailEventVDRView = new DetailEventVDRView( view, customAdapter );
-		}
-	}
 
-	public void updateEventInfo(int position )
+	public void updateEventInfo(int position, DatabaseConnector datasource  )
 	{
 		if (detailEventVDRView != null ) {
-			detailEventVDRView.setDetails(position);
+			detailEventVDRView.setDetails(position, datasource);
 			Log.d("DetailEventVDRFragment","updateEventInfo position" + position  );
 		}
 	}

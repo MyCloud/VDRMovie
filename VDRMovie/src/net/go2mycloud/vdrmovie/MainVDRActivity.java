@@ -104,11 +104,11 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 		//downloader.execute("test", "test2");
 		// open database need to make sure the context is not gone while assess
 		// database
-		try {
-			datasource = new DatabaseConnector(this.getBaseContext());
-		} catch (SQLException e) {
-			throw new Error("Error copying database");
-		}
+//		try {
+//			datasource = new DatabaseConnector(this.getBaseContext());
+//		} catch (SQLException e) {
+//			throw new Error("Error copying database");
+//		}
 		//final ListView listView = (ListView) findViewById(R.id.list_events);
 		listView = (ListView) findViewById(R.id.list_events);
 		listView.setOnItemClickListener(new OnItemClickListener() {
@@ -143,7 +143,7 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
   //         public void run() {
       //Looper.prepare();
 
-         	  datasource.open();
+//         	  datasource.open();
 
 //               customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getNowEvents(), CursorAdapter.NO_SELECTION);
 
@@ -175,15 +175,11 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 		    DetailEventVDRFragment fragment = (DetailEventVDRFragment) getFragmentManager()
 		        .findFragmentById(R.id.detailFragment);
 		    if (fragment != null && fragment.isInLayout()) {
-		    	fragment.setViewCA(customAdapter );	
-		      fragment.updateEventInfo(position);
+		      fragment.updateEventInfo(position, datasource);
 		    } else {
-			      Intent intent = new Intent(this.getApplicationContext(),
+			  Intent intent = new Intent(this.getApplicationContext(),
 				          DetailEventVDRActivity.class);
-//			      Intent intent = new Intent(getActivity().getApplicationContext(),
-//				          DetailActivity.class);
-		//	      intent.pu
-		 //     intent.putExtra("position", Integer.toString(position) );
+		      intent.putExtra("position", Integer.toString(position) );
 		      startActivity(intent);
 
 		    }

@@ -2,22 +2,68 @@ package net.go2mycloud.vdrmovie;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 public class DetailEventVDRView {
 	private View DetailView = null;
-	CustomEventAdapter EventCA;
-	public DetailEventVDRView ( View view, CustomEventAdapter customAdapter ) {
+
+	public DetailEventVDRView ( View view ) {
 		DetailView = view;
-		EventCA = customAdapter;
 	}
-	public void setDetails(int position) {
-		Cursor c = EventCA.getCursor();
-		c.moveToPosition(position);
-		TextView view = (TextView) DetailView.findViewById(R.id.text_title_year_detail);
-		view.setText(c.getString(c.getColumnIndex(c.getColumnName(9))) + " " + c.getString(c.getColumnIndex(c.getColumnName(7))) );
+	public void setDetails(int position, DatabaseConnector datasource) {
+		//Cursor c = EventCA.getCursor();
+		//c.moveToPosition(position);  // fragment_vdrevent_detail.xml
+		Log.d("DetailEventVDRView", "Position: " + position);
+		Cursor c = datasource.getCursorDetails(position+1);
+        if( c == null  ) {
+        	return;
+        }
+    	c.moveToFirst();
+		//TextView textViewTitle = (TextView) DetailView.findViewById(R.id.title);
+		TextView T = (TextView) DetailView.findViewById(R.id.text_title_year_detail);
 		
+        T.setText(c.getString(c.getColumnIndex(DatabaseOpenHelper.C_TITLE)) + " " + c.getString(c.getColumnIndex(DatabaseOpenHelper.C_STITLE))) ;
+        if ( c.getInt(c.getColumnIndex(DatabaseOpenHelper.C_MOVIEM)) == 0 )
+        {
+        	// use the VDR info
+        	T = (TextView) DetailView.findViewById(R.id.text_directors_detail);
+            T.setText("Regie: " + c.getString(c.getColumnIndex(DatabaseOpenHelper.C_REGIE))) ;
+        	T = (TextView) DetailView.findViewById(R.id.text_genres_detail);
+            T.setText("Genre: " + c.getString(c.getColumnIndex(DatabaseOpenHelper.C_GENRE))) ;
+        	T = (TextView) DetailView.findViewById(R.id.text_actors_detail);            
+            T.setText("Actors: ");
+        	T = (TextView) DetailView.findViewById(R.id.text_countries_detail);
+            T.setText("Countries: ");
+    		c = datasource.getCursorDataDetails(c.getLong(c.getColumnIndex(DatabaseOpenHelper.C_DATA_KEY)));
+            if( c == null  ) {
+            	return;
+            }
+        	c.moveToFirst();
+        	T = (TextView) DetailView.findViewById(R.id.text_plot_detail);
+            T.setText("Plot: " + c.getString(c.getColumnIndex(DatabaseOpenHelper.DATA_DETAILS))) ;
+        	
+        }
+        else {
+        	// use moviemeter info
+        	
+        }
+        	
+
 	}
 	
 }
+
+//public static final String TBL_CURSOR = "CursorTbl";
+//public static final String C_CHANNELS_KEY = "ch_key";
+///public static final String C_TIME = "time";
+//public static final String C_DURATION = "dr";
+//public static final String C_TITLE = "tt";
+//public static final String C_STITLE = "st";
+//public static final String C_REGIE = "rt";
+//public static final String C_GENRE = "gt";
+//public static final String C_MOVIEM = "mm";
+//public static final String C_DATA_KEY = "data_key";
+//public static final String C_E_1 = "e1"; //Watched or TimerCreated
+
