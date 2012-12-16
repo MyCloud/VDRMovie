@@ -38,7 +38,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainVDRActivity extends Activity implements OnNavigationListener {
+public class MainVDRActivity extends VDRActivity implements OnNavigationListener {
 
 	/**
 	 * The serialization (saved instance state) Bundle key representing the
@@ -47,7 +47,7 @@ public class MainVDRActivity extends Activity implements OnNavigationListener {
 	private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
 	private DownloadVDR downloader;
     private CustomEventAdapter customAdapter;
-	private DatabaseConnector datasource;
+	//private DatabaseConnector datasource;
 	private DetailEventVDRView  detailEventVDRView;
 
 
