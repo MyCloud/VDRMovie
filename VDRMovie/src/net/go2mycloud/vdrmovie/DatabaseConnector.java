@@ -115,23 +115,36 @@ public class DatabaseConnector {
 
 		database.execSQL(buildSQL, new String [] { Long.toString(unixTime)} );
    }
-	public Cursor getNextEvents() {
+	public void setCursorNextEvents() 
+	{
+		cleanCursorTbl();
 		long unixTime = System.currentTimeMillis() / 1000L;
-		  String buildSQL = "select ch_key _id, ch_key, dr, gt, nr, hsh_key, rt, st, time, tt "
-				  + "from EventTbl where time = ( select min(time) from EventTbl as f " 
-				  + "where f.ch_key = EventTbl.ch_key and f.time >= " + Long.toString(unixTime) + " ); ";
-		  Log.d(" DatabaseConnector", "getNextEvents unixtime:" + unixTime );
-		  
-		  return database.rawQuery(buildSQL, null);
-	}
-	public Cursor getMovieEvents() {
+		String buildSQL = 
+				"insert into CursorTbl ( ch_key, time, dr, tt, st, rt, gt, mm, data_key ) " +
+				"select EventTbl.ch_key, EventTbl.time, EventTbl.dr, EventTbl.tt, EventTbl.st, EventTbl.rt, EventTbl.gt, DataTbl.nr, DataTbl._id " +  
+				"from EventTbl, HashTbl, DataTbl where time = ( select min(time) " +
+				"from EventTbl as f where f.ch_key == EventTbl.ch_key and f.time >= ? ) " + 
+				"and EventTbl.hsh_key = HashTbl._id and HashTbl.data_key = DataTbl._id"; 
+		//database.rawQuery(buildSQL, null );
+		Log.d(" DatabaseConnector", "getNextEvents unixtime:" + unixTime );
+		Log.d(" DatabaseConnector", "sql:" + buildSQL );
 
-		String buildSQL = "select EventTbl.ch_key _id, EventTbl.ch_key, EventTbl.dr, EventTbl.gt, EventTbl.nr, EventTbl.hsh_key, EventTbl.rt, EventTbl.st, EventTbl.time, " + 
-	  "EventTbl.tt, DataTbl.nr " +
-	  "from EventTbl, HashTbl ,DataTbl " +
-	  "where EventTbl.hsh_key = HashTbl._id and HashTbl.data_key = DataTbl._id and DataTbl.nr > 0";
-		  return database.rawQuery(buildSQL, null);
+		database.execSQL(buildSQL, new String [] { Long.toString(unixTime)} );
+   }
 
+	
+	public void setCursorMovieEvents() {
+		cleanCursorTbl();
+		long unixTime = System.currentTimeMillis() / 1000L;
+		String buildSQL = "insert into CursorTbl ( ch_key, time, dr, tt, st, rt, gt, mm, data_key ) " + 
+		"select EventTbl.ch_key, EventTbl.time, EventTbl.dr, EventTbl.tt, EventTbl.st, EventTbl.rt, EventTbl.gt, DataTbl.nr, DataTbl._id ) " + 
+		"from EventTbl, HashTbl, DataTbl  ) " +
+		"where EventTbl.time >= ? ) " +
+		"and EventTbl.hsh_key = HashTbl._id and HashTbl.data_key = DataTbl._id and DataTbl.nr > 0";
+		Log.d(" DatabaseConnector", "getNextEvents unixtime:" + unixTime );
+		Log.d(" DatabaseConnector", "sql:" + buildSQL );
+
+		database.execSQL(buildSQL, new String [] { Long.toString(unixTime)} );
 	}	
 	
 	public Cursor getRecordedEvents() {

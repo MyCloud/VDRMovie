@@ -1,6 +1,10 @@
 package net.go2mycloud.vdrmovie;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -16,6 +20,7 @@ public class DetailEventVDRView {
 	public DetailEventVDRView ( View view ) {
 		DetailView = view;
 	}
+	@SuppressWarnings("rawtypes")
 	public void setDetails(int position, DatabaseConnector datasource) {
 		//Cursor c = EventCA.getCursor();
 		//c.moveToPosition(position);  // fragment_vdrevent_detail.xml
@@ -51,6 +56,8 @@ public class DetailEventVDRView {
         }
         else {
         	// use moviemeter info
+        	Map<String, String> map = new HashMap<String, String>();
+
         	Uri uri= Uri.parse( "mnt/sdcard/VDR_TH_" + c.getString(c.getColumnIndex(DatabaseOpenHelper.C_MOVIEM))  + ".jpg");
             ImageView imageViewIcon = (ImageView) DetailView.findViewById(R.id.image_thump_detail);
 			imageViewIcon.setImageURI(uri);
@@ -59,14 +66,33 @@ public class DetailEventVDRView {
             	return;
             }
         	c.moveToFirst();
-			HashMap filmInfo = (HashMap) c.getClass(c.getColumnIndex(DatabaseOpenHelper.DATA_DETAILS));
-
-			idFilm = filmInfo.get("filmId").toString();
+			String str = c.getString(c.getColumnIndex(DatabaseOpenHelper.DATA_DETAILS));
+			Properties props = new Properties();
+			try {
+				props.load(new StringReader(str.substring(1, str.length() - 1).replace(", ", "\n")));
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}       
+			Map<String, String> map2 = new HashMap<String, String>();
+			for (Map.Entry<Object, Object> e : props.entrySet()) {
+			    map2.put((String)e.getKey(), (String)e.getValue());
+			}
+			//idFilm = Map.get("filmId").toString();
+        	T = (TextView) DetailView.findViewById(R.id.text_directors_detail);
+    //        T.setText(filmInfo.get("directors_text").toString()) ;
+            
+        	//T = (TextView) DetailView.findViewById(R.id.text_genres_detail);
+            //T.setText("Genre: " + c.getString(c.getColumnIndex(DatabaseOpenHelper.C_GENRE))) ;
+        	//T = (TextView) DetailView.findViewById(R.id.text_actors_detail);            
+            //T.setText("Actors: ");
+        	//T = (TextView) DetailView.findViewById(R.id.text_countries_detail);
+            T.setText("Countries: " + str);
 
         	
         	
            // imageViewIcon.setImageURI(cursor.getString(cursor.getColumnIndex(cursor.getColumnName(1))));
-            textViewDetails.setText(cursor.getString(cursor.getColumnIndex(cursor.getColumnName(3))) + " Regie: " + cursor.getString(cursor.getColumnIndex(cursor.getColumnName(6))));
+           // textViewDetails.setText(cursor.getString(cursor.getColumnIndex(cursor.getColumnName(3))) + " Regie: " + cursor.getString(cursor.getColumnIndex(cursor.getColumnName(6))));
         	
         }
         	

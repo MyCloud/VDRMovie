@@ -259,17 +259,19 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
     		customAdapter = new CustomEventAdapter(MainVDRActivity.this, null, CursorAdapter.IGNORE_ITEM_VIEW_TYPE , itemPosition );        	
 		}
 		if(itemPosition == 0) {
-//    		customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getNowEvents(), CursorAdapter.NO_SELECTION , itemPosition );        	
             datasource.setCursorNowEvents();
         }
         if(itemPosition == 1) {
+            datasource.setCursorNextEvents();
 //    		customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getNextEvents(), CursorAdapter.NO_SELECTION, itemPosition);        	
             //customAdapter.swapCursor(datasource.getNextEvents());
       }
         if(itemPosition == 2) {
+            datasource.setCursorMovieEvents();
     		//customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getSheduledEvents(), CursorAdapter.NO_SELECTION, itemPosition);      
         }
         if(itemPosition == 3) {
+        	
  //   		customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getMovieEvents(), CursorAdapter.NO_SELECTION, itemPosition);      
             //customAdapter.swapCursor(datasource.getMovieEvents());
         }
