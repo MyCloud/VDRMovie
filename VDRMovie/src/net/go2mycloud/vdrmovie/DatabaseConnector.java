@@ -72,9 +72,9 @@ public class DatabaseConnector {
 
 	private void cleanCursorTbl()
 	{
-		database.execSQL("TRUNCATE TABLE DatabaseOpenHelper.TBL_CURSOR" );
-		//database.execSQL("drop table " + DatabaseOpenHelper.TBL_CURSOR );
-		//database.execSQL(DatabaseOpenHelper.createTblCursor );
+		//database.execSQL("TRUNCATE TABLE DatabaseOpenHelper.TBL_CURSOR" );
+		database.execSQL("drop table " + DatabaseOpenHelper.TBL_CURSOR );
+		database.execSQL(DatabaseOpenHelper.createTblCursor );
 
 	}
 	/*
@@ -91,15 +91,29 @@ public class DatabaseConnector {
     		+ ");";                 
 
 	 */
+	public Cursor getCursor() {
+		String buildSQL = "select * from " + DatabaseOpenHelper.TBL_CURSOR ;
+
+		return database.rawQuery(buildSQL, null );
+		
+	}
 	
 	
-	
-	public Cursor getNowEvents () 
+	public void setCursorNowEvents () 
 	{
 		cleanCursorTbl();
 		long unixTime = System.currentTimeMillis() / 1000L;
-		String buildSQL = "insert into ? select ch_key, dr, tt, st, rt, gt, mm, data_key, rt, st, time, tt from EventTbl where time = ( select max(time) from EventTbl as f where f.ch_key = EventTbl.ch_key and f.time < ? );";
-		return database.rawQuery(buildSQL, new String [] { DatabaseOpenHelper.TBL_CURSOR, Long.toString(unixTime)} );
+		String buildSQL = 
+				"insert into CursorTbl ( ch_key, time, dr, tt, st, rt, gt, mm, data_key ) " +
+				"select EventTbl.ch_key, EventTbl.time, EventTbl.dr, EventTbl.tt, EventTbl.st, EventTbl.rt, EventTbl.gt, DataTbl.nr, DataTbl._id " +  
+				"from EventTbl, HashTbl, DataTbl where time = ( select max(time) " +
+				"from EventTbl as f where f.ch_key == EventTbl.ch_key and f.time < ? ) " + 
+				"and EventTbl.hsh_key = HashTbl._id and HashTbl.data_key = DataTbl._id"; 
+		//database.rawQuery(buildSQL, null );
+		Log.d(" DatabaseConnector", "getNextEvents unixtime:" + unixTime );
+		Log.d(" DatabaseConnector", "sql:" + buildSQL );
+
+		database.execSQL(buildSQL, new String [] { Long.toString(unixTime)} );
    }
 	public Cursor getNextEvents() {
 		long unixTime = System.currentTimeMillis() / 1000L;

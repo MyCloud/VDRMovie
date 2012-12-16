@@ -264,23 +264,24 @@ public class MainVDRActivity extends Activity implements OnNavigationListener {
 		}
 		if(itemPosition == 0) {
 //    		customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getNowEvents(), CursorAdapter.NO_SELECTION , itemPosition );        	
-   //         customAdapter.swapCursor(datasource.getNowEvents());
+            datasource.setCursorNowEvents();
         }
         if(itemPosition == 1) {
 //    		customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getNextEvents(), CursorAdapter.NO_SELECTION, itemPosition);        	
-            customAdapter.swapCursor(datasource.getNextEvents());
+            //customAdapter.swapCursor(datasource.getNextEvents());
       }
         if(itemPosition == 2) {
     		//customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getSheduledEvents(), CursorAdapter.NO_SELECTION, itemPosition);      
         }
         if(itemPosition == 3) {
  //   		customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getMovieEvents(), CursorAdapter.NO_SELECTION, itemPosition);      
-            customAdapter.swapCursor(datasource.getMovieEvents());
+            //customAdapter.swapCursor(datasource.getMovieEvents());
         }
         if(itemPosition == 4) {
  //   		customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getRecordedEvents(), CursorAdapter.NO_SELECTION, itemPosition);      
-            customAdapter.swapCursor(datasource.getRecordedEvents());
+            //customAdapter.swapCursor(datasource.getRecordedEvents());
         }
+        customAdapter.swapCursor(datasource.getCursor());
         customAdapter.setType(itemPosition);
         customAdapter.setSelected(0);
         if( customAdapter.getCursor() != null ) {

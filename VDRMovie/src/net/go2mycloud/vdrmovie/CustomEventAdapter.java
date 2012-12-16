@@ -94,11 +94,11 @@ public class CustomEventAdapter extends CursorAdapter {
             break;
         default:
         case 0: // recording cursor
-            textViewTitle.setText(cursor.getString(cursor.getColumnIndex(cursor.getColumnName(9))) + " " + cursor.getString(cursor.getColumnIndex(cursor.getColumnName(7))) );
+            textViewTitle.setText(cursor.getString(cursor.getColumnIndex(DatabaseOpenHelper.C_TITLE)) + " " + cursor.getString(cursor.getColumnIndex(DatabaseOpenHelper.C_STITLE))) ;
             //uri= Uri.parse( "mnt/sdcard/VDR_TH_" + cursor.getString(cursor.getColumnIndex(cursor.getColumnName(10)))  + ".jpg");
 			//imageViewIcon.setImageURI(uri);
             		//"http://www.moviemeter.nl/images/covers/thumbs/62000/62576.jpg");
-            textViewDetails.setText(cursor.getString(cursor.getColumnIndex(cursor.getColumnName(3))) + " Regie: " + cursor.getString(cursor.getColumnIndex(cursor.getColumnName(6))));
+            textViewDetails.setText(cursor.getString(cursor.getColumnIndex(DatabaseOpenHelper.C_GENRE)) + " Regie: " + cursor.getString(cursor.getColumnIndex(DatabaseOpenHelper.C_REGIE)));
             break;
         }
  //       if ( focus ) {
