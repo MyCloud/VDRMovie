@@ -12,6 +12,9 @@ import java.net.HttpURLConnection;
 import java.net.Socket;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.zip.CRC32;
 
 
@@ -319,7 +322,7 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 												// no movie found use the data from VDR
 												Data_Id = datasource.insertData(0, Ev_dt);
 											} else {
-												Data_Id = datasource.insertData(Integer.parseInt(idFilm), filmInfo.toString());
+												Data_Id = datasource.insertData(Integer.parseInt(idFilm), filmInfo..toString());
 											}
 											
 											Ev_hsh_key = datasource.insertHash(Data_Id,
@@ -669,5 +672,24 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 
 		return true;
 	}
-
+			
+	@SuppressWarnings("rawtypes")
+	private String MyToString ( HashMap h ) {
+		// Get a set of the entries 
+		String hs = "";
+		Set set = h.entrySet(); 
+		// Get an iterator 
+		Iterator i = set.iterator(); 
+		// Display elements 
+		hs += "{";
+		while(i.hasNext()) { 
+			Map.Entry me = (Map.Entry)i.next(); 
+			hs += me.getKey();
+			hs += ": ";
+			hs += me.getValue();
+			hs += "|";
+		} 
+		hs += "}";
+		return hs;
+	}
 }
