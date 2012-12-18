@@ -20,7 +20,10 @@ import java.util.zip.CRC32;
 
 
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Bitmap;
@@ -34,6 +37,8 @@ import android.util.Log;
 public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 	private static final String DEBUG_TAG = "MainVDR$DownloadVDR";
 	private DatabaseConnector datasource;
+	ProgressDialog pleaseWaitDialog;
+
 	Context mContext;
 	   
 	
@@ -85,6 +90,7 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 		if ( datasource != null ){
 			datasource.close();
 		}
+		pleaseWaitDialog.dismiss();
 			
 	}
 
@@ -103,6 +109,15 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 
 		}
 		datasource.open();
+		pleaseWaitDialog = ProgressDialog.show(mContext,
+				"VDR Guid", "Downloading VDR Guid data", true, true);
+		pleaseWaitDialog.setOnCancelListener(new OnCancelListener() {
+			public void onCancel(DialogInterface dialog) {
+				Log.d("onOptionsItemSelected" , "onCancel ");
+				cancel(true);
+			}
+		});
+
 
 	}
 
@@ -154,7 +169,7 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 			// delete all channels for now the easy way.
 
 			// datasource.deleteAllChannels();
-			for (int channel = 5; channel <= toChannel; channel++) {
+			for (int channel = 1; channel <= toChannel; channel++) {
 				// for all channel that need to be collected
 				// for now its the first 30 channels
 
@@ -322,7 +337,7 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 												// no movie found use the data from VDR
 												Data_Id = datasource.insertData(0, Ev_dt);
 											} else {
-												Data_Id = datasource.insertData(Integer.parseInt(idFilm), filmInfo..toString());
+												Data_Id = datasource.insertData(Integer.parseInt(idFilm), MyToString(filmInfo));
 											}
 											
 											Ev_hsh_key = datasource.insertHash(Data_Id,
@@ -574,7 +589,7 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 												// no movie found use the data from VDR
 												Data_Id = datasource.insertData(0, Ev_dt);
 											} else {
-												Data_Id = datasource.insertData(Integer.parseInt(idFilm), filmInfo.toString());
+												Data_Id = datasource.insertData(Integer.parseInt(idFilm), MyToString(filmInfo));
 											}
 											
 											Ev_hsh_key = datasource.insertHash(Data_Id,
@@ -685,9 +700,9 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 		while(i.hasNext()) { 
 			Map.Entry me = (Map.Entry)i.next(); 
 			hs += me.getKey();
-			hs += ": ";
+			hs += "=";
 			hs += me.getValue();
-			hs += "|";
+			hs += "\n";
 		} 
 		hs += "}";
 		return hs;

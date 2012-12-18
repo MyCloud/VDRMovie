@@ -137,9 +137,9 @@ public class DatabaseConnector {
 		cleanCursorTbl();
 		long unixTime = System.currentTimeMillis() / 1000L;
 		String buildSQL = "insert into CursorTbl ( ch_key, time, dr, tt, st, rt, gt, mm, data_key ) " + 
-		"select EventTbl.ch_key, EventTbl.time, EventTbl.dr, EventTbl.tt, EventTbl.st, EventTbl.rt, EventTbl.gt, DataTbl.nr, DataTbl._id ) " + 
-		"from EventTbl, HashTbl, DataTbl  ) " +
-		"where EventTbl.time >= ? ) " +
+		"select EventTbl.ch_key, EventTbl.time, EventTbl.dr, EventTbl.tt, EventTbl.st, EventTbl.rt, EventTbl.gt, DataTbl.nr, DataTbl._id  " + 
+		"from EventTbl, HashTbl, DataTbl " +
+		"where EventTbl.time >= ? " +
 		"and EventTbl.hsh_key = HashTbl._id and HashTbl.data_key = DataTbl._id and DataTbl.nr > 0";
 		Log.d(" DatabaseConnector", "getNextEvents unixtime:" + unixTime );
 		Log.d(" DatabaseConnector", "sql:" + buildSQL );

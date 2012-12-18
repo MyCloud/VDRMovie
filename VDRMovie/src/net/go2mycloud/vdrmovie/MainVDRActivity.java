@@ -99,7 +99,8 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 		actionBar.setSelectedNavigationItem(0);
 
 		// Start loading the questions in the background
-		downloader = new DownloadVDR(this.getBaseContext());
+		downloader = new DownloadVDR(MainVDRActivity.this);
+//		downloader = new DownloadVDR(this.getBaseContext()); MainVDRActivity.this
 		
 		//downloader.execute("test", "test2");
 		// open database need to make sure the context is not gone while assess
@@ -197,16 +198,16 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 			break;
 		case R.id.menu_update:
 			Toast.makeText(this, "Menu update", Toast.LENGTH_SHORT).show();
-			pleaseWaitDialog = ProgressDialog.show(MainVDRActivity.this,
-					"VDR Guid", "Downloading VDR Guid data", true, true);
-			pleaseWaitDialog.setOnCancelListener(new OnCancelListener() {
-				public void onCancel(DialogInterface dialog) {
-					Log.d("onOptionsItemSelected" , "onCancel ");
-					downloader.cancel(true);
-				}
-			});
+//			pleaseWaitDialog = ProgressDialog.show(MainVDRActivity.this,
+//					"VDR Guid", "Downloading VDR Guid data", true, true);
+//			pleaseWaitDialog.setOnCancelListener(new OnCancelListener() {
+//				public void onCancel(DialogInterface dialog) {
+//					Log.d("onOptionsItemSelected" , "onCancel ");
+//					downloader.cancel(true);
+//				}
+//			});
 			if(downloader.getStatus() == AsyncTask.Status.FINISHED ) {
-				downloader = new DownloadVDR(this.getBaseContext());
+				downloader = new DownloadVDR(MainVDRActivity.this);
 			}
 			if(downloader.getStatus() == AsyncTask.Status.PENDING){
 				downloader.execute("");

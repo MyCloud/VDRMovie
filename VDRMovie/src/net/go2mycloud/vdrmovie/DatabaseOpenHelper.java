@@ -72,6 +72,10 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	public static final String C_DATA_KEY = "data_key";
 	public static final String C_E_1 = "e1"; //Watched or TimerCreated
 	
+	
+	private static final String DATABASE_NAME = "events.db";
+	private static final int DATABASE_VERSION = 5;
+
 	public static final String createTblCursor = "CREATE TABLE "+ TBL_CURSOR + "( " 
     		+ TBL_ID + " integer primary key autoincrement, " 
     		+ C_CHANNELS_KEY + " integer not null, "
@@ -85,10 +89,8 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
     		+ C_DATA_KEY + " integer not null, "
     		+ C_E_1 + " integer default 0 " 
     		+ ");";                 
-	
-	private static final String DATABASE_NAME = "events.db";
-	private static final int DATABASE_VERSION = 3;
 
+	
 	private static final String createTblChannels = "CREATE TABLE "+ TBL_CHANNELS + "( " 
     		+ TBL_ID + " integer primary key autoincrement, " 
     		+ CHANNELS_NUM + " integer unique not null, "

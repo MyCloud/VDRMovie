@@ -9,6 +9,7 @@ import java.util.Properties;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -51,6 +52,9 @@ public class DetailEventVDRView {
             }
         	c.moveToFirst();
         	T = (TextView) DetailView.findViewById(R.id.text_plot_detail);
+        	T.setMovementMethod(new ScrollingMovementMethod());
+
+
             T.setText("Plot: " + c.getString(c.getColumnIndex(DatabaseOpenHelper.DATA_DETAILS))) ;
         	
         }
@@ -69,27 +73,35 @@ public class DetailEventVDRView {
 			String str = c.getString(c.getColumnIndex(DatabaseOpenHelper.DATA_DETAILS));
 			Properties props = new Properties();
 			try {
-				props.load(new StringReader(str.substring(1, str.length() - 1).replace(", ", "\n")));
+				props.load(new StringReader(str.substring(1, str.length() - 1)));
+//				props.load(new StringReader(str.substring(1, str.length() - 1).replace(", ", "\n")));
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}       
+			
 			Map<String, String> map2 = new HashMap<String, String>();
 			for (Map.Entry<Object, Object> e : props.entrySet()) {
 			    map2.put((String)e.getKey(), (String)e.getValue());
 			}
-			//idFilm = Map.get("filmId").toString();
         	T = (TextView) DetailView.findViewById(R.id.text_directors_detail);
-    //        T.setText(filmInfo.get("directors_text").toString()) ;
-            
-        	//T = (TextView) DetailView.findViewById(R.id.text_genres_detail);
-            //T.setText("Genre: " + c.getString(c.getColumnIndex(DatabaseOpenHelper.C_GENRE))) ;
-        	//T = (TextView) DetailView.findViewById(R.id.text_actors_detail);            
-            //T.setText("Actors: ");
-        	//T = (TextView) DetailView.findViewById(R.id.text_countries_detail);
-            T.setText("Countries: " + str);
+            T.setText(map2.get("directors_text").toString());
 
-        	
+            T = (TextView) DetailView.findViewById(R.id.text_actors_detail);
+            T.setText(map2.get("actors_text").toString());
+
+        	T = (TextView) DetailView.findViewById(R.id.text_countries_detail);
+            T.setText(map2.get("countries_text").toString());
+        	T = (TextView) DetailView.findViewById(R.id.text_genres_detail);
+            T.setText(map2.get("genres_text").toString());
+        	T = (TextView) DetailView.findViewById(R.id.text_plot_detail);
+        	T.setMovementMethod(new ScrollingMovementMethod());
+            T.setText(map2.get("plot").toString());
+        	T = (TextView) DetailView.findViewById(R.id.text_rating);
+            T.setText(map2.get("average").toString() + " 1-5 votes count" + map2.get("votes_count").toString() );
+        	T = (TextView) DetailView.findViewById(R.id.text_year);
+            T.setText(map2.get("year").toString());
+
         	
            // imageViewIcon.setImageURI(cursor.getString(cursor.getColumnIndex(cursor.getColumnName(1))));
            // textViewDetails.setText(cursor.getString(cursor.getColumnIndex(cursor.getColumnName(3))) + " Regie: " + cursor.getString(cursor.getColumnIndex(cursor.getColumnName(6))));
