@@ -10,7 +10,7 @@
     <string-array name="MainMenu">
         <item >Now</item>
         <item >Next</item>
-        <item >Sheduled</item>
+        <item >Movie</item>
         <item >Timers</item>
         <item >Records</item>
     </string-array>

@@ -147,15 +147,20 @@ public class DatabaseConnector {
 		database.execSQL(buildSQL, new String [] { Long.toString(unixTime)} );
 	}	
 	
-	public Cursor getRecordedEvents() {
-		String buildSQL = "select RecordingsTbl._id, RecordingsTbl.ch_key, RecordingsTbl.dr, RecordingsTbl.gt, RecordingsTbl.nr, RecordingsTbl.hsh_key, RecordingsTbl.rt, RecordingsTbl.st, RecordingsTbl.time, " +  
-				  "RecordingsTbl.tt, DataTbl.nr "+ 
-				  "from RecordingsTbl, HashTbl ,DataTbl " +
-				  "where RecordingsTbl.hsh_key = HashTbl._id and HashTbl.data_key = DataTbl._id and DataTbl.nr > 0 order by RecordingsTbl.tt";	  
+	public void setRecordedEvents() {
+		cleanCursorTbl();
+//		String buildSQL = "select RecordingsTbl._id, RecordingsTbl.ch_key, RecordingsTbl.dr, RecordingsTbl.gt, RecordingsTbl.nr, RecordingsTbl.hsh_key, RecordingsTbl.rt, RecordingsTbl.st, RecordingsTbl.time, " +  
+//				  "RecordingsTbl.tt, DataTbl.nr "+ 
+//				  "from RecordingsTbl, HashTbl ,DataTbl " +
+//				  "where RecordingsTbl.hsh_key = HashTbl._id and HashTbl.data_key = DataTbl._id and DataTbl.nr > 0 order by RecordingsTbl.tt";	  
+		String buildSQL = "insert into CursorTbl ( ch_key, time, dr, tt, st, rt, gt, mm, data_key, e1 ) " + 
+		"select RecordingsTbl.ch_key, RecordingsTbl.time, RecordingsTbl.dr, RecordingsTbl.tt, RecordingsTbl.st, " +
+		"RecordingsTbl.rt, RecordingsTbl.gt, DataTbl.nr, DataTbl._id, RecordingsTbl.wt  " + 
+		"from RecordingsTbl, HashTbl, DataTbl " +
+		"where RecordingsTbl.hsh_key = HashTbl._id and HashTbl.data_key = DataTbl._id and DataTbl.nr > 0 order by RecordingsTbl.tt";
+		Log.d(" DatabaseConnector", "sql:" + buildSQL );
 
-		
-		//String buildSQL = "select * from RecordingsTbl ORDER BY tt";		  
-		  return database.rawQuery(buildSQL, null);
+		database.execSQL(buildSQL, new String [] { "onzin"});
 	}
 
 	
