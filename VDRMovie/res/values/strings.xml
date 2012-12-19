@@ -15,5 +15,6 @@
         <item >Records</item>
     </string-array>
         <string name="menu_update">Update Events</string>
+        <string name="menu_event_play">play</string>
 
 </resources>

@@ -278,7 +278,13 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 //        	SVDRPInterface SVDRP;
         	//svdrpInterface = new SVDRPInterface(MainVDRActivity.this);
 //        	svdrpInterface.doInBackground()
-        	svdrpInterface.execute("PLAY","Tchaikovsky - The Tempest");
+			if(svdrpInterface.getStatus() == AsyncTask.Status.FINISHED ) {
+				svdrpInterface = new SVDRPInterface(MainVDRActivity.this);
+				svdrpInterface.execute("PLAY","Sint");
+			}
+			if (svdrpInterface.getStatus() == AsyncTask.Status.PENDING){
+	        	svdrpInterface.execute("PLAY","Sint");				
+			}
  //   		customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getMovieEvents(), CursorAdapter.NO_SELECTION, itemPosition);      
             //customAdapter.swapCursor(datasource.getMovieEvents());
         }
@@ -296,7 +302,6 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
             //customAdapter.swapCursor(datasource.getRecordedEvents());
         }
         customAdapter.changeCursor(datasource.getCursor());
-//        customAdapter.swapCursor(datasource.getCursor());
         customAdapter.setType(itemPosition);
         customAdapter.setSelected(0);
         if( customAdapter.getCursor() != null ) {

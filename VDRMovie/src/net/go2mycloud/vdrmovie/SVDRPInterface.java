@@ -136,17 +136,23 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 			dos.write(rl);
 			data = dis.readLine();
 			data.getBytes(0, 2, buffer, 0);
-			if (buffer.equals("220")) {
+			int type = Integer.parseInt(data.substring(0, 3));
+
+			if (type == 220) {
 				data = dis.readLine();
-				if (buffer.equals("250")) {
+				type = Integer.parseInt(data.substring(0, 3));
+				if (type == 250 ) {
 					// last record
+					Log.d(D_TAG, "read  " + data);
 					sendSting = "QUIT";
 					dos.write(sendSting.getBytes());
 					dos.write(rl);					
 					data = dis.readLine();
+					Log.d(D_TAG, "play  " + data);
 					recNum = data.toString();
 				}
 			}
+			Log.d(D_TAG, "send end  " + data);
 			s.close();
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
