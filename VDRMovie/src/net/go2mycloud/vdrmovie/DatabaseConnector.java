@@ -155,12 +155,12 @@ public class DatabaseConnector {
 //				  "where RecordingsTbl.hsh_key = HashTbl._id and HashTbl.data_key = DataTbl._id and DataTbl.nr > 0 order by RecordingsTbl.tt";	  
 		String buildSQL = "insert into CursorTbl ( ch_key, time, dr, tt, st, rt, gt, mm, data_key, e1 ) " + 
 		"select RecordingsTbl.ch_key, RecordingsTbl.time, RecordingsTbl.dr, RecordingsTbl.tt, RecordingsTbl.st, " +
-		"RecordingsTbl.rt, RecordingsTbl.gt, DataTbl.nr, DataTbl._id, RecordingsTbl.wt  " + 
+		"RecordingsTbl.rt, RecordingsTbl.gt, DataTbl.nr, DataTbl._id,  RecordingsTbl.wt " + 
 		"from RecordingsTbl, HashTbl, DataTbl " +
-		"where RecordingsTbl.hsh_key = HashTbl._id and HashTbl.data_key = DataTbl._id and DataTbl.nr > 0 order by RecordingsTbl.tt";
+		"where RecordingsTbl.hsh_key = HashTbl._id and HashTbl.data_key = DataTbl._id order by RecordingsTbl.tt";
 		Log.d(" DatabaseConnector", "sql:" + buildSQL );
 
-		database.execSQL(buildSQL, new String [] { "onzin"});
+		database.execSQL(buildSQL );
 	}
 
 	

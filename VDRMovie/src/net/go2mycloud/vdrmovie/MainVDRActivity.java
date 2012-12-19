@@ -46,6 +46,7 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 	 */
 	private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
 	private DownloadVDR downloader;
+	private SVDRPInterface svdrpInterface;
     private CustomEventAdapter customAdapter;
 	//private DatabaseConnector datasource;
 	private DetailEventVDRView  detailEventVDRView;
@@ -98,8 +99,10 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 		actionBar.setListNavigationCallbacks(adapter, this);
 		actionBar.setSelectedNavigationItem(0);
 
+		
 		// Start loading the questions in the background
 		downloader = new DownloadVDR(MainVDRActivity.this);
+		svdrpInterface = new SVDRPInterface(MainVDRActivity.this);
 //		downloader = new DownloadVDR(this.getBaseContext()); MainVDRActivity.this
 		
 		//downloader.execute("test", "test2");
@@ -272,12 +275,23 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
     		//customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getSheduledEvents(), CursorAdapter.NO_SELECTION, itemPosition);      
         }
         if(itemPosition == 3) {
-        	
+//        	SVDRPInterface SVDRP;
+        	//svdrpInterface = new SVDRPInterface(MainVDRActivity.this);
+//        	svdrpInterface.doInBackground()
+        	svdrpInterface.execute("PLAY","Tchaikovsky - The Tempest");
  //   		customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getMovieEvents(), CursorAdapter.NO_SELECTION, itemPosition);      
             //customAdapter.swapCursor(datasource.getMovieEvents());
         }
         if(itemPosition == 4) {
-            datasource.setRecordedEvents();
+//			if(svdrpInterface.getStatus() == AsyncTask.Status.FINISHED ) {
+//				downloader = new DownloadVDR(MainVDRActivity.this);
+//			}
+//			if(downloader.getStatus() == AsyncTask.Status.PENDING){
+//				downloader.execute("");
+//			}
+
+        	
+        	datasource.setRecordedEvents();
  //   		customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getRecordedEvents(), CursorAdapter.NO_SELECTION, itemPosition);      
             //customAdapter.swapCursor(datasource.getRecordedEvents());
         }

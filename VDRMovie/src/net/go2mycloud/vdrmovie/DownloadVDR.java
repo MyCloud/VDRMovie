@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimerTask;
 import java.util.zip.CRC32;
 
 
@@ -29,6 +30,7 @@ import android.database.SQLException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 
@@ -44,6 +46,11 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 	
 	DownloadVDR(Context context){
         super();
+//		if(Build.VERSION.SDK_INT >= 11)
+//			DownloadVDR.executeOnExecutor(TimerTask.THREAD_POOL_EXECUTOR, params);
+//	    else
+//	        asyncTask.execute(params);
+        
         this.mContext = context;
     }
     

@@ -34,10 +34,10 @@ public final class R {
         public static final int row=0x7f080002;
         public static final int text_actors_detail=0x7f08000e;
         public static final int text_countries_detail=0x7f08000b;
-        public static final int text_directors_detail=0x7f08000c;
-        public static final int text_genres_detail=0x7f08000a;
+        public static final int text_directors_detail=0x7f08000d;
+        public static final int text_genres_detail=0x7f08000c;
         public static final int text_plot_detail=0x7f08000f;
-        public static final int text_rating=0x7f08000d;
+        public static final int text_rating=0x7f08000a;
         public static final int text_title_year_detail=0x7f080007;
         public static final int text_year=0x7f080008;
         public static final int title=0x7f080006;
