@@ -68,7 +68,7 @@ public class MainVDRFragment extends Fragment {
 		}
 	}
 
-
+/*
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// TODO Auto-generated method stub
@@ -109,7 +109,7 @@ public class MainVDRFragment extends Fragment {
 		return super.onOptionsItemSelected(item);
 
 	}
-
+*/
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		// Serialize the current dropdown position.

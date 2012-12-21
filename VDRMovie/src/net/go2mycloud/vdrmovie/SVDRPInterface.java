@@ -69,12 +69,12 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 						break;
 					case 250:
 						String dataObj[] = data.split("[ -]", 6);
-						Log.d(D_TAG, "D:" + dataObj[0]);
-						Log.d(D_TAG, "D:" + dataObj[1]);
-						Log.d(D_TAG, "D:" + dataObj[2]);
-						Log.d(D_TAG, "D:" + dataObj[3]);
-						Log.d(D_TAG, "D:" + dataObj[4]);
-						Log.d(D_TAG, "D:" + dataObj[5]);
+						//Log.d(D_TAG, "D:" + dataObj[0]);
+						//Log.d(D_TAG, "D:" + dataObj[1]);
+						//Log.d(D_TAG, "D:" + dataObj[2]);
+						//Log.d(D_TAG, "D:" + dataObj[3]);
+						//Log.d(D_TAG, "D:" + dataObj[4]);
+						//Log.d(D_TAG, "D:" + dataObj[5]);
 						//do the things
 						if (dataObj[5].contains(recName)) {
 							//found recording
@@ -112,7 +112,7 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 		if (playrec != null ) {
 			return playRecordingByNum(playrec);
 		}
-		return "";
+		return null;
 	}
 
 	@SuppressWarnings("deprecation")
@@ -120,6 +120,7 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 		byte[] rl = new byte[] { 13, 10 };
 		byte[] buffer = new byte[250];
 		String data = new String();
+		String responce = null;
 		Socket s;
 		try {
 			s = new Socket(host, port);
@@ -144,6 +145,7 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 				if (type == 250 ) {
 					// last record
 					Log.d(D_TAG, "read  " + data);
+					responce = data;
 					sendSting = "QUIT";
 					dos.write(sendSting.getBytes());
 					dos.write(rl);					
@@ -161,7 +163,7 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return recNum;
+		return responce;
 
 	}
 

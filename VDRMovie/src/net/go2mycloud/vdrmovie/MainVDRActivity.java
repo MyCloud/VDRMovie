@@ -2,6 +2,8 @@ package net.go2mycloud.vdrmovie;
 
 
 
+import java.util.concurrent.ExecutionException;
+
 import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
@@ -55,13 +57,14 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 
 
 	ListView listView;
-	
+	Menu menu;
 //	ProgressDialog pleaseWaitDialog;
 
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 
 		setContentView(R.layout.activity_main_vdr);
 
@@ -86,6 +89,23 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 		 */
 		actionBar.setListNavigationCallbacks(adapter, this);
 		actionBar.setSelectedNavigationItem( getViewType());
+
+		// force at bottom
+	   // ViewGroup v = (ViewGroup)LayoutInflater.from(this)
+		//        .inflate(R.layout.activity_main_vdr, null);
+
+		
+		//actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM,
+	     //       ActionBar.DISPLAY_SHOW_CUSTOM);
+	    //actionBar.setCustomView(v,
+	    //        new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT,
+	     //               ActionBar.LayoutParams.WRAP_CONTENT,
+	      //              Gravity.CENTER_VERTICAL | Gravity.RIGHT));
+
+		
+		
+		
+		
 		Log.d("MainVDRActivity", "onCreate VieuwType " + getViewType() );
 		
 		// Start loading the questions in the background
@@ -99,7 +119,8 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 			    int position, long id) {
 				  
 				  customAdapter.setSelected(position);
-				  
+				  setViewEvent(position);
+								  
 				  updateDetailEvent(parent, view, position, id);
 			  }
 			}); 
@@ -129,6 +150,21 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 
 	}
 
+/*	private void setupActionBar() {
+	    ActionBar actionBar = getActionBar();
+
+	    ViewGroup v = (ViewGroup)LayoutInflater.from(this)
+	        .inflate(R.layout.conversation_list_actionbar, null);
+	    actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM,
+	            ActionBar.DISPLAY_SHOW_CUSTOM);
+	    actionBar.setCustomView(v,
+	            new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT,
+	                    ActionBar.LayoutParams.WRAP_CONTENT,
+	                    Gravity.CENTER_VERTICAL | Gravity.RIGHT));
+
+	    mUnreadConvCount = (TextView)v.findViewById(R.id.unread_conv_count);
+	}
+	*/
 	/**
 	 * Backward-compatible version of {@link ActionBar#getThemedContext()} that
 	 * simply returns the {@link android.app.Activity} if
@@ -145,6 +181,7 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 	  public void updateDetailEvent(AdapterView<?> parent, View view, int position, long id) {
 		    DetailEventVDRFragment fragment = (DetailEventVDRFragment) getFragmentManager()
 		        .findFragmentById(R.id.detailFragment);
+			
 		    if (fragment != null && fragment.isInLayout()) {
 		      fragment.updateEventInfo(position, datasource);
 		    } else {
@@ -161,17 +198,44 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		// TODO Auto-generated method stub
+		boolean fragmentInLauout = false;
 		Log.d("MainVDRActivity", "onPrepareOptionsMenu");
 	    DetailEventVDRFragment fragment = (DetailEventVDRFragment) getFragmentManager()
 		        .findFragmentById(R.id.detailFragment);
 		    if (fragment != null && fragment.isInLayout()) {
-				Log.d("MainVDRActivity", "true");
-	            menu.add(R.id.menu_event_details);
-		        //menu.findItem(R.id.menu_event_details).setEnabled(true);
-		    } else {
-				Log.d("MainVDRActivity", "false");
-	            menu.removeItem(R.id.menu_event_details);
-		        //menu.findItem(R.id.menu_event_details).setEnabled(false);		    	
+		    	fragmentInLauout = true;
+		    }
+		    //menu.clear();
+            menu.add(R.id.menu_settings);
+            menu.add(R.id.menu_update);
+            hideOption(R.id.menu_event_play);		            
+            hideOption(R.id.menu_event_rec);		            
+            hideOption(R.id.menu_event_stream);		            
+            hideOption(R.id.menu_event_pause);		            
+		    switch ( getViewType()) {
+		    case 0: //now
+		    	if (fragmentInLauout) {
+		            showOption(R.id.menu_event_play);		            
+		            showOption(R.id.menu_event_rec);		            
+		            showOption(R.id.menu_event_stream);		            
+		    	}		    		
+		    	break;
+		    case 1: //next
+		    	if (fragmentInLauout) {
+		    		showOption(R.id.menu_event_rec);
+		            // add set timer or switch to service
+		    	}		    		
+		    	break;
+		    case 4: // recordings
+			    switch ( getViewState()) {
+			    case 0: // default
+			    	showOption(R.id.menu_event_play);		            
+		            break;
+			    case 1: // play mode
+			    	showOption(R.id.menu_event_pause);		            
+		            break;
+			    }
+		    	
 		    }
 		    return true;
 		    //return super.onPrepareOptionsMenu(menu);
@@ -181,6 +245,13 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// TODO Auto-generated method stub
 		switch (item.getItemId()) {
+		case R.id.menu_event_play:
+			if ( PLayCurrentEvent() != null ){
+				//running in play mode update the menu items in play mode
+				setViewState(1);
+			    invalidateOptionsMenu();
+			}
+			break;	
 		case R.id.menu_settings:
 			Toast.makeText(this, "Menu settings", Toast.LENGTH_SHORT).show();
 			// The animation has ended, transition to the Main Menu screen
@@ -238,7 +309,7 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 	    //MenuInflater inflater = getSupportMenuInflater();
-	      
+	     this.menu = menu; 
 		
 		getMenuInflater().inflate(R.menu.activity_main_vdr, menu);
 //		return super.onCreateOptionsMenu(menu);
@@ -256,6 +327,7 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 		}
 		if (itemPosition != getViewType()) {
 			setViewType(itemPosition);
+		    invalidateOptionsMenu();
 
 			if(itemPosition == 0 ) {
 	            datasource.setCursorNowEvents();
@@ -273,13 +345,13 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 	//        	SVDRPInterface SVDRP;
 	        	//svdrpInterface = new SVDRPInterface(MainVDRActivity.this);
 	//        	svdrpInterface.doInBackground()
-				if(svdrpInterface.getStatus() == AsyncTask.Status.FINISHED ) {
-					svdrpInterface = new SVDRPInterface(MainVDRActivity.this);
-					svdrpInterface.execute("PLAY","Sint");
-				}
-				if (svdrpInterface.getStatus() == AsyncTask.Status.PENDING){
-		        	svdrpInterface.execute("PLAY","Sint");				
-				}
+//				if(svdrpInterface.getStatus() == AsyncTask.Status.FINISHED ) {
+//					svdrpInterface = new SVDRPInterface(MainVDRActivity.this);
+//					svdrpInterface.execute("PLAY","Sint");
+//				}
+//				if (svdrpInterface.getStatus() == AsyncTask.Status.PENDING){
+//		        	svdrpInterface.execute("PLAY","Sint");				
+//				}
 	 //   		customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getMovieEvents(), CursorAdapter.NO_SELECTION, itemPosition);      
 	            //customAdapter.swapCursor(datasource.getMovieEvents());
 	        }
@@ -325,5 +397,56 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 	public DetailEventVDRView getDetailEventVDRView() {
 		return detailEventVDRView;
 	}
-	
+
+	private String PLayCurrentEvent() {
+		Cursor c = datasource.getCursorDetails(getViewEvent() + 1);
+		if (c == null) {
+			return null;
+		}
+		c.moveToFirst();
+		// TextView textViewTitle = (TextView)
+		// DetailView.findViewById(R.id.title);
+		String title = c
+				.getString(c.getColumnIndex(DatabaseOpenHelper.C_TITLE));
+		try {			
+			if (svdrpInterface.getStatus() == AsyncTask.Status.FINISHED) {
+				svdrpInterface = new SVDRPInterface(MainVDRActivity.this);
+				title = svdrpInterface.execute("PLAY", title).get();
+			}
+			if (svdrpInterface.getStatus() == AsyncTask.Status.PENDING) {
+				title = svdrpInterface.execute("PLAY", title).get();
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Log.d("test", title);
+		return title;
+	}	
+	private void hideOption(int id)
+	{
+	    MenuItem item = menu.findItem(id);
+	    item.setVisible(false);
+	}
+
+	private void showOption(int id)
+	{
+	    MenuItem item = menu.findItem(id);
+	    item.setVisible(true);
+	}
+
+	private void setOptionTitle(int id, String title)
+	{
+	    MenuItem item = menu.findItem(id);
+	    item.setTitle(title);
+	}
+
+	private void setOptionIcon(int id, int iconRes)
+	{
+	    MenuItem item = menu.findItem(id);
+	    item.setIcon(iconRes);
+	}
 }

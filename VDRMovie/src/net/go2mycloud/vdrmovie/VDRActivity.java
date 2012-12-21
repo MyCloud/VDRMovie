@@ -13,6 +13,7 @@ public class VDRActivity extends Activity {
 	protected DatabaseConnector datasource;
 	private int ViewType;
 	private int ViewEvent;
+	private int ViewState = 0; //0 = default 1 = play recording
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +74,7 @@ public class VDRActivity extends Activity {
 	}
 
 	public int getViewEvent() {
+		Log.d("debug", "getViewEvent:" + ViewEvent );
 		return ViewEvent;
 	}
 
@@ -82,6 +84,14 @@ public class VDRActivity extends Activity {
 		SharedPreferences.Editor prefEditor = settings.edit();
 		prefEditor.putInt(getString(R.string.pref_view_event), ViewEvent);
 		prefEditor.commit();
+	}
+
+	public int getViewState() {
+		return ViewState;
+	}
+
+	public void setViewState(int viewState) {
+		ViewState = viewState;
 	}
 
 

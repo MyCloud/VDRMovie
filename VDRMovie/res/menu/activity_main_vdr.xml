@@ -6,7 +6,9 @@
         android:showAsAction="collapseActionView"
         android:title="@string/menu_settings"/>
     <item android:id="@+id/menu_update" android:orderInCategory="100" android:title="@string/menu_update" android:icon="@drawable/ic_action_refresh" android:showAsAction="ifRoom"></item>
-    <item android:id="@+id/menu_event_details" android:orderInCategory="100" android:title="@string/menu_event_play" android:icon="@drawable/ic_action_video" android:showAsAction="ifRoom"></item>
-    <item android:id="@+id/menu_event_stream" android:orderInCategory="100" android:title="@string/menu_event_stream" android:icon="@drawable/ic_action_send" android:showAsAction="ifRoom"></item>
-
+    <item android:id="@+id/menu_event_play" android:orderInCategory="99" android:title="@string/menu_event_play" android:icon="@drawable/ic_action_video" android:showAsAction="ifRoom"></item>
+    <item android:id="@+id/menu_event_stream" android:orderInCategory="98" android:title="@string/menu_event_stream" android:icon="@drawable/ic_action_send" android:showAsAction="ifRoom"></item>
+    <item android:id="@+id/menu_event_rec" android:orderInCategory="97" android:title="@string/menu_event_rec" android:icon="@drawable/av_play" android:showAsAction="ifRoom"></item>
+    <item android:id="@+id/menu_event_pause" android:orderInCategory="96" android:title="@string/menu_event_pause" android:icon="@drawable/av_pause" android:showAsAction="ifRoom"></item>
+    
 </menu>

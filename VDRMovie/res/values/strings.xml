@@ -17,6 +17,7 @@
         <string name="menu_update">Update Events</string>
         <string name="menu_event_play">play</string>
         <string name="menu_event_rec">rec</string>
+        <string name="menu_event_pause">pause</string>
         <string name="menu_event_stream">stream</string>
         <string name="preference_file">VDR_Movie_Preference</string>
         <string name="pref_view_type">view_type</string>
