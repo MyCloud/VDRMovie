@@ -23,10 +23,10 @@ public class DetailEventVDRFragment extends Fragment {
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		// TODO Auto-generated method stub
 //		super.onCreateOptionsMenu(menu, inflater);
-	      menu.add(0, R.menu.activity_main_vdr, 0, 
-	                getString(R.string.menu_event_play)).setIcon(android.R.drawable.ic_menu_edit) ;
-	      	Log.d(" DetailEventVDRFragment", "onPrepareOptionsMenu");
-//		super.onCreateOptionsMenu(menu, inflater);
+//	      menu.add(0, R.menu.activity_main_vdr, 0, 
+//	                getString(R.string.menu_event_play)).setIcon(android.R.drawable.ic_menu_edit) ;
+//	      	Log.d(" DetailEventVDRFragment", "onPrepareOptionsMenu");
+		super.onCreateOptionsMenu(menu, inflater);
 	}
 
 
@@ -38,7 +38,8 @@ public class DetailEventVDRFragment extends Fragment {
 			Bundle savedInstanceState) {
 	    view = inflater.inflate(R.layout.fragment_vdrevent_detail,
 		        container, false);
-			detailEventVDRView = new DetailEventVDRView( view );	    	
+			detailEventVDRView = new DetailEventVDRView( view );	
+			
 		    return view;
 	}
 
