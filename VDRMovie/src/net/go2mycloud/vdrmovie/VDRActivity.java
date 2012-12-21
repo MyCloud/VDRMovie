@@ -13,7 +13,7 @@ public class VDRActivity extends Activity {
 	protected DatabaseConnector datasource;
 	private int ViewType;
 	private int ViewEvent;
-	private int ViewState = 0; //0 = default 1 = play recording
+	private int ViewState; //0 = default 1 = play recording
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +30,7 @@ public class VDRActivity extends Activity {
 	    // read last date if null than use current date
 		ViewType = settings.getInt( getString(R.string.pref_view_type), 0 );
 		ViewEvent = settings.getInt( getString(R.string.pref_view_event), 0 );
+		ViewState = settings.getInt( getString(R.string.pref_view_state), 0 );
 
 	}
 
@@ -57,6 +58,7 @@ public class VDRActivity extends Activity {
 		SharedPreferences.Editor prefEditor = settings.edit();
 		prefEditor.putInt(getString(R.string.pref_view_type), ViewType);
 		prefEditor.putInt(getString(R.string.pref_view_event), ViewEvent);
+		prefEditor.putInt(getString(R.string.pref_view_state), ViewState);
 		prefEditor.commit();
 
 	}
@@ -92,6 +94,10 @@ public class VDRActivity extends Activity {
 
 	public void setViewState(int viewState) {
 		ViewState = viewState;
+		SharedPreferences settings = getSharedPreferences(getString(R.string.preference_file), 0);
+		SharedPreferences.Editor prefEditor = settings.edit();
+		prefEditor.putInt(getString(R.string.pref_view_state), ViewState);
+		prefEditor.commit();
 	}
 
 

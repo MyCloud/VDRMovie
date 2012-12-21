@@ -5,10 +5,15 @@
         android:orderInCategory="100"
         android:showAsAction="collapseActionView"
         android:title="@string/menu_settings"/>
-    <item android:id="@+id/menu_update" android:orderInCategory="100" android:title="@string/menu_update" android:icon="@drawable/ic_action_refresh" android:showAsAction="ifRoom"></item>
-    <item android:id="@+id/menu_event_play" android:orderInCategory="99" android:title="@string/menu_event_play" android:icon="@drawable/ic_action_video" android:showAsAction="ifRoom"></item>
-    <item android:id="@+id/menu_event_stream" android:orderInCategory="98" android:title="@string/menu_event_stream" android:icon="@drawable/ic_action_send" android:showAsAction="ifRoom"></item>
-    <item android:id="@+id/menu_event_rec" android:orderInCategory="97" android:title="@string/menu_event_rec" android:icon="@drawable/av_play" android:showAsAction="ifRoom"></item>
-    <item android:id="@+id/menu_event_pause" android:orderInCategory="96" android:title="@string/menu_event_pause" android:icon="@drawable/av_pause" android:showAsAction="ifRoom"></item>
-    
+    <item android:id="@+id/menu_update" android:orderInCategory="100" android:title="@string/menu_update" android:icon="@drawable/ic_action_refresh" android:visible="true" android:menuCategory="container"></item>
+    <item android:id="@+id/menu_event_play" android:orderInCategory="70" android:title="@string/menu_event_play" android:icon="@drawable/player_play" android:showAsAction="ifRoom"></item>
+    <item android:id="@+id/menu_event_stream" android:orderInCategory="55" android:title="@string/menu_event_stream" android:icon="@drawable/player_eject" android:showAsAction="ifRoom"></item>
+    <item android:id="@+id/menu_event_rec" android:orderInCategory="40" android:title="@string/menu_event_rec" android:icon="@drawable/player_rec" android:showAsAction="ifRoom"></item>
+    <item android:id="@+id/menu_event_pause" android:orderInCategory="75" android:title="@string/menu_event_pause" android:icon="@drawable/player_pause" android:showAsAction="always"></item>
+    <item android:id="@+id/menu_event_stop" android:orderInCategory="70" android:title="@string/menu_event_stop" android:icon="@drawable/player_stop" android:showAsAction="ifRoom"></item>
+    <item android:id="@+id/menu_event_end" android:orderInCategory="102" android:title="@string/menu_event_end" android:icon="@drawable/player_end" android:showAsAction="always"></item>
+    <item android:id="@+id/menu_event_start" android:orderInCategory="50" android:title="@string/menu_event_start" android:icon="@drawable/player_start" android:showAsAction="always"></item>
+    <item android:id="@+id/menu_event_fwd" android:orderInCategory="103" android:title="@string/menu_event_fwd" android:icon="@drawable/player_fwd" android:showAsAction="ifRoom"></item>
+    <item android:id="@+id/menu_event_rev" android:orderInCategory="60" android:title="@string/menu_event_rev" android:icon="@drawable/player_rev" android:showAsAction="ifRoom"></item>
+            
 </menu>

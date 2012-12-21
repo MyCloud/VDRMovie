@@ -212,6 +212,11 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
             hideOption(R.id.menu_event_rec);		            
             hideOption(R.id.menu_event_stream);		            
             hideOption(R.id.menu_event_pause);		            
+            hideOption(R.id.menu_event_fwd);		            
+            hideOption(R.id.menu_event_rev);		            
+            hideOption(R.id.menu_event_stop);		            
+            hideOption(R.id.menu_event_start);		            
+            hideOption(R.id.menu_event_end);		            
 		    switch ( getViewType()) {
 		    case 0: //now
 		    	if (fragmentInLauout) {
@@ -232,7 +237,10 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 			    	showOption(R.id.menu_event_play);		            
 		            break;
 			    case 1: // play mode
+			    	showOption(R.id.menu_event_start);		            
 			    	showOption(R.id.menu_event_pause);		            
+			    	showOption(R.id.menu_event_fwd);		            
+			    	showOption(R.id.menu_event_end);		            
 		            break;
 			    }
 		    	
