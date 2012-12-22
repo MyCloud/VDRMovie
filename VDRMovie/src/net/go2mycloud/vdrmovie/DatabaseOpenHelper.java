@@ -74,7 +74,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	
 	
 	private static final String DATABASE_NAME = "events.db";
-	private static final int DATABASE_VERSION = 5;
+	private static final int DATABASE_VERSION = 12;
 
 	public static final String createTblCursor = "CREATE TABLE "+ TBL_CURSOR + "( " 
     		+ TBL_ID + " integer primary key autoincrement, " 

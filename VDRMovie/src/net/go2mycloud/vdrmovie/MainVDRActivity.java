@@ -150,21 +150,6 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 
 	}
 
-/*	private void setupActionBar() {
-	    ActionBar actionBar = getActionBar();
-
-	    ViewGroup v = (ViewGroup)LayoutInflater.from(this)
-	        .inflate(R.layout.conversation_list_actionbar, null);
-	    actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM,
-	            ActionBar.DISPLAY_SHOW_CUSTOM);
-	    actionBar.setCustomView(v,
-	            new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT,
-	                    ActionBar.LayoutParams.WRAP_CONTENT,
-	                    Gravity.CENTER_VERTICAL | Gravity.RIGHT));
-
-	    mUnreadConvCount = (TextView)v.findViewById(R.id.unread_conv_count);
-	}
-	*/
 	/**
 	 * Backward-compatible version of {@link ActionBar#getThemedContext()} that
 	 * simply returns the {@link android.app.Activity} if
@@ -233,10 +218,30 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 		    	break;
 		    case 4: // recordings
 			    switch ( getViewState()) {
-			    case 0: // default
+			    case R.id.menu_event_stop: // default
 			    	showOption(R.id.menu_event_play);		            
 		            break;
-			    case 1: // play mode
+			    case R.id.menu_event_play: // play mode
+			    	showOption(R.id.menu_event_start);		            
+			    	showOption(R.id.menu_event_pause);		            
+			    	showOption(R.id.menu_event_fwd);		            
+			    	showOption(R.id.menu_event_end);		            
+		            break;
+			    case R.id.menu_event_pause: // pause mode
+			    	showOption(R.id.menu_event_rev);		            
+			    	showOption(R.id.menu_event_play);		            
+			    	showOption(R.id.menu_event_stop);		            
+			    	showOption(R.id.menu_event_fwd);		            
+		            break;
+			    case R.id.menu_event_rev: // pause mode
+			    case R.id.menu_event_fwd: // pause mode
+			    	showOption(R.id.menu_event_start);		            
+			    	showOption(R.id.menu_event_rev);		            
+			    	showOption(R.id.menu_event_play);		            
+			    	showOption(R.id.menu_event_fwd);		            
+		            break;
+			    case R.id.menu_event_start: // pause mode
+			    case R.id.menu_event_end: // pause mode
 			    	showOption(R.id.menu_event_start);		            
 			    	showOption(R.id.menu_event_pause);		            
 			    	showOption(R.id.menu_event_fwd);		            
@@ -254,9 +259,31 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 		// TODO Auto-generated method stub
 		switch (item.getItemId()) {
 		case R.id.menu_event_play:
-			if ( PLayCurrentEvent() != null ){
+			if ( getViewState() != R.id.menu_event_play) {
+				if ( PLayCurrentEvent() != null ){
+					//running in play mode update the menu items in play mode
+					setViewState(R.id.menu_event_play);
+				    invalidateOptionsMenu();
+				}
+			} else {
+				if ( sendKey( item.getTitle().toString()) != null ){
+					//running in play mode update the menu items in play mode
+					setViewState(item.getItemId());
+				    invalidateOptionsMenu();
+				}
+				
+			}			
+			break;	
+		case R.id.menu_event_stop:
+		case R.id.menu_event_start:
+		case R.id.menu_event_end:
+		case R.id.menu_event_pause:
+		case R.id.menu_event_fwd:
+		case R.id.menu_event_rev:
+
+			if ( sendKey( item.getTitle().toString()) != null ){
 				//running in play mode update the menu items in play mode
-				setViewState(1);
+				setViewState(item.getItemId());
 			    invalidateOptionsMenu();
 			}
 			break;	
@@ -426,14 +453,41 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
+			Log.d("PLayCurrentEvent", "InterruptedException");
 			e.printStackTrace();
 		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
+			Log.d("PLayCurrentEvent", "ExecutionException");
 			e.printStackTrace();
 		}
 		Log.d("test", title);
 		return title;
 	}	
+	private String sendKey( String key) {
+		Log.d("presendKey", key);
+		try {			
+			if (svdrpInterface.getStatus() == AsyncTask.Status.FINISHED) {
+				svdrpInterface = new SVDRPInterface(MainVDRActivity.this);
+				key = svdrpInterface.execute("HITK", key).get();
+			}
+			if (svdrpInterface.getStatus() == AsyncTask.Status.PENDING) {
+				key = svdrpInterface.execute("HITK", key).get();
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			Log.d("sendKey", "InterruptedException");
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			Log.d("sendKey", "ExecutionException");
+			e.printStackTrace();
+		}
+		Log.d("sendKey", key);
+		return key;
+	}	
+
+	
+	
 	private void hideOption(int id)
 	{
 	    MenuItem item = menu.findItem(id);

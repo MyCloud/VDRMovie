@@ -11,11 +11,13 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.Socket;
 import java.net.URL;
+import java.net.UnknownServiceException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutionException;
 import java.util.zip.CRC32;
 
 
@@ -29,10 +31,13 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
+import android.widget.Toast;
 
 
 
@@ -40,7 +45,7 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 	private static final String DEBUG_TAG = "MainVDR$DownloadVDR";
 	private DatabaseConnector datasource;
 	ProgressDialog pleaseWaitDialog;
-
+	private boolean networkOn = false;
 	Context mContext;
 	   
 	
@@ -60,32 +65,48 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 	            URL myImageURL = new URL(imageURL);
 	            HttpURLConnection connection = (HttpURLConnection)myImageURL.openConnection();
 	            connection.setDoInput(true);
+	            connection.setReadTimeout(300);
+	            connection.setConnectTimeout(1500);
+	            Log.i("help", " 0");
 	            connection.connect();
+	            //connection.getErrorStream();
+	            Log.i("help", " 1");
 	            InputStream input = connection.getInputStream();
+//	            URLConnection ucon = url.openConnection();
+
+	            Log.i("help", " 2");
 
 	            // Get the bitmap
 	            Bitmap myBitmap = BitmapFactory.decodeStream(input);
+	            Log.i("help", " 3");
 
 	            // Save the bitmap to the file
 	            String path = Environment.getExternalStorageDirectory().toString();
 
 	            OutputStream fOut = null;
 	            File file = new File(path, fileName);
-	            Log.i("help", file.getAbsolutePath());
-	            Log.i("help", file.toString());
-	            Log.i("help", file.length() + "");
+	            //Log.i("help", file.getAbsolutePath());
+	            //Log.i("help", file.toString());
+	            //Log.i("help", file.length() + "");
 	            //System.out.println("THIS IS A TEST OF SYSTEM.OUT.PRINTLN()");
 	            fOut = new FileOutputStream(file);
+	            Log.i("help", " 4");
 
 	            myBitmap.compress(Bitmap.CompressFormat.JPEG, 85, fOut);
 	            fOut.flush();
 	            fOut.close();
-	            System.out.println("file Path: " + file.getAbsolutePath());
-	            Log.i("help2", file.getAbsolutePath());
-	            Log.i("help2", file.toString());
-	            Log.i("help2", file.length() + "");
+	            Log.i("help", " 5");
 
-	        } catch (IOException e) {}
+	            //System.out.println("file Path: " + file.getAbsolutePath());
+	            //Log.i("help2", file.getAbsolutePath());
+	            //Log.i("help2", file.toString());
+	            //Log.i("help2", file.length() + "");
+
+//        } catch (Exception e) {
+        } catch (Throwable e) {
+	            Log.d("downloadFromUrl", e.getMessage());
+				e.printStackTrace();
+	        }
 	}
 	
 	
@@ -96,8 +117,8 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 		super.onPostExecute(result);
 		if ( datasource != null ){
 			datasource.close();
+			pleaseWaitDialog.dismiss();
 		}
-		pleaseWaitDialog.dismiss();
 			
 	}
 
@@ -108,26 +129,48 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 		Log.d(DEBUG_TAG, "onPreExecute -- dialog");
 		
 		super.onPreExecute();
-		try {
-			datasource = new DatabaseConnector(mContext);
-		} catch (SQLException e) {
-
-			throw new Error("Error open database");
+		if ( isNetworkAvailable() ) {
+			try {
+				datasource = new DatabaseConnector(mContext);
+			} catch (SQLException e) {
+	
+				throw new Error("Error open database");
+	
+			}
+			datasource.open();
+			pleaseWaitDialog = ProgressDialog.show(mContext,
+					"VDR Guid", "Downloading VDR Guid data", true, true);
+			pleaseWaitDialog.setOnCancelListener(new OnCancelListener() {
+				public void onCancel(DialogInterface dialog) {
+					Log.d("onOptionsItemSelected" , "onCancel ");
+					cancel(true);
+				}
+			});
+			networkOn = true;
+		} else {
+			Toast.makeText(mContext, "No network connection ", Toast.LENGTH_SHORT).show();
 
 		}
-		datasource.open();
-		pleaseWaitDialog = ProgressDialog.show(mContext,
-				"VDR Guid", "Downloading VDR Guid data", true, true);
-		pleaseWaitDialog.setOnCancelListener(new OnCancelListener() {
-			public void onCancel(DialogInterface dialog) {
-				Log.d("onOptionsItemSelected" , "onCancel ");
-				cancel(true);
-			}
-		});
 
 
 	}
 
+	public boolean isNetworkAvailable() {
+		// Context context = getApplicationContext();
+		ConnectivityManager connectivity = (ConnectivityManager) mContext
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		if (connectivity != null) {
+			NetworkInfo[] info = connectivity.getAllNetworkInfo();
+			if (info != null) {
+				for (int i = 0; i < info.length; i++) {
+					if (info[i].getState() == NetworkInfo.State.CONNECTED) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
 
 	@Override
 	protected void onProgressUpdate(String... values) {
@@ -153,7 +196,9 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 		String Ev_st = "";
 		String Ev_dt = "";
 		long Ev_hsh_key = 0;
-
+		if (!networkOn) {
+			return false;
+		}
 		session = new MovieMeterPluginSession();
 		try {
 			//datasource.open();
@@ -185,6 +230,7 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 
 				OutputStream os = s.getOutputStream();
 				InputStream is = s.getInputStream();
+				s.setSoTimeout(2000);
 				DataInputStream dis = new DataInputStream(is);
 				DataOutputStream dos = new DataOutputStream(os);
 
@@ -209,6 +255,10 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 
 				do {
 					try {
+						//int av = dis.available();
+						//if ( av <= 0 ) {
+							//Log.d(DEBUG_TAG, "dis " + av );
+						//}								
 						data = dis.readLine();
 						data.getBytes(0, 2, buffer, 0);
 						type = Integer.parseInt(data.substring(0, 3));
@@ -320,6 +370,7 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 											// , "");
 
 											if (!Ev_rlt.isEmpty()) {
+												Log.d(DEBUG_TAG, "getMovieByTitleRegieGenre " + Ev_tt + Ev_tt + Ev_rlt + Ev_gt );
 												filmInfo = session
 														.getMovieByTitleRegieGenre(Ev_tt,
 																Ev_rft, Ev_rlt, Ev_gt);
@@ -329,8 +380,12 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 																		+ String.valueOf(checkSum
 																				.getValue()));
 													idFilm = filmInfo.get("filmId").toString();
+													Log.d(DEBUG_TAG, "idFilm " + idFilm );
 													filmInfo = session.getMovieDetailsById( Integer.parseInt(idFilm));
+													Log.d(DEBUG_TAG, "getMovieDetailsById " + filmInfo.get("thumbnail").toString() );
 													downloadFromUrl(filmInfo.get("thumbnail").toString(), "VDR_TH_" + idFilm + ".jpg");
+													Log.d(DEBUG_TAG, "downloadFromUrl " );
+												
 													//idFilm = filmInfo.get("filmId").toString();
 												}
 
@@ -402,7 +457,7 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 							Log.d(DEBUG_TAG, "Default case " + data.toString());
 							break;
 						}
-						// Log.d(DEBUG_TAG, data.toString());
+						//Log.d(DEBUG_TAG, Integer.toString(type));
 
 					} catch (Exception NumberFormatException) {
 						// TODO: handle exception
@@ -433,6 +488,7 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 
 			OutputStream os = s.getOutputStream();
 			InputStream is = s.getInputStream();
+			s.setSoTimeout(1000);
 			DataInputStream dis = new DataInputStream(is);
 			DataOutputStream dos = new DataOutputStream(os);
 
@@ -582,8 +638,19 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 																				.getValue()));
 													idFilm = filmInfo.get("filmId").toString();
 													filmInfo = session.getMovieDetailsById( Integer.parseInt(idFilm));
-													downloadFromUrl(filmInfo.get("thumbnail").toString(), "VDR_TH_" + idFilm + ".jpg");
+													Log.d(DEBUG_TAG, "getMovieDetailsById " + filmInfo.get("thumbnail").toString() );
+											  	downloadFromUrl(filmInfo.get("thumbnail").toString(), "VDR_TH_" + idFilm + ".jpg");
+													Log.d(DEBUG_TAG, "downloadFromUrl " );
 													//idFilm = filmInfo.get("filmId").toString();
+												
+
+												
+
+												
+												
+												
+												
+												
 												}
 
 											}
@@ -668,7 +735,7 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 							data.toString() + NumberFormatException.getMessage());
 					endOfSession = true;
 					// break out of while loop and go no next channel
-					break;
+//					break;
 				}
 
 			} while (!endRecordings);

@@ -167,6 +167,54 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 
 	}
 
+	private String hitKey(String key) {
+		byte[] rl = new byte[] { 13, 10 };
+		byte[] buffer = new byte[250];
+		String data = new String();
+		String responce = null;
+		Socket s;
+		try {
+			s = new Socket(host, port);
+
+			OutputStream os = s.getOutputStream();
+			InputStream is = s.getInputStream();
+			DataInputStream dis = new DataInputStream(is);
+			DataOutputStream dos = new DataOutputStream(os);
+
+			String sendSting = "HITK " + key;
+			Log.d(D_TAG, "send  " + sendSting);
+			dos.write(sendSting.getBytes());
+			dos.write(rl);
+			data = dis.readLine();
+			data.getBytes(0, 2, buffer, 0);
+			int type = Integer.parseInt(data.substring(0, 3));
+
+			if (type == 220) {
+				data = dis.readLine();
+				type = Integer.parseInt(data.substring(0, 3));
+				if (type == 250 ) {
+					// last record
+					Log.d(D_TAG, "read  " + data);
+					responce = data;
+					sendSting = "QUIT";
+					dos.write(sendSting.getBytes());
+					dos.write(rl);					
+					data = dis.readLine();
+					Log.d(D_TAG, "play  " + data);
+				}
+			}
+			Log.d(D_TAG, "send end  " + data);
+			s.close();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return responce;
+	}
+
 	@Override
 	protected String doInBackground(String... svdrpC ) {
 	    int count = svdrpC.length;
@@ -176,6 +224,9 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
         	if( svdrpC[i].contains("PLAY") ) {
         		return playRecordingByName(svdrpC[1]);
         	}
+        	if( svdrpC[i].contains("HITK") ) {
+        		return hitKey(svdrpC[1]);
+        	}
         }
     
         
@@ -184,4 +235,68 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 	}
 
 
+
 }
+
+/*
+ * 
+ * HITK
+ * 
+
+Up
+Down
+Menu
+Ok
+Back
+Left
+Right
+Red
+Green
+Yellow
+Blue
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+Info
+Play
+Pause
+Stop
+Record
+FastFwd
+FastRew
+Next
+Prev
+Power
+Channel+
+Channel-
+PrevChannel
+Volume+
+Volume-
+Mute
+Audio
+Subtitles
+Schedule
+Channels
+Timers
+Recordings
+Setup
+Commands
+User0
+User1
+User2
+User3
+User4
+User5
+User6
+User7
+User8
+User9
+
+*/
