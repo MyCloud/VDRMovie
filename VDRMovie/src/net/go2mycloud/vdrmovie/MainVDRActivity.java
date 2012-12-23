@@ -56,9 +56,8 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 	//private DatabaseConnector datasource;
 	private DetailEventVDRView  detailEventVDRView;
 
-
 	ListView listView;
-	Menu menu;
+//	Menu menu;
 //	ProgressDialog pleaseWaitDialog;
 
 	
@@ -91,21 +90,6 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 		actionBar.setListNavigationCallbacks(adapter, this);
 		actionBar.setSelectedNavigationItem( getViewType());
 
-		// force at bottom
-	   // ViewGroup v = (ViewGroup)LayoutInflater.from(this)
-		//        .inflate(R.layout.activity_main_vdr, null);
-
-		
-		//actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM,
-	     //       ActionBar.DISPLAY_SHOW_CUSTOM);
-	    //actionBar.setCustomView(v,
-	    //        new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT,
-	     //               ActionBar.LayoutParams.WRAP_CONTENT,
-	      //              Gravity.CENTER_VERTICAL | Gravity.RIGHT));
-
-		
-		
-		
 		
 		Log.d("MainVDRActivity", "onCreate VieuwType " + getViewType() );
 		
@@ -126,30 +110,8 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 			  }
 			}); 
 
-      
-
-       // Database query can be a time consuming task ..
-       // so its safe to call database query in another thread
-
-//       Thread thread = new Thread() {
-
-  //         public void run() {
-      //Looper.prepare();
-
-//         	  datasource.open();
-
-//               customAdapter = new CustomEventAdapter(MainVDRActivity.this, datasource.getNowEvents(), CursorAdapter.NO_SELECTION);
-
-
-
-  //            listView.setAdapter(customAdapter);
-              //datasource.close();
-  //         }
-   //    };
-    //   thread.start();
-		
-
 	}
+
 	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
 	    if ((keyCode == KeyEvent.KEYCODE_VOLUME_UP) || (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)) {
@@ -160,25 +122,11 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-			for (int i = 0; i < menu.size(); i++) {
-				if (menu.getItem(i).isVisible()) {
-					onOptionsItemSelected(menu.getItem(i));
-				}
-			}
-		} else {
-			if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-				boolean next = false;
-				for (int i = 0; i < menu.size(); i++) {
-					if (menu.getItem(i).isVisible() && next) {
-						onOptionsItemSelected(menu.getItem(i));
-					}
-					if (menu.getItem(i).isVisible()) {
-						next = true;
-					}
-				}
-
-				return true;
-			}
+			onOptionsItemSelected( getVolumeUp());
+			return true;
+		} else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+			onOptionsItemSelected( getVolumeDown());
+			return true;
 		}
 		return super.onKeyDown(keyCode, event);
 	}
@@ -213,81 +161,6 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 	/* (non-Javadoc)
 	 * @see android.app.Activity#onPrepareOptionsMenu(android.view.Menu)
 	 */
-	@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
-		// TODO Auto-generated method stub
-		boolean fragmentInLauout = false;
-		Log.d("MainVDRActivity", "onPrepareOptionsMenu");
-	    DetailEventVDRFragment fragment = (DetailEventVDRFragment) getFragmentManager()
-		        .findFragmentById(R.id.detailFragment);
-		    if (fragment != null && fragment.isInLayout()) {
-		    	fragmentInLauout = true;
-		    }
-		    //menu.clear();
-            menu.add(R.id.menu_settings);
-            menu.add(R.id.menu_update);
-            hideOption(R.id.menu_event_play);		            
-            hideOption(R.id.menu_event_rec);		            
-            hideOption(R.id.menu_event_stream);		            
-            hideOption(R.id.menu_event_pause);		            
-            hideOption(R.id.menu_event_fwd);		            
-            hideOption(R.id.menu_event_rev);		            
-            hideOption(R.id.menu_event_stop);		            
-            hideOption(R.id.menu_event_start);		            
-            hideOption(R.id.menu_event_end);	
-            Log.d("onPrepareOptionsMenu", "Type:" + getViewType() + " State:" + getViewState() );
-		    switch ( getViewType()) {
-		    case 0: //now
-		    	if (fragmentInLauout) {
-		            showOption(R.id.menu_event_play);		            
-		            showOption(R.id.menu_event_rec);		            
-		            showOption(R.id.menu_event_stream);		            
-		    	}		    		
-		    	break;
-		    case 1: //next
-		    	if (fragmentInLauout) {
-		    		showOption(R.id.menu_event_rec);
-		            // add set timer or switch to service
-		    	}		    		
-		    	break;
-		    case 4: // recordings
-			    switch ( getViewState()) {
-			    case R.id.menu_event_stop: // default
-			    	showOption(R.id.menu_event_play);		            
-		            break;
-			    case R.id.menu_event_play: // play mode
-			    	showOption(R.id.menu_event_start);		            
-			    	showOption(R.id.menu_event_pause);		            
-			    	showOption(R.id.menu_event_stop);		            
-			    	showOption(R.id.menu_event_fwd);		            
-			    	showOption(R.id.menu_event_end);		            
-		            break;
-			    case R.id.menu_event_pause: // pause mode
-			    	showOption(R.id.menu_event_rev);		            
-			    	showOption(R.id.menu_event_play);		            
-			    	showOption(R.id.menu_event_stop);		            
-			    	showOption(R.id.menu_event_fwd);		            
-		            break;
-			    case R.id.menu_event_rev: // pause mode
-			    case R.id.menu_event_fwd: // pause mode
-			    	showOption(R.id.menu_event_start);		            
-			    	showOption(R.id.menu_event_rev);		            
-			    	showOption(R.id.menu_event_play);		            
-			    	showOption(R.id.menu_event_fwd);		            
-		            break;
-			    case R.id.menu_event_start: // pause mode
-			    case R.id.menu_event_end: // pause mode
-			    	showOption(R.id.menu_event_start);		            
-			    	showOption(R.id.menu_event_pause);		            
-			    	showOption(R.id.menu_event_fwd);		            
-			    	showOption(R.id.menu_event_end);		            
-		            break;
-			    }
-		    	
-		    }
-		    return true;
-		    //return super.onPrepareOptionsMenu(menu);
-	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -379,7 +252,7 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 	    //MenuInflater inflater = getSupportMenuInflater();
-	     this.menu = menu; 
+	     setMenu(menu); 
 		
 		getMenuInflater().inflate(R.menu.activity_main_vdr, menu);
 //		return super.onCreateOptionsMenu(menu);
@@ -525,27 +398,4 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 
 	
 	
-	private void hideOption(int id)
-	{
-	    MenuItem item = menu.findItem(id);
-	    item.setVisible(false);
-	}
-
-	private void showOption(int id)
-	{
-	    MenuItem item = menu.findItem(id);
-	    item.setVisible(true);
-	}
-
-	private void setOptionTitle(int id, String title)
-	{
-	    MenuItem item = menu.findItem(id);
-	    item.setTitle(title);
-	}
-
-	private void setOptionIcon(int id, int iconRes)
-	{
-	    MenuItem item = menu.findItem(id);
-	    item.setIcon(iconRes);
-	}
 }
