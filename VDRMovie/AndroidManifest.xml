@@ -30,7 +30,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="net.go2mycloud.vdrmovie.DetailEventVDRActivity"></activity>
+        <activity android:name="net.go2mycloud.vdrmovie.DetailEventVDRActivity"
+                        android:uiOptions="splitActionBarWhenNarrow" >
+            
+        </activity>
     </application>
 
 </manifest>

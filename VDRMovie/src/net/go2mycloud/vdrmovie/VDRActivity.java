@@ -1,18 +1,35 @@
 package net.go2mycloud.vdrmovie;
 
 
+import java.util.concurrent.ExecutionException;
+
+import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.Activity;
+import android.app.ActionBar.OnNavigationListener;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.SQLException;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
 
-public class VDRActivity extends Activity {
+public class VDRActivity extends Activity implements OnNavigationListener {
 //	public static final String PREFS_NAME = "MyPrefsFile";
 
 	protected DatabaseConnector datasource;
+	protected DownloadVDR downloader;
+	protected SVDRPInterface svdrpInterface;
 	private int ViewType;
 	private int ViewEvent;
 	private int ViewState; //0 = default 1 = play recording
@@ -26,19 +43,140 @@ public class VDRActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		try {
 			datasource = new DatabaseConnector(this.getBaseContext());
-       	    datasource.open();
+			datasource.open();
 
 		} catch (SQLException e) {
 			throw new Error("Error copying database");
 		}
-		SharedPreferences settings = getSharedPreferences( getString(R.string.preference_file) , 0);
-	    // read last date if null than use current date
-		ViewType = settings.getInt( getString(R.string.pref_view_type), 0 );
-		ViewEvent = settings.getInt( getString(R.string.pref_view_event), 0 );
-		ViewState = settings.getInt( getString(R.string.pref_view_state), 0 );
-//		ViewState = settings.getInt( getString(R.string.pref_view_state), R.id.menu_event_stop );
+		SharedPreferences settings = getSharedPreferences(
+				getString(R.string.preference_file), 0);
+		// read last date if null than use current date
+		ViewType = settings.getInt(getString(R.string.pref_view_type), 0);
+		ViewEvent = settings.getInt(getString(R.string.pref_view_event), 0);
+		ViewState = settings.getInt(getString(R.string.pref_view_state), 0);
+		// ViewState = settings.getInt( getString(R.string.pref_view_state),
+		// R.id.menu_event_stop );
+
+
+		Log.d("MainVDRActivity", "onCreate VieuwType " + getViewType());
+
+		// Start loading the questions in the background
+		downloader = new DownloadVDR(VDRActivity.this);
+		svdrpInterface = new SVDRPInterface(VDRActivity.this);
+		
+		// Set up the action bar to show a dropdown list.
+		final ActionBar actionBar = getActionBar();
+		actionBar.setDisplayShowTitleEnabled(false);
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+		//requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+
+
+
+
+
+
+		/**
+		 * Setting dropdown items and item navigation listener for the actionbar
+		 */
+//		actionBar.setListNavigationCallbacks(adapter, this);
+		//actionBar.setSelectedNavigationItem( getViewType());
+
 
 	}
+		
+	
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// TODO Auto-generated method stub
+		switch (item.getItemId()) {
+		case R.id.menu_event_play:
+			switch ( getViewType()) {
+			case 0: // tune to channel
+				if ( getViewState() != R.id.menu_event_stop) {
+					sendKey( R.id.menu_event_stop, menu.findItem(R.id.menu_event_stop).getTitle().toString() );
+				}
+				if ( getViewState() == R.id.menu_event_stop) {
+					TuneToCurrentEvent(item.getItemId());
+				}
+				break;
+			case 4:
+				if ( getViewState() == R.id.menu_event_stop) {
+					PLayCurrentEvent(item.getItemId());
+				} else {
+					sendKey( item.getItemId(), item.getTitle().toString() );
+				}
+				break;
+			}
+			break;
+		case R.id.menu_event_stop:
+		case R.id.menu_event_start:
+		case R.id.menu_event_end:
+		case R.id.menu_event_pause:
+		case R.id.menu_event_fwd:
+		case R.id.menu_event_rev:
+			sendKey( item.getItemId(), item.getTitle().toString() );
+			break;	
+		case R.id.menu_settings:
+			Toast.makeText(this, "Menu settings", Toast.LENGTH_SHORT).show();
+			// The animation has ended, transition to the Main Menu screen
+			//startActivity(new Intent(QuizMenuActivity.this, QuizHelpActivity.class));
+			//QuizMenuActivity.this.finish();
+			break;
+		case R.id.menu_update:
+			if(downloader.getStatus() == AsyncTask.Status.FINISHED ) {
+				downloader = new DownloadVDR(VDRActivity.this);
+			}
+			if(downloader.getStatus() == AsyncTask.Status.PENDING){
+				downloader.execute("");
+			}
+			break;
+		case android.R.id.home:
+			//Intent intent = new Intent(this, QuizSplashActivity.class);
+			//intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			//startActivity(intent);
+			break;
+		default:
+			break;
+		}
+
+		return super.onOptionsItemSelected(item);
+
+	}
+
+
+
+
+	/**
+	 * Backward-compatible version of {@link ActionBar#getThemedContext()} that
+	 * simply returns the {@link android.app.Activity} if
+	 * <code>getThemedContext</code> is unavailable.
+	 */
+	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+	protected Context getActionBarThemedContextCompat() {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+			return getActionBar().getThemedContext();
+		} else {
+			return this;
+		}
+	}
+	
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+
+	
 
 	@Override
 	protected void onRestart() {
@@ -129,6 +267,17 @@ public class VDRActivity extends Activity {
 
 	public void setMenu(Menu menu) {
 		this.menu = menu;
+	}
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+	    //MenuInflater inflater = getSupportMenuInflater();
+	    setMenu(menu); 
+		
+		getMenuInflater().inflate(R.menu.activity_main_vdr, menu);
+//		return super.onCreateOptionsMenu(menu);
+
+		return true;
 	}
 
 	public boolean onPrepareOptionsMenu(Menu menu) {
@@ -250,6 +399,105 @@ public class VDRActivity extends Activity {
 	public void setVolumeDown(int id) {
 		VolumeDown = getMenu().findItem(id);
 	}
+
+	@Override
+	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	private String TuneToCurrentEvent(int ViewState) {
+		Cursor c = datasource.getCursorDetails(getViewEvent() + 1);
+		if (c == null) {
+			return null;
+		}
+		c.moveToFirst();
+		// TextView textViewTitle = (TextView)
+		// DetailView.findViewById(R.id.title);
+		String title = c.getString(c.getColumnIndex(DatabaseOpenHelper.C_CHANNELS_KEY));
+		// get the channel number
+		c = datasource.getOneChannel(c.getLong(c.getColumnIndex(DatabaseOpenHelper.C_CHANNELS_KEY)));
+		if (c == null) {
+			return null;
+		}
+		c.moveToFirst();
+		title = c.getString(c.getColumnIndex(DatabaseOpenHelper.CHANNELS_NUM));
+		title = svdrSend ("CHAN", title);
+		if (title != null ) {
+			Log.d("TuneToCurrentEvent", title);
+			setViewState(ViewState);
+		    invalidateOptionsMenu();
+		}
+		return title;
+	}
+
+	
+	private String PLayCurrentEvent(int ViewState) {
+		Cursor c = datasource.getCursorDetails(getViewEvent() + 1);
+		if (c == null) {
+			return null;
+		}
+		c.moveToFirst();
+		// TextView textViewTitle = (TextView)
+		// DetailView.findViewById(R.id.title);
+		String title = c
+				.getString(c.getColumnIndex(DatabaseOpenHelper.C_TITLE));
+		title = svdrSend ("PLAY", title);
+		if (title != null ) {
+			Log.d("Play", title);
+			setViewState(ViewState);
+		    invalidateOptionsMenu();
+		}
+		return title;
+	}	
+
+	private String svdrSend(String command, String arg) {
+		String ret = null;
+		try {
+			if (svdrpInterface.getStatus() == AsyncTask.Status.FINISHED) {
+				svdrpInterface = new SVDRPInterface(VDRActivity.this);
+				ret = svdrpInterface.execute(command, arg).get();
+			}
+			if (svdrpInterface.getStatus() == AsyncTask.Status.PENDING) {
+				ret = svdrpInterface.execute(command, arg).get();
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			Log.d("PLayCurrentEvent", "InterruptedException");
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			Log.d("PLayCurrentEvent", "ExecutionException");
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	
+	private String sendKey( int ViewState, String key) {
+		Log.d("presendKey", key);
+		try {			
+			if (svdrpInterface.getStatus() == AsyncTask.Status.FINISHED) {
+				svdrpInterface = new SVDRPInterface(VDRActivity.this);
+				key = svdrpInterface.execute("HITK", key).get();
+			}
+			if (svdrpInterface.getStatus() == AsyncTask.Status.PENDING) {
+				key = svdrpInterface.execute("HITK", key).get();
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			Log.d("sendKey", "InterruptedException");
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			Log.d("sendKey", "ExecutionException");
+			e.printStackTrace();
+		}
+		if( key != null) {
+			Log.d("sendKey", key);
+			setViewState(ViewState);
+		    invalidateOptionsMenu();
+		}
+		return key;
+	}	
 
 
 }

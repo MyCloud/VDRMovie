@@ -163,6 +163,10 @@ public class DatabaseConnector {
 		database.execSQL(buildSQL );
 	}
 
+	public Cursor getOneChannel(long id) {
+		return database.query(DatabaseOpenHelper.TBL_CHANNELS, null, "_id=" + id, null, null, null,
+				null);
+	}
 	
 	public Cursor getNowChannels () 
 	{

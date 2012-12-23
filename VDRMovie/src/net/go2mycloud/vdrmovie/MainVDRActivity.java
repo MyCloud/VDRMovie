@@ -42,7 +42,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainVDRActivity extends VDRActivity implements OnNavigationListener {
+public class MainVDRActivity extends VDRActivity  {
 
 
 	/**
@@ -50,8 +50,6 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 	 * current dropdown position.
 	 */
 	private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
-	private DownloadVDR downloader;
-	private SVDRPInterface svdrpInterface;
     private CustomEventAdapter customAdapter;
 	//private DatabaseConnector datasource;
 	private DetailEventVDRView  detailEventVDRView;
@@ -67,23 +65,14 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 
 
 		setContentView(R.layout.activity_main_vdr);
-
 		// Set up the action bar to show a dropdown list.
 		final ActionBar actionBar = getActionBar();
-		actionBar.setDisplayShowTitleEnabled(false);
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-		//requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-
-
 		// Set up the dropdown list navigation in the action bar.
 		/** Create an array adapter to populate dropdownlist */
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
 				getActionBarThemedContextCompat(), R.array.MainMenu, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-
-
-
+	
 		/**
 		 * Setting dropdown items and item navigation listener for the actionbar
 		 */
@@ -93,9 +82,6 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 		
 		Log.d("MainVDRActivity", "onCreate VieuwType " + getViewType() );
 		
-		// Start loading the questions in the background
-		downloader = new DownloadVDR(MainVDRActivity.this);
-		svdrpInterface = new SVDRPInterface(MainVDRActivity.this);
 
 		listView = (ListView) findViewById(R.id.list_events);
 		listView.setOnItemClickListener(new OnItemClickListener() {
@@ -109,6 +95,7 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 				  updateDetailEvent(parent, view, position, id);
 			  }
 			}); 
+		
 
 	}
 
@@ -131,19 +118,6 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 		return super.onKeyDown(keyCode, event);
 	}
 
-	/**
-	 * Backward-compatible version of {@link ActionBar#getThemedContext()} that
-	 * simply returns the {@link android.app.Activity} if
-	 * <code>getThemedContext</code> is unavailable.
-	 */
-	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-	private Context getActionBarThemedContextCompat() {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-			return getActionBar().getThemedContext();
-		} else {
-			return this;
-		}
-	}
 	  public void updateDetailEvent(AdapterView<?> parent, View view, int position, long id) {
 		    DetailEventVDRFragment fragment = (DetailEventVDRFragment) getFragmentManager()
 		        .findFragmentById(R.id.detailFragment);
@@ -162,75 +136,6 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 	 * @see android.app.Activity#onPrepareOptionsMenu(android.view.Menu)
 	 */
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// TODO Auto-generated method stub
-		switch (item.getItemId()) {
-		case R.id.menu_event_play:
-			if ( getViewState() == R.id.menu_event_stop) {
-				if ( PLayCurrentEvent() != null ){
-					//running in play mode update the menu items in play mode
-					setViewState(item.getItemId());
-				    invalidateOptionsMenu();
-				}
-			} else {
-				if ( sendKey( item.getTitle().toString()) != null ){
-					//running in play mode update the menu items in play mode
-					setViewState(item.getItemId());
-				    invalidateOptionsMenu();
-				}
-				
-			}			
-			break;
-		case R.id.menu_event_stop:
-		case R.id.menu_event_start:
-		case R.id.menu_event_end:
-		case R.id.menu_event_pause:
-		case R.id.menu_event_fwd:
-		case R.id.menu_event_rev:
-
-			if ( sendKey( item.getTitle().toString()) != null ){
-				//running in play mode update the menu items in play mode
-				setViewState(item.getItemId());
-			    invalidateOptionsMenu();
-			}
-			break;	
-		case R.id.menu_settings:
-			Toast.makeText(this, "Menu settings", Toast.LENGTH_SHORT).show();
-			// The animation has ended, transition to the Main Menu screen
-			//startActivity(new Intent(QuizMenuActivity.this, QuizHelpActivity.class));
-			//QuizMenuActivity.this.finish();
-			break;
-		case R.id.menu_update:
-			Toast.makeText(this, "Menu update", Toast.LENGTH_SHORT).show();
-//			pleaseWaitDialog = ProgressDialog.show(MainVDRActivity.this,
-//					"VDR Guid", "Downloading VDR Guid data", true, true);
-//			pleaseWaitDialog.setOnCancelListener(new OnCancelListener() {
-//				public void onCancel(DialogInterface dialog) {
-//					Log.d("onOptionsItemSelected" , "onCancel ");
-//					downloader.cancel(true);
-//				}
-//			});
-			if(downloader.getStatus() == AsyncTask.Status.FINISHED ) {
-				downloader = new DownloadVDR(MainVDRActivity.this);
-			}
-			if(downloader.getStatus() == AsyncTask.Status.PENDING){
-				downloader.execute("");
-			}
-
-			break;
-		case android.R.id.home:
-			//Intent intent = new Intent(this, QuizSplashActivity.class);
-			//intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			//startActivity(intent);
-			break;
-		default:
-			break;
-		}
-
-		return super.onOptionsItemSelected(item);
-
-	}
 
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -248,17 +153,6 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 				.getSelectedNavigationIndex());
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-	    //MenuInflater inflater = getSupportMenuInflater();
-	     setMenu(menu); 
-		
-		getMenuInflater().inflate(R.menu.activity_main_vdr, menu);
-//		return super.onCreateOptionsMenu(menu);
-
-		return true;
-	}
 
 	@Override
 	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
@@ -341,60 +235,6 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 		return detailEventVDRView;
 	}
 
-	private String PLayCurrentEvent() {
-		Cursor c = datasource.getCursorDetails(getViewEvent() + 1);
-		if (c == null) {
-			return null;
-		}
-		c.moveToFirst();
-		// TextView textViewTitle = (TextView)
-		// DetailView.findViewById(R.id.title);
-		String title = c
-				.getString(c.getColumnIndex(DatabaseOpenHelper.C_TITLE));
-		try {			
-			if (svdrpInterface.getStatus() == AsyncTask.Status.FINISHED) {
-				svdrpInterface = new SVDRPInterface(MainVDRActivity.this);
-				title = svdrpInterface.execute("PLAY", title).get();
-			}
-			if (svdrpInterface.getStatus() == AsyncTask.Status.PENDING) {
-				title = svdrpInterface.execute("PLAY", title).get();
-			}
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			Log.d("PLayCurrentEvent", "InterruptedException");
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			Log.d("PLayCurrentEvent", "ExecutionException");
-			e.printStackTrace();
-		}
-		if (title != null ) {
-			Log.d("test", title);
-		}
-		return title;
-	}	
-	private String sendKey( String key) {
-		Log.d("presendKey", key);
-		try {			
-			if (svdrpInterface.getStatus() == AsyncTask.Status.FINISHED) {
-				svdrpInterface = new SVDRPInterface(MainVDRActivity.this);
-				key = svdrpInterface.execute("HITK", key).get();
-			}
-			if (svdrpInterface.getStatus() == AsyncTask.Status.PENDING) {
-				key = svdrpInterface.execute("HITK", key).get();
-			}
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			Log.d("sendKey", "InterruptedException");
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			Log.d("sendKey", "ExecutionException");
-			e.printStackTrace();
-		}
-		Log.d("sendKey", key);
-		return key;
-	}	
 
 	
 	

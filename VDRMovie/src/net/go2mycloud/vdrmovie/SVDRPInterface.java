@@ -234,6 +234,53 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 		}
 		return responce;
 	}
+	private String sendCommand(String Command, String key) {
+		byte[] rl = new byte[] { 13, 10 };
+		byte[] buffer = new byte[250];
+		String data = new String();
+		String responce = null;
+		Socket s;
+		try {
+			s = new Socket(host, port);
+
+			OutputStream os = s.getOutputStream();
+			InputStream is = s.getInputStream();
+			DataInputStream dis = new DataInputStream(is);
+			DataOutputStream dos = new DataOutputStream(os);
+
+			String sendSting = Command + " " + key;
+			Log.d(D_TAG, "send  " + sendSting);
+			dos.write(sendSting.getBytes());
+			dos.write(rl);
+			data = dis.readLine();
+			data.getBytes(0, 2, buffer, 0);
+			int type = Integer.parseInt(data.substring(0, 3));
+
+			if (type == 220) {
+				data = dis.readLine();
+				type = Integer.parseInt(data.substring(0, 3));
+				if (type == 250 ) {
+					// last record
+					Log.d(D_TAG, "read  " + data);
+					responce = data;
+					sendSting = "QUIT";
+					dos.write(sendSting.getBytes());
+					dos.write(rl);					
+					data = dis.readLine();
+					Log.d(D_TAG, Command + key + data);
+				}
+			}
+			Log.d(D_TAG, "send end  " + data);
+			s.close();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return responce;
+	}
 
 	@Override
 	protected String doInBackground(String... svdrpC ) {
@@ -243,12 +290,15 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 	    	return null;
 	    }
         // This will download stuff from each URL passed in
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < count - 1; i++) {
         	if( svdrpC[i].contains("PLAY") ) {
         		return playRecordingByName(svdrpC[1]);
         	}
         	if( svdrpC[i].contains("HITK") ) {
         		return hitKey(svdrpC[1]);
+        	}
+        	if( svdrpC[i].contains("CHAN") ) {
+        		return sendCommand(svdrpC[i], svdrpC[1]);
         	}
         }
     
