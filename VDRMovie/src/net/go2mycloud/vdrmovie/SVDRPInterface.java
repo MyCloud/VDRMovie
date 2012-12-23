@@ -9,6 +9,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 
 public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String>{
@@ -33,8 +35,27 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 	}
 
 	public SVDRPInterface(MainVDRActivity mainVDRActivity) {
+		mContext = mainVDRActivity;
 		// TODO Auto-generated constructor stub
 	}
+	
+	public boolean isNetworkAvailable() {
+		// Context context = getApplicationContext();
+		ConnectivityManager connectivity = (ConnectivityManager) mContext
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		if (connectivity != null) {
+			NetworkInfo[] info = connectivity.getAllNetworkInfo();
+			if (info != null) {
+				for (int i = 0; i < info.length; i++) {
+					if (info[i].getState() == NetworkInfo.State.CONNECTED) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
 	@SuppressWarnings("deprecation")
 	private String playRecordingByName(String recName) {
 		byte[] rl = new byte[] { 13, 10 };
@@ -80,7 +101,7 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 							//found recording
 							playrec = dataObj[1];
 						}
-						if (data.substring(3, 4).contains(" ") | playrec != null ) {
+						if (data.substring(3, 4).contains(" ") ) {
 							// last record
 							sendSting = "QUIT";
 							dos.write(sendSting.getBytes());
@@ -93,8 +114,7 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 					}
 				} catch (Exception NumberFormatException) {
 					// TODO: handle exception
-					// Log.d(DEBUG_TAG,
-					// data.toString() + NumberFormatException.getMessage());
+					Log.d("exception", data.toString() + NumberFormatException.getMessage());
 					// moreData = false;
 					// break out of while loop and go no next channel
 					break;
@@ -218,7 +238,10 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 	@Override
 	protected String doInBackground(String... svdrpC ) {
 	    int count = svdrpC.length;
-
+	    if ( !isNetworkAvailable() )
+	    {
+	    	return null;
+	    }
         // This will download stuff from each URL passed in
         for (int i = 0; i < count; i++) {
         	if( svdrpC[i].contains("PLAY") ) {

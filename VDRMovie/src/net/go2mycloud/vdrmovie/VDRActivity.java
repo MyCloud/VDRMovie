@@ -30,7 +30,8 @@ public class VDRActivity extends Activity {
 	    // read last date if null than use current date
 		ViewType = settings.getInt( getString(R.string.pref_view_type), 0 );
 		ViewEvent = settings.getInt( getString(R.string.pref_view_event), 0 );
-		ViewState = settings.getInt( getString(R.string.pref_view_state), R.id.menu_event_stop );
+		ViewState = settings.getInt( getString(R.string.pref_view_state), 0 );
+//		ViewState = settings.getInt( getString(R.string.pref_view_state), R.id.menu_event_stop );
 
 	}
 
@@ -76,7 +77,7 @@ public class VDRActivity extends Activity {
 		}
 		SharedPreferences settings = getSharedPreferences(getString(R.string.preference_file), 0);
 		SharedPreferences.Editor prefEditor = settings.edit();
-		prefEditor.putInt(getString(R.string.pref_view_state), R.id.menu_event_stop);
+//		prefEditor.putInt(getString(R.string.pref_view_state), R.id.menu_event_stop);
 		prefEditor.commit();
 
 	}
@@ -109,6 +110,7 @@ public class VDRActivity extends Activity {
 
 	public void setViewState(int viewState) {
 		ViewState = viewState;
+		Log.d("setViewState", Integer.toString(viewState) );
 		SharedPreferences settings = getSharedPreferences(getString(R.string.preference_file), 0);
 		SharedPreferences.Editor prefEditor = settings.edit();
 		prefEditor.putInt(getString(R.string.pref_view_state), ViewState);

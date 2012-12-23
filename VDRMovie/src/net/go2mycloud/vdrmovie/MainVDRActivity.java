@@ -27,6 +27,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.CursorAdapter;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -149,6 +150,38 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 		
 
 	}
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event) {
+	    if ((keyCode == KeyEvent.KEYCODE_VOLUME_UP) || (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)) {
+	       return true;
+	    }
+	    return super.onKeyUp(keyCode, event);
+	}
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+			for (int i = 0; i < menu.size(); i++) {
+				if (menu.getItem(i).isVisible()) {
+					onOptionsItemSelected(menu.getItem(i));
+				}
+			}
+		} else {
+			if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+				boolean next = false;
+				for (int i = 0; i < menu.size(); i++) {
+					if (menu.getItem(i).isVisible() && next) {
+						onOptionsItemSelected(menu.getItem(i));
+					}
+					if (menu.getItem(i).isVisible()) {
+						next = true;
+					}
+				}
+
+				return true;
+			}
+		}
+		return super.onKeyDown(keyCode, event);
+	}
 
 	/**
 	 * Backward-compatible version of {@link ActionBar#getThemedContext()} that
@@ -201,7 +234,8 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
             hideOption(R.id.menu_event_rev);		            
             hideOption(R.id.menu_event_stop);		            
             hideOption(R.id.menu_event_start);		            
-            hideOption(R.id.menu_event_end);		            
+            hideOption(R.id.menu_event_end);	
+            Log.d("onPrepareOptionsMenu", "Type:" + getViewType() + " State:" + getViewState() );
 		    switch ( getViewType()) {
 		    case 0: //now
 		    	if (fragmentInLauout) {
@@ -224,6 +258,7 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 			    case R.id.menu_event_play: // play mode
 			    	showOption(R.id.menu_event_start);		            
 			    	showOption(R.id.menu_event_pause);		            
+			    	showOption(R.id.menu_event_stop);		            
 			    	showOption(R.id.menu_event_fwd);		            
 			    	showOption(R.id.menu_event_end);		            
 		            break;
@@ -259,10 +294,10 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 		// TODO Auto-generated method stub
 		switch (item.getItemId()) {
 		case R.id.menu_event_play:
-			if ( getViewState() != R.id.menu_event_play) {
+			if ( getViewState() == R.id.menu_event_stop) {
 				if ( PLayCurrentEvent() != null ){
 					//running in play mode update the menu items in play mode
-					setViewState(R.id.menu_event_play);
+					setViewState(item.getItemId());
 				    invalidateOptionsMenu();
 				}
 			} else {
@@ -273,7 +308,7 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 				}
 				
 			}			
-			break;	
+			break;
 		case R.id.menu_event_stop:
 		case R.id.menu_event_start:
 		case R.id.menu_event_end:
@@ -460,7 +495,9 @@ public class MainVDRActivity extends VDRActivity implements OnNavigationListener
 			Log.d("PLayCurrentEvent", "ExecutionException");
 			e.printStackTrace();
 		}
-		Log.d("test", title);
+		if (title != null ) {
+			Log.d("test", title);
+		}
 		return title;
 	}	
 	private String sendKey( String key) {

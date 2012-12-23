@@ -32,8 +32,17 @@ public final class R {
         public static final int player_rev=0x7f02000f;
         public static final int player_start=0x7f020010;
         public static final int player_stop=0x7f020011;
-        public static final int status_green=0x7f020012;
-        public static final int status_rec=0x7f020013;
+        public static final int s_player_eject=0x7f020012;
+        public static final int s_player_end=0x7f020013;
+        public static final int s_player_fwd=0x7f020014;
+        public static final int s_player_pause=0x7f020015;
+        public static final int s_player_play=0x7f020016;
+        public static final int s_player_rec=0x7f020017;
+        public static final int s_player_rev=0x7f020018;
+        public static final int s_player_start=0x7f020019;
+        public static final int s_player_stop=0x7f02001a;
+        public static final int status_green=0x7f02001b;
+        public static final int status_rec=0x7f02001c;
     }
     public static final class id {
         public static final int detailFragment=0x7f080000;
@@ -43,17 +52,17 @@ public final class R {
         public static final int image_thump_detail=0x7f080009;
         public static final int listFragment=0x7f080001;
         public static final int list_events=0x7f080010;
-        public static final int menu_event_end=0x7f080018;
-        public static final int menu_event_fwd=0x7f08001a;
-        public static final int menu_event_pause=0x7f080016;
-        public static final int menu_event_play=0x7f080013;
-        public static final int menu_event_rec=0x7f080015;
-        public static final int menu_event_rev=0x7f08001b;
-        public static final int menu_event_start=0x7f080019;
+        public static final int menu_event_end=0x7f080012;
+        public static final int menu_event_fwd=0x7f080016;
+        public static final int menu_event_pause=0x7f080015;
+        public static final int menu_event_play=0x7f080014;
+        public static final int menu_event_rec=0x7f080018;
+        public static final int menu_event_rev=0x7f080013;
+        public static final int menu_event_start=0x7f080011;
         public static final int menu_event_stop=0x7f080017;
-        public static final int menu_event_stream=0x7f080014;
-        public static final int menu_settings=0x7f080011;
-        public static final int menu_update=0x7f080012;
+        public static final int menu_event_stream=0x7f080019;
+        public static final int menu_settings=0x7f08001b;
+        public static final int menu_update=0x7f08001a;
         public static final int row=0x7f080002;
         public static final int text_actors_detail=0x7f08000e;
         public static final int text_countries_detail=0x7f08000b;
