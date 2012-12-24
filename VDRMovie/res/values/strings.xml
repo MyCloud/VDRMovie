@@ -22,8 +22,11 @@
         <string name="menu_event_end">Yellow</string>
                 <string name="menu_event_fwd">FastFwd</string>
                 <string name="menu_event_rev">FastRew</string>
+                <string name="menu_event_live">Live</string>
                 <string name="menu_event_start">Green</string>
                 <string name="menu_event_stop">Stop</string>
+                <string name="menu_event_volup">Volume+</string>
+                <string name="menu_event_voldown">Volume-</string>
                 <string name="preference_file">VDR_Movie_Preference</string>
         <string name="pref_view_type">view_type</string>
         <string name="pref_view_state">view_state</string>

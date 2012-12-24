@@ -130,7 +130,9 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 			e.printStackTrace();
 		}
 		if (playrec != null ) {
-			return playRecordingByNum(playrec);
+    		return sendCommand("PLAY", playrec);
+			
+//			return playRecordingByNum(playrec);
 		}
 		return null;
 	}
@@ -295,7 +297,8 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
         		return playRecordingByName(svdrpC[1]);
         	}
         	if( svdrpC[i].contains("HITK") ) {
-        		return hitKey(svdrpC[1]);
+        		return sendCommand(svdrpC[i], svdrpC[1]);
+//        		return hitKey(svdrpC[1]);
         	}
         	if( svdrpC[i].contains("CHAN") ) {
         		return sendCommand(svdrpC[i], svdrpC[1]);

@@ -84,6 +84,7 @@ public class MainVDRActivity extends VDRActivity  {
 		
 
 		listView = (ListView) findViewById(R.id.list_events);
+		listView.setItemsCanFocus(true);
 		listView.setOnItemClickListener(new OnItemClickListener() {
 			  @Override
 			  public void onItemClick(AdapterView<?> parent, View view,
@@ -99,24 +100,6 @@ public class MainVDRActivity extends VDRActivity  {
 
 	}
 
-	@Override
-	public boolean onKeyUp(int keyCode, KeyEvent event) {
-	    if ((keyCode == KeyEvent.KEYCODE_VOLUME_UP) || (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)) {
-	       return true;
-	    }
-	    return super.onKeyUp(keyCode, event);
-	}
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-			onOptionsItemSelected( getVolumeUp());
-			return true;
-		} else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-			onOptionsItemSelected( getVolumeDown());
-			return true;
-		}
-		return super.onKeyDown(keyCode, event);
-	}
 
 	  public void updateDetailEvent(AdapterView<?> parent, View view, int position, long id) {
 		    DetailEventVDRFragment fragment = (DetailEventVDRFragment) getFragmentManager()
@@ -234,6 +217,16 @@ public class MainVDRActivity extends VDRActivity  {
 	public DetailEventVDRView getDetailEventVDRView() {
 		return detailEventVDRView;
 	}
+
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+        Log.d("onResume", "Done" );
+	    invalidateOptionsMenu();
+
+	}
+
 
 
 	

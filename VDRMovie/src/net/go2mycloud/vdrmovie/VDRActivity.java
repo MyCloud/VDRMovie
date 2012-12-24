@@ -15,6 +15,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,12 +31,17 @@ public class VDRActivity extends Activity implements OnNavigationListener {
 	protected DatabaseConnector datasource;
 	protected DownloadVDR downloader;
 	protected SVDRPInterface svdrpInterface;
-	private int ViewType;
-	private int ViewEvent;
-	private int ViewState; //0 = default 1 = play recording
+	private static int ViewType;
+	private static int ViewEvent;
+	private static int ViewState; //0 = default 1 = play recording
 	private Menu menu;
 	private MenuItem VolumeUp;
 	private MenuItem VolumeDown;
+	private MenuItem VolumeLongUp;
+	private MenuItem VolumeLongDown;
+
+	private boolean KeyInProgress = false;
+	private boolean LongKeyInProgress = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +65,8 @@ public class VDRActivity extends Activity implements OnNavigationListener {
 
 
 		Log.d("MainVDRActivity", "onCreate VieuwType " + getViewType());
+		Log.d("MainVDRActivity", "onCreate ViewEvent " + getViewEvent());
+		Log.d("MainVDRActivity", "onCreate VieuwStarte " + getViewState());
 
 		// Start loading the questions in the background
 		downloader = new DownloadVDR(VDRActivity.this);
@@ -74,40 +82,80 @@ public class VDRActivity extends Activity implements OnNavigationListener {
 
 
 
-
-		/**
-		 * Setting dropdown items and item navigation listener for the actionbar
-		 */
-//		actionBar.setListNavigationCallbacks(adapter, this);
-		//actionBar.setSelectedNavigationItem( getViewType());
-
-
 	}
 		
-	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+	    if ((keyCode == KeyEvent.KEYCODE_VOLUME_UP) || (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)) {
+		    if ( LongKeyInProgress ) {
+				if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+					onOptionsItemSelected( getVolumeLongUp());
+					Log.d("onKeyLongPress", "up KeyInProgress:" + Boolean.toString(KeyInProgress));
+				} else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+					onOptionsItemSelected( getVolumeLongDown());
+					Log.d("onKeyLongPress", "down KeyInProgress:" + Boolean.toString(KeyInProgress));
+				}
+		    } else {
+		    	KeyInProgress = true;
+				Log.d("onKeyDown", "KeyInProgress:" + Boolean.toString(KeyInProgress));
+		    }
+		    event.startTracking(); 
+	        return true;
+	    }
+	    return super.onKeyDown(keyCode, event);
+	}
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event) {
+	    if ((keyCode == KeyEvent.KEYCODE_VOLUME_UP) || (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)) {
+			if (KeyInProgress) {
+				KeyInProgress = false;
+				if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+					onOptionsItemSelected(getVolumeUp());
+				} else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+					onOptionsItemSelected(getVolumeDown());
+				}
+			}
+			if (LongKeyInProgress) {
+				LongKeyInProgress = false;
+			}
+			return true;
+	    }
+		return super.onKeyUp(keyCode, event);
+	}
+
+	@Override
+	public boolean onKeyLongPress(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+	    	KeyInProgress = false;
+	    	LongKeyInProgress = true;
+			Log.d("onKeyLongPress", "up KeyInProgress:" + Boolean.toString(KeyInProgress));
+			return true;
+		} else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+	    	KeyInProgress = false;
+	    	LongKeyInProgress = true;
+			Log.d("onKeyLongPress", "down KeyInProgress:" + Boolean.toString(KeyInProgress));
+			return true;
+		}
+	    return super.onKeyLongPress(keyCode, event);
+	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// TODO Auto-generated method stub
 		switch (item.getItemId()) {
+		case R.id.menu_event_live:
+			TuneToCurrentEvent(item.getItemId());
+			break;
 		case R.id.menu_event_play:
-			switch ( getViewType()) {
-			case 0: // tune to channel
-				if ( getViewState() != R.id.menu_event_stop) {
-					sendKey( R.id.menu_event_stop, menu.findItem(R.id.menu_event_stop).getTitle().toString() );
-				}
-				if ( getViewState() == R.id.menu_event_stop) {
-					TuneToCurrentEvent(item.getItemId());
-				}
-				break;
-			case 4:
-				if ( getViewState() == R.id.menu_event_stop) {
-					PLayCurrentEvent(item.getItemId());
-				} else {
-					sendKey( item.getItemId(), item.getTitle().toString() );
-				}
-				break;
+			if ( getViewState() == R.id.menu_event_stop) {
+				PLayCurrentEvent(item.getItemId());
+			} else {
+				sendKey( item.getItemId(), item.getTitle().toString() );
 			}
+			break;
+		case R.id.menu_event_voldown:
+		case R.id.menu_event_volup:
+			sendKey( item.getTitle().toString() );
 			break;
 		case R.id.menu_event_stop:
 		case R.id.menu_event_start:
@@ -147,6 +195,7 @@ public class VDRActivity extends Activity implements OnNavigationListener {
 
 
 
+
 	/**
 	 * Backward-compatible version of {@link ActionBar#getThemedContext()} that
 	 * simply returns the {@link android.app.Activity} if
@@ -177,6 +226,8 @@ public class VDRActivity extends Activity implements OnNavigationListener {
 		
 
 	
+
+
 
 	@Override
 	protected void onRestart() {
@@ -253,7 +304,7 @@ public class VDRActivity extends Activity implements OnNavigationListener {
 
 	public void setViewState(int viewState) {
 		ViewState = viewState;
-		Log.d("setViewState", Integer.toString(viewState) );
+		Log.d("setViewState", "setViewState to:" +Integer.toString(viewState) );
 		SharedPreferences settings = getSharedPreferences(getString(R.string.preference_file), 0);
 		SharedPreferences.Editor prefEditor = settings.edit();
 		prefEditor.putInt(getString(R.string.pref_view_state), ViewState);
@@ -289,9 +340,13 @@ public class VDRActivity extends Activity implements OnNavigationListener {
 		    if (fragment != null && fragment.isInLayout()) {
 		    	fragmentInLauout = true;
 			    fragment.updateEventInfo(getViewEvent(), datasource);
+	            Log.d("onPrepareOptionsMenu", "Update fragment event info" );
 
 		    	
 		    }
+			setVolumeLongUp(R.id.menu_event_volup );
+			setVolumeLongDown(R.id.menu_event_voldown );
+
 		    //menu.clear();
             menu.add(R.id.menu_settings);
             menu.add(R.id.menu_update);
@@ -299,6 +354,7 @@ public class VDRActivity extends Activity implements OnNavigationListener {
             hideOption(R.id.menu_event_rec);		            
             hideOption(R.id.menu_event_stream);		            
             hideOption(R.id.menu_event_pause);		            
+            hideOption(R.id.menu_event_live);		            
             hideOption(R.id.menu_event_fwd);		            
             hideOption(R.id.menu_event_rev);		            
             hideOption(R.id.menu_event_stop);		            
@@ -307,21 +363,22 @@ public class VDRActivity extends Activity implements OnNavigationListener {
             Log.d("onPrepareOptionsMenu", "Type:" + getViewType() + " State:" + getViewState() );
 		    switch ( getViewType()) {
 		    case 0: //now
-		    	if (fragmentInLauout) {
-		            showOption(R.id.menu_event_play);		            
+//		    	if (fragmentInLauout) {
+		            showOption(R.id.menu_event_live);		            
 		            showOption(R.id.menu_event_rec);		            
 		            showOption(R.id.menu_event_stream);		            
-		    	}		    		
+//		    	}		    		
 		    	break;
 		    case 1: //next
-		    	if (fragmentInLauout) {
+//		    	if (fragmentInLauout) {
 		    		showOption(R.id.menu_event_rec);
 		            // add set timer or switch to service
-		    	}		    		
+//		    	}		    		
 		    	break;
 		    case 4: // recordings
 			    switch ( getViewState()) {
 			    case R.id.menu_event_stop: // default
+			    case R.id.menu_event_live: // default
 			    	showOption(R.id.menu_event_play);
 			    	setVolumeUp(R.id.menu_event_play);
 			    	setVolumeDown(R.id.menu_event_play);
@@ -359,8 +416,8 @@ public class VDRActivity extends Activity implements OnNavigationListener {
 			    }
 		    	
 		    }
-		    return true;
-		    //return super.onPrepareOptionsMenu(menu);
+		    //return true;
+		    return super.onPrepareOptionsMenu(menu);
 	}
 
 	private void hideOption(int id)
@@ -398,6 +455,22 @@ public class VDRActivity extends Activity implements OnNavigationListener {
 	}
 	public void setVolumeDown(int id) {
 		VolumeDown = getMenu().findItem(id);
+	}
+
+	public MenuItem getVolumeLongUp() {
+		return VolumeLongUp;
+	}
+
+	public void setVolumeLongUp(int id) {
+		VolumeLongUp = getMenu().findItem(id);
+	}
+
+	public MenuItem getVolumeLongDown() {
+		return VolumeLongDown;
+	}
+
+	public void setVolumeLongDown(int id) {
+		VolumeLongDown = getMenu().findItem(id);
 	}
 
 	@Override
@@ -471,7 +544,12 @@ public class VDRActivity extends Activity implements OnNavigationListener {
 		}
 		return ret;
 	}
-	
+
+	private String sendKey(String string) {
+		// TODO Auto-generated method stub
+		return sendKey ( getViewState(), string );
+	}
+
 	private String sendKey( int ViewState, String key) {
 		Log.d("presendKey", key);
 		try {			
