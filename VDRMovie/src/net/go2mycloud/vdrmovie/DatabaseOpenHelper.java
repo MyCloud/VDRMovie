@@ -49,6 +49,21 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	public static final String REC_WATCH = "wt";	
 	public static final String REC_HASH_KEY = "hsh_key";
 	
+	public static final String TBL_TIM = "TimerTbl";
+	public static final String TIM_STATUS = "status";
+	public static final String TIM_CHANNELS_KEY = "ch_key";
+	public static final String TIM_EVENT_KEY = "event_key";
+	public static final String TIM_NR = "t_nr";
+	public static final String TIM_EVENT_NR = "e_nr";
+	public static final String TIM_DATE = "date";
+	public static final String TIM_START = "start_t";
+	public static final String TIM_STOP = "stop_t";
+	public static final String TIM_PRI = "pri";
+	public static final String TIM_REM = "rem";
+	public static final String TIM_DIR = "dir";
+	public static final String TIM_TITLE = "tt";
+	public static final String TIM_ST = "start_s";
+	public static final String TIM_SP = "stop_s";
 
 	
 	public static final String TBL_HASH = "HashTbl";
@@ -74,7 +89,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	
 	
 	private static final String DATABASE_NAME = "events.db";
-	private static final int DATABASE_VERSION = 12;
+	private static final int DATABASE_VERSION = 13;
 
 	public static final String createTblCursor = "CREATE TABLE "+ TBL_CURSOR + "( " 
     		+ TBL_ID + " integer primary key autoincrement, " 
@@ -140,6 +155,25 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
     		+ DATA_NR + " integer , "
     		+ DATA_DETAILS + " text not null);";                 
 
+	private static final String createTblTimers = "CREATE TABLE "+ TBL_TIM + "( " 
+    		+ TBL_ID + " integer primary key autoincrement, " 
+    		+ TIM_STATUS + " integer not null, "
+    		+ TIM_CHANNELS_KEY + " integer not null, "
+    		+ TIM_EVENT_KEY + " integer not null, "
+    		+ TIM_NR + " integer not null, "
+    		+ TIM_EVENT_NR + " integer not null, "
+    		+ TIM_DATE + " text, "
+    		+ TIM_START + " text, "
+    		+ TIM_STOP + " text, "
+    		+ TIM_PRI + " integer, " 
+    		+ TIM_DIR + " integer, " 
+    		+ TIM_TITLE + " text not null, "
+    		+ TIM_ST + " integer not null, "
+    		+ TIM_SP + " integer not null, "
+    		+ "FOREIGN KEY(" + TIM_EVENT_KEY + ") REFERENCES " + TBL_EVENT + "(" + TBL_ID + "), "
+    		+ "FOREIGN KEY(" + TIM_CHANNELS_KEY + ") REFERENCES " + TBL_CHANNELS + "(" + TBL_ID + ") "
+    		+ ");";                 
+
 	
 	
 	public DatabaseOpenHelper(Context context ) {
@@ -193,6 +227,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 		db.execSQL(createIndexTblHash);
 		db.execSQL(createTblRec);
 		db.execSQL(createTblCursor);
+		db.execSQL(createTblTimers);
 	}
 
 	@Override
@@ -207,9 +242,10 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	    Log.w(DatabaseOpenHelper.class.getName(),
 	        "Upgrading database from version " + oldVersion + " to "
 	            + newVersion + ", which will destroy all old data");
+	    db.execSQL("DROP TABLE IF EXISTS " + TBL_TIM);
 	    db.execSQL("DROP TABLE IF EXISTS " + TBL_CURSOR);
-	    db.execSQL("DROP TABLE IF EXISTS " + TBL_CHANNELS);
 	    db.execSQL("DROP TABLE IF EXISTS " + TBL_EVENT);
+	    db.execSQL("DROP TABLE IF EXISTS " + TBL_CHANNELS);
 	    db.execSQL("DROP TABLE IF EXISTS " + TBL_HASH);
 	    db.execSQL("DROP TABLE IF EXISTS " + TBL_DATA);
 	    db.execSQL("DROP TABLE IF EXISTS " + TBL_REC);

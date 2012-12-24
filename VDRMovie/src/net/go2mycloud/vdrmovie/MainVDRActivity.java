@@ -85,12 +85,17 @@ public class MainVDRActivity extends VDRActivity  {
 
 		listView = (ListView) findViewById(R.id.list_events);
 		listView.setItemsCanFocus(true);
+		
+		listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+
 		listView.setOnItemClickListener(new OnItemClickListener() {
 			  @Override
 			  public void onItemClick(AdapterView<?> parent, View view,
 			    int position, long id) {
 				  
 				  customAdapter.setSelected(position);
+				  listView.setItemChecked(position, true);
+
 				  setViewEvent(position);
 								  
 				  updateDetailEvent(parent, view, position, id);
@@ -191,6 +196,7 @@ public class MainVDRActivity extends VDRActivity  {
 		}
         customAdapter.changeCursor(datasource.getCursor());
         customAdapter.setType(itemPosition);
+        setViewEvent(itemPosition);
         customAdapter.setSelected(0);
         if( customAdapter.getCursor() != null ) {
         	customAdapter.getCursor().moveToFirst();

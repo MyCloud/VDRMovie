@@ -2,8 +2,10 @@ package net.go2mycloud.vdrmovie;
 
 
 import android.R.color;
+import android.R.layout;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -63,15 +65,23 @@ public class CustomEventAdapter extends CursorAdapter {
         ImageView imageViewIcon = (ImageView) view.findViewById(R.id.icon);
         ImageView imageViewFocus = (ImageView) view.findViewById(R.id.focus);
         Uri uri;
+//		View temp = view.findViewById(R.id.row);
+        
         //if ( BackGroud == 0) {
-        //	textViewDetails.getBackground();
+//        Log.d("back", "color:" + temp.getBackground() );
         //}
         if( cursor.getInt(0) == (Selected +1 ) ) {
         	//textViewFocus.setText(">");
-        	imageViewFocus.setImageResource(R.drawable.status_rec);
-        	imageViewFocus.invalidate();
-        	imageViewFocus.refreshDrawableState();
+        	view.setBackgroundColor(Color.WHITE);
+//        	imageViewFocus.setImageResource(R.drawable.status_rec);
+//        	textViewTitle.setBackgroundColor(4000);
+//        	textViewTitle.invalidate();
+ //       	textViewTitle.refreshDrawableState();
+ //       	imageViewFocus.invalidate();
+//        	imageViewFocus.refreshDrawableState();
+
         } else {
+        	view.setBackgroundColor(Color.LTGRAY);
         	imageViewFocus.setImageResource(R.drawable.status_green);
         	
         }
