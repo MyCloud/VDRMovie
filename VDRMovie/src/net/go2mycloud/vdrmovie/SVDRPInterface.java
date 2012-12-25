@@ -19,7 +19,10 @@ import java.util.zip.CRC32;
 
 import org.xmlrpc.android.XMLRPCException;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Bitmap;
@@ -28,10 +31,12 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
 import android.util.Log;
+import android.widget.Toast;
 
 public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String>{
 	
 	private static final String D_TAG = "MainVDR$SVDRPInterface";
+	private ProgressDialog pleaseWaitDialog;
 	private String host="192.168.2.13";
 	private int port = 6419;
 	private DatabaseConnector datasource;
@@ -252,7 +257,6 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 	
 	@SuppressWarnings("rawtypes")
 	private int scanChannel( int channelNr) {
-		boolean result = false;
 		int numEvewnts=0;
 		long Ev_ch_key = 0;
 		int Ev_nr = 0;
@@ -513,7 +517,6 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 			try {
 				s.close();
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		}
@@ -536,6 +539,7 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 	    int count = svdrpC.length;
 	    if ( !isNetworkAvailable() )
 	    {
+			Toast.makeText(mContext, "No network connection ", Toast.LENGTH_SHORT).show();
 	    	return null;
 	    }
         // This will download stuff from each URL passed in
@@ -563,6 +567,34 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 
 
 
+
+@Override
+	protected void onPostExecute(String result) {
+		// TODO Auto-generated method stub
+		super.onPostExecute(result);
+		pleaseWaitDialog.dismiss();
+		
+	}
+
+	@Override
+	protected void onPreExecute() {
+		// TODO Auto-generated method stub
+		super.onPreExecute();
+		pleaseWaitDialog = ProgressDialog.show(mContext,
+				"VDR Guid", "Downloading VDR Guid data", true, true);
+		pleaseWaitDialog.setOnCancelListener(new OnCancelListener() {
+			public void onCancel(DialogInterface dialog) {
+				Log.d("onOptionsItemSelected" , "onCancel ");
+				cancel(true);
+			}
+		});
+	}
+
+@Override
+	protected void onProgressUpdate(Integer... values) {
+		// TODO Auto-generated method stub
+		super.onProgressUpdate(values);
+	}
 
 /*
  * 
