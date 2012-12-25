@@ -30,6 +30,9 @@ public class DetailEventVDRView {
         if( c == null  ) {
         	return;
         }
+        if( c.getCount() == 0 ) {
+        	return;
+        }	
     	c.moveToFirst();
 		//TextView textViewTitle = (TextView) DetailView.findViewById(R.id.title);
 		TextView T = (TextView) DetailView.findViewById(R.id.text_title_year_detail);

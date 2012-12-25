@@ -172,12 +172,13 @@ public class VDRActivity extends Activity implements OnNavigationListener {
 			//QuizMenuActivity.this.finish();
 			break;
 		case R.id.menu_update:
-			if(downloader.getStatus() == AsyncTask.Status.FINISHED ) {
-				downloader = new DownloadVDR(VDRActivity.this);
-			}
-			if(downloader.getStatus() == AsyncTask.Status.PENDING){
-				downloader.execute("");
-			}
+			svdrSendSync(false,"LSTE", "1-29");
+//			if(downloader.getStatus() == AsyncTask.Status.FINISHED ) {
+//				downloader = new DownloadVDR(VDRActivity.this);
+//			}
+//			if(downloader.getStatus() == AsyncTask.Status.PENDING){
+//				downloader.execute("");
+//			}
 			break;
 		case android.R.id.home:
 			//Intent intent = new Intent(this, QuizSplashActivity.class);
@@ -348,8 +349,8 @@ public class VDRActivity extends Activity implements OnNavigationListener {
 			setVolumeLongDown(R.id.menu_event_voldown );
 
 		    //menu.clear();
-            menu.add(R.id.menu_settings);
-            menu.add(R.id.menu_update);
+            //menu.add(R.id.menu_settings);
+            //menu.add(R.id.menu_update);
             hideOption(R.id.menu_event_play);		            
             hideOption(R.id.menu_event_rec);		            
             hideOption(R.id.menu_event_stream);		            
@@ -524,14 +525,25 @@ public class VDRActivity extends Activity implements OnNavigationListener {
 	}	
 
 	private String svdrSend(String command, String arg) {
+		return svdrSendSync(true,command, arg );
+	}
+	private String svdrSendSync(boolean Sync, String command, String arg) {
 		String ret = null;
 		try {
 			if (svdrpInterface.getStatus() == AsyncTask.Status.FINISHED) {
 				svdrpInterface = new SVDRPInterface(VDRActivity.this);
-				ret = svdrpInterface.execute(command, arg).get();
+				if (Sync) {
+					ret = svdrpInterface.execute(command, arg).get();
+				} else {
+					svdrpInterface.execute(command, arg);
+				}
 			}
 			if (svdrpInterface.getStatus() == AsyncTask.Status.PENDING) {
-				ret = svdrpInterface.execute(command, arg).get();
+				if (Sync) {
+					ret = svdrpInterface.execute(command, arg).get();
+				} else {
+					svdrpInterface.execute(command, arg);
+				}
 			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block

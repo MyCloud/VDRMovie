@@ -22,6 +22,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	private Context context;
 	public static final String TBL_CHANNELS = "ChannelsTbl";
 	public static final String TBL_ID = "_id";
+	public static final String CHANNELS_DB = "db";
 	public static final String CHANNELS_NUM = "num";
 	public static final String CHANNELS_NAME = "name";
 	public static final String CHANNELS_SERVICE = "service";
@@ -29,16 +30,19 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	public static final String TBL_EVENT = "EventTbl";
 	public static final String EVENT_CHANNELS_KEY = "ch_key";
 	public static final String EVENT_NR = "nr";
+	public static final String EVENT_DB = "db";
 	public static final String EVENT_TIME = "time";
 	public static final String EVENT_DURATION = "dr";
 	public static final String EVENT_TITLE = "tt";
 	public static final String EVENT_STITLE = "st";
 	public static final String EVENT_REGIE = "rt";
 	public static final String EVENT_GENRE = "gt";
+	public static final String EVENT_TYPE = "gr";
 	public static final String EVENT_HASH_KEY = "hsh_key";
 
 	public static final String TBL_REC = "RecordingsTbl";
 	public static final String REC_CHANNELS_KEY = "ch_key";
+	public static final String REC_DB = "db";
 	public static final String REC_E_NR = "nr";
 	public static final String REC_E_TIME = "time";
 	public static final String REC_E_DURATION = "dr";
@@ -50,6 +54,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	public static final String REC_HASH_KEY = "hsh_key";
 	
 	public static final String TBL_TIM = "TimerTbl";
+	public static final String TIM_DB = "db";
 	public static final String TIM_STATUS = "status";
 	public static final String TIM_CHANNELS_KEY = "ch_key";
 	public static final String TIM_EVENT_KEY = "event_key";
@@ -68,6 +73,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	
 	public static final String TBL_HASH = "HashTbl";
 	public static final String IDX_HASH = "HashTblIdx";
+	public static final String HASH_DB = "db";
 	public static final String HASH = "hsh";
 	public static final String HASH_DATA_KEY = "data_key";
 
@@ -89,7 +95,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	
 	
 	private static final String DATABASE_NAME = "events.db";
-	private static final int DATABASE_VERSION = 13;
+	private static final int DATABASE_VERSION = 14;
 
 	public static final String createTblCursor = "CREATE TABLE "+ TBL_CURSOR + "( " 
     		+ TBL_ID + " integer primary key autoincrement, " 
@@ -116,12 +122,14 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 //    		+ TBL_ID + " integer primary key auto increment, " 
     		+ EVENT_CHANNELS_KEY + " integer not null, "
     		+ EVENT_NR + " integer not null, "
+    		+ EVENT_DB + " integer default 0, "
     		+ EVENT_TIME + " integer not null, "
     		+ EVENT_DURATION + " integer not null, "
     		+ EVENT_TITLE + " text, "
     		+ EVENT_STITLE + " text, "
     		+ EVENT_REGIE + " text, " 
     		+ EVENT_GENRE + " text, " 
+    		+ EVENT_TYPE + " integer default 0, " 
     		+ EVENT_HASH_KEY + " integer not null, "
     		+ "FOREIGN KEY(" + EVENT_CHANNELS_KEY + ") REFERENCES " + TBL_CHANNELS + "(" + TBL_ID + "), "
     		+ "FOREIGN KEY(" + EVENT_HASH_KEY + ") REFERENCES " + TBL_HASH + "(" + TBL_ID + "), "
@@ -131,6 +139,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	private static final String createTblRec = "CREATE TABLE "+ TBL_REC + "( " 
     		+ TBL_ID + " integer primary key autoincrement, " 
     		+ REC_CHANNELS_KEY + " integer not null, "
+    		+ REC_DB + " integer default 0, "
     		+ REC_E_NR + " integer not null, "
     		+ REC_E_TIME + " integer not null, "
     		+ REC_E_DURATION + " integer not null, "
@@ -138,13 +147,14 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
     		+ REC_E_STITLE + " text, "
     		+ REC_E_REGIE + " text, " 
     		+ REC_E_GENRE + " text, " 
-    		+ REC_WATCH + " integert, " 
+    		+ REC_WATCH + " integert default 0, " 
     		+ REC_HASH_KEY + " integer not null, "
     		+ "FOREIGN KEY(" + REC_CHANNELS_KEY + ") REFERENCES " + TBL_CHANNELS + "(" + TBL_ID + ") "
     		+ ");";                 
 
 	private static final String createTblHash = "CREATE TABLE "+ TBL_HASH + "( " 
     		+ TBL_ID + " integer primary key autoincrement, "
+    		+ HASH_DB + " integer default 0, "
     		+ HASH + " integer unique not null, "
     		+ HASH_DATA_KEY + " integer, "
 	        + "FOREIGN KEY(" + HASH_DATA_KEY + ") REFERENCES " + TBL_DATA + "(" + TBL_ID + "));";                 
@@ -157,6 +167,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 
 	private static final String createTblTimers = "CREATE TABLE "+ TBL_TIM + "( " 
     		+ TBL_ID + " integer primary key autoincrement, " 
+    		+ TIM_DB + " integer default 0, "
     		+ TIM_STATUS + " integer not null, "
     		+ TIM_CHANNELS_KEY + " integer not null, "
     		+ TIM_EVENT_KEY + " integer not null, "

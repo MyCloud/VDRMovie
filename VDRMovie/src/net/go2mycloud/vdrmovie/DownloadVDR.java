@@ -761,7 +761,7 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 
 		return true;
 	}
-	private 
+
 	
 	
 	

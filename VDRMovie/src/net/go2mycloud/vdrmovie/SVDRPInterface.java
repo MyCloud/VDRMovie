@@ -2,15 +2,31 @@ package net.go2mycloud.vdrmovie;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.Socket;
+import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.zip.CRC32;
+
+import org.xmlrpc.android.XMLRPCException;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.database.SQLException;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Environment;
 import android.util.Log;
 
 public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String>{
@@ -18,8 +34,10 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 	private static final String D_TAG = "MainVDR$SVDRPInterface";
 	private String host="192.168.2.13";
 	private int port = 6419;
+	private DatabaseConnector datasource;
+	private MovieMeterPluginSession session = null;
 
-	Context mContext;
+	private Context mContext;
 	   
 	
 	SVDRPInterface(Context context){
@@ -39,7 +57,7 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 		// TODO Auto-generated constructor stub
 	}
 	
-	public boolean isNetworkAvailable() {
+	private boolean isNetworkAvailable() {
 		// Context context = getApplicationContext();
 		ConnectivityManager connectivity = (ConnectivityManager) mContext
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -113,10 +131,7 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 						break;
 					}
 				} catch (Exception NumberFormatException) {
-					// TODO: handle exception
 					Log.d("exception", data.toString() + NumberFormatException.getMessage());
-					// moreData = false;
-					// break out of while loop and go no next channel
 					break;
 				}
 			} while (moreData);
@@ -132,110 +147,13 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 		if (playrec != null ) {
     		return sendCommand("PLAY", playrec);
 			
-//			return playRecordingByNum(playrec);
 		}
 		return null;
 	}
 
+
+
 	@SuppressWarnings("deprecation")
-	private String playRecordingByNum(String recNum) {
-		byte[] rl = new byte[] { 13, 10 };
-		byte[] buffer = new byte[250];
-		String data = new String();
-		String responce = null;
-		Socket s;
-		try {
-			s = new Socket(host, port);
-
-			OutputStream os = s.getOutputStream();
-			InputStream is = s.getInputStream();
-			DataInputStream dis = new DataInputStream(is);
-			DataOutputStream dos = new DataOutputStream(os);
-
-			String sendSting = "PLAY " + recNum;
-			recNum="";
-			Log.d(D_TAG, "send  " + sendSting);
-			dos.write(sendSting.getBytes());
-			dos.write(rl);
-			data = dis.readLine();
-			data.getBytes(0, 2, buffer, 0);
-			int type = Integer.parseInt(data.substring(0, 3));
-
-			if (type == 220) {
-				data = dis.readLine();
-				type = Integer.parseInt(data.substring(0, 3));
-				if (type == 250 ) {
-					// last record
-					Log.d(D_TAG, "read  " + data);
-					responce = data;
-					sendSting = "QUIT";
-					dos.write(sendSting.getBytes());
-					dos.write(rl);					
-					data = dis.readLine();
-					Log.d(D_TAG, "play  " + data);
-					recNum = data.toString();
-				}
-			}
-			Log.d(D_TAG, "send end  " + data);
-			s.close();
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return responce;
-
-	}
-
-	private String hitKey(String key) {
-		byte[] rl = new byte[] { 13, 10 };
-		byte[] buffer = new byte[250];
-		String data = new String();
-		String responce = null;
-		Socket s;
-		try {
-			s = new Socket(host, port);
-
-			OutputStream os = s.getOutputStream();
-			InputStream is = s.getInputStream();
-			DataInputStream dis = new DataInputStream(is);
-			DataOutputStream dos = new DataOutputStream(os);
-
-			String sendSting = "HITK " + key;
-			Log.d(D_TAG, "send  " + sendSting);
-			dos.write(sendSting.getBytes());
-			dos.write(rl);
-			data = dis.readLine();
-			data.getBytes(0, 2, buffer, 0);
-			int type = Integer.parseInt(data.substring(0, 3));
-
-			if (type == 220) {
-				data = dis.readLine();
-				type = Integer.parseInt(data.substring(0, 3));
-				if (type == 250 ) {
-					// last record
-					Log.d(D_TAG, "read  " + data);
-					responce = data;
-					sendSting = "QUIT";
-					dos.write(sendSting.getBytes());
-					dos.write(rl);					
-					data = dis.readLine();
-					Log.d(D_TAG, "play  " + data);
-				}
-			}
-			Log.d(D_TAG, "send end  " + data);
-			s.close();
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return responce;
-	}
 	private String sendCommand(String Command, String key) {
 		byte[] rl = new byte[] { 13, 10 };
 		byte[] buffer = new byte[250];
@@ -284,6 +202,335 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 		return responce;
 	}
 
+	private int scanChannels(String channels) {
+		int numChannels = 0;
+		String channelsObj[] = channels.split(",");
+
+		try {
+			datasource = new DatabaseConnector(mContext);
+			datasource.open();
+			session = new MovieMeterPluginSession();
+		} catch (SQLException eSQL) {
+
+			throw new Error("Error open database");
+		}
+
+//		} catch (XMLRPCException e) {
+//			throw new Error("Error open MovieMeter session");
+//		}
+		
+		
+		for (int serie = 0; serie < channelsObj.length; serie++) {
+			try {
+				if (channelsObj[serie].contains("-")) {
+					String serieObj[] = channelsObj[serie].split("-", 2);
+					if (serieObj.length != 2) {
+						Log.d(D_TAG, "Error in serie " + channels + " section"
+								+ channelsObj[serie]);
+						break;
+					}
+					int from = Integer.parseInt(serieObj[0]);
+					int to = Integer.parseInt(serieObj[1]);
+					Log.d(D_TAG, "scan Channels " + from + " to " + to);
+					for (int channel = from; channel <= to; channel++) {
+						numChannels++;
+						scanChannel(channel);
+					}
+				} else {
+					numChannels++;
+					scanChannel(Integer.parseInt(channelsObj[0]));
+				}
+			} catch (NumberFormatException eNum) {
+				Log.d(D_TAG, "Error in serie " + channels + " section"
+						+ channelsObj[serie] + eNum.getMessage());
+			}
+		}
+		datasource.close();
+		return numChannels;
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
+	private int scanChannel( int channelNr) {
+		boolean result = false;
+		int numEvewnts=0;
+		long Ev_ch_key = 0;
+		int Ev_nr = 0;
+		long Ev_time = 0;
+		int Ev_dr = 0;
+		String Ev_tt = "";
+		String Ev_gt = "";
+		String Ev_rft = "";
+		String Ev_rlt = "";
+		String Ev_st = "";
+		String Ev_dt = "";
+		long Ev_hsh_key = 0;
+		Socket s=null;
+
+		int type;
+		Boolean endOfSession = false;
+		String data = new String();
+		CRC32 checkSum = new CRC32();
+		String sendString = new String();
+
+		byte[] rl = new byte[] { 13, 10 };
+		byte[] buffer = new byte[250];
+		long cur_Id = -1;
+		try {
+			s = new Socket(host, port);
+
+			OutputStream os = s.getOutputStream();
+			InputStream is = s.getInputStream();
+			s.setSoTimeout(2000);
+			DataInputStream dis = new DataInputStream(is);
+			DataOutputStream dos = new DataOutputStream(os);
+
+
+			sendString = "LSTE " + channelNr; // + " NOW"; // currently
+														// only
+														// the
+														// now
+														// event
+														// data
+			dos.write(sendString.getBytes());
+			dos.write(rl);
+			// clear data
+			cur_Id = -1;
+			Ev_time = -1;
+			Ev_dr = -1;
+			endOfSession = false;
+			Log.d(D_TAG, "TI: channel " + Integer.toString(channelNr));
+
+			do {
+					data = dis.readLine();
+					data.getBytes(0, 2, buffer, 0);
+					type = Integer.parseInt(data.substring(0, 3));
+					switch (type) {
+					case 215: // EPG data record
+						String dataObj[] = data.split(" ", 3);
+
+						if (dataObj[0].contentEquals("215-C")) {
+							// new channel record store in database
+							cur_Id = datasource.insertChannel(channelNr,
+									dataObj[2], dataObj[1]);
+							break;
+						} else if (dataObj[0].contentEquals("215-E")
+								& cur_Id >= 0) {
+							// Event info
+							Ev_ch_key = cur_Id;
+							Ev_nr = Integer.parseInt(dataObj[1]);
+							String eventObj[] = dataObj[2].split(" ", 4);
+							Ev_time = Long.parseLong(eventObj[0]);
+							Ev_dr = Integer.parseInt(eventObj[1]);
+							Ev_tt = "";
+							Ev_st = "";
+							Ev_gt = "";
+							Ev_rft = "";
+							Ev_rlt = "";
+							Ev_dt = "";
+							Ev_hsh_key = 0;
+
+						} else if (dataObj[0].contentEquals("215-T")
+								& Ev_time > 0 & Ev_dr > 0) {
+							// Title info
+							if (dataObj.length < 3) {
+								Ev_tt = dataObj[1];
+
+							} else {
+								Ev_tt = dataObj[1] + " " + dataObj[2]; // cat
+								// together
+							}
+						} else if (dataObj[0].contentEquals("215-S")
+								& Ev_time > 0 & Ev_dr > 0) {
+							// Sub Title info
+							Ev_st = dataObj[1];
+						} else if (dataObj[0].contentEquals("215-D")
+								& !Ev_tt.isEmpty()) {
+							// Title info
+							// genre is mostely the first word
+							// regie is mostely the first 2 words behind Regie:
+
+							int regie = 0;
+							if (dataObj.length < 3) {
+								Ev_dt = dataObj[1];
+
+							} else {
+								Ev_dt = dataObj[1] + " " + dataObj[2]; // cat
+								// together
+							}
+							Ev_gt = dataObj[1]; // genre
+							dataObj[1] = dataObj[1].replaceAll("Film|film|\\.",
+									"");
+
+							if (dataObj[1].length() > 2) {
+								Ev_gt = Character.toUpperCase(dataObj[1].charAt(0))
+										+ dataObj[1].substring(1);
+
+								String eventObj[] = dataObj[dataObj.length - 1]
+										.split("[ \\.]");
+								for (int i = 0; eventObj.length > i; i++) {
+									if (eventObj[i].equals("Regie:")) {
+										regie = 2;
+										continue;
+									}
+									if (regie > 1)
+										Ev_rft = eventObj[i];
+									if (regie > 0)
+										Ev_rlt = eventObj[i];
+									regie--;
+								}
+							}
+						} else if (dataObj[0].contentEquals("215-e")
+								& !Ev_tt.isEmpty() 
+								& (!Ev_st.isEmpty() | !Ev_gt.isEmpty())  ) {
+							// write event data
+							Ev_hsh_key = datasource.findHashKeyEvent(Ev_ch_key,
+									Ev_nr);
+							if (Ev_hsh_key <= 0) {
+								if (Ev_rlt.isEmpty()){
+									Ev_gt = "";
+								}
+								checkSum.reset();
+								checkSum.update(Ev_tt.getBytes());
+								checkSum.update(Ev_rft.getBytes());
+								checkSum.update(Ev_rlt.getBytes());
+								checkSum.update(Ev_gt.getBytes());
+
+								Cursor c = datasource.getOneHash(checkSum
+										.getValue());
+								if (c != null) {
+									if (c.getCount() < 1) {
+										// hash not found
+										HashMap filmInfo = null;
+										String idFilm = "0";
+										long Data_Id = 0;
+										// session.getMovieDetailsByTitleAndYear(Ev_tt
+										// , "");
+
+										if (!Ev_rlt.isEmpty()) {
+											Log.d(D_TAG, "getMovieByTitleRegieGenre " + Ev_tt + Ev_tt + Ev_rlt + Ev_gt );
+											filmInfo = session
+													.getMovieByTitleRegieGenre(Ev_tt,
+															Ev_rft, Ev_rlt, Ev_gt);
+											if (filmInfo != null) {
+												Log.d(D_TAG,
+															"NEW FILM "
+																	+ String.valueOf(checkSum
+																			.getValue()));
+												idFilm = filmInfo.get("filmId").toString();
+												Log.d(D_TAG, "idFilm " + idFilm );
+												try {
+													filmInfo = session.getMovieDetailsById( Integer.parseInt(idFilm));
+													Log.d(D_TAG, "getMovieDetailsById " + filmInfo.get("thumbnail").toString() );
+													downloadFromUrl(filmInfo.get("thumbnail").toString(), "VDR_TH_" + idFilm + ".jpg");
+													Log.d(D_TAG, "downloadFromUrl " );
+												} catch (Exception e ) {
+													Log.d(D_TAG, "catch all get details:" +
+															data.toString() + e.getMessage());													
+												}
+											
+												//idFilm = filmInfo.get("filmId").toString();
+											}
+
+										}
+
+										if (idFilm.contentEquals("0")) {
+											// no movie found use the data from VDR
+											Data_Id = datasource.insertData(0, Ev_dt);
+										} else {
+											Data_Id = datasource.insertData(Integer.parseInt(idFilm), MyToString(filmInfo));
+										}
+										
+										Ev_hsh_key = datasource.insertHash(Data_Id,
+												checkSum.getValue());
+									} else {
+										if (c.moveToFirst()) {
+											Ev_hsh_key = c
+													.getLong(c
+															.getColumnIndex(DatabaseOpenHelper.TBL_ID));
+										}
+									}
+									numEvewnts++;
+									datasource
+											.insertEventNoCheck(Ev_ch_key, Ev_nr,
+													Ev_time, Ev_dr, Ev_tt, Ev_st,
+													Ev_gt, Ev_rft + " " + Ev_rlt,
+													Ev_hsh_key);
+
+								}
+							} else {
+								//Log.d(D_TAG, "Event already in database" + data.toString());								
+							}
+						}
+						if (dataObj[0].contentEquals("215")) {
+							// Last event data record quit connection
+							endOfSession = true;
+							break;
+						}
+						break;
+					case 220: // VDR service ready
+						break;
+					case 221: // VDR service closing transmission
+									// channel
+						endOfSession = true;
+						break;
+					case 554: // Transaction failed
+					case 550: // Requested action not taken
+					case 250: // Requested VDR action okay, completed
+					case 354: // Start sending EPG data
+					case 451: // Requested action aborted: local error
+									// in processing
+					case 502: // Command not implemented
+					case 504: // Command parameter not implemented
+						Log.d(D_TAG, "need investigation" + data.toString());
+						endOfSession = true;
+						break;
+
+					case 500: // Syntax error, command unrecognized
+					case 501: // Syntax error in parameters or arguments
+						dos.write(sendString.getBytes());
+						dos.write(rl);
+						Log.d(D_TAG,
+								"Try again same command " + data.toString());
+
+						break;
+					default:
+						Log.d(D_TAG, "Default case " + data.toString());
+						break;
+					}
+					//Log.d(DEBUG_TAG, Integer.toString(type));
+
+
+			} while (!endOfSession);
+			sendString = "QUIT";
+			dos.write(sendString.getBytes());
+			dos.write(rl);
+			data = dis.readLine();
+			s.close();
+		} catch (Exception e) {
+			Log.d(D_TAG, "catch all scanChannel:" +
+					data.toString() + e.getMessage());
+			try {
+				s.close();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		Log.d(D_TAG, "Scan done fond new events: " + Integer.toString(numEvewnts));
+		return numEvewnts;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	@Override
 	protected String doInBackground(String... svdrpC ) {
 	    int count = svdrpC.length;
@@ -294,14 +541,17 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
         // This will download stuff from each URL passed in
         for (int i = 0; i < count - 1; i++) {
         	if( svdrpC[i].contains("PLAY") ) {
-        		return playRecordingByName(svdrpC[1]);
+        		return playRecordingByName(svdrpC[i+1]);
         	}
         	if( svdrpC[i].contains("HITK") ) {
-        		return sendCommand(svdrpC[i], svdrpC[1]);
+        		return sendCommand(svdrpC[i], svdrpC[i+1]);
 //        		return hitKey(svdrpC[1]);
         	}
         	if( svdrpC[i].contains("CHAN") ) {
-        		return sendCommand(svdrpC[i], svdrpC[1]);
+        		return sendCommand(svdrpC[i], svdrpC[i+1]);
+        	}
+        	if( svdrpC[i].contains("LSTE") ) {
+        		return Integer.toString(scanChannels(svdrpC[i+1]));
         	}
         }
     
@@ -312,7 +562,7 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 
 
 
-}
+
 
 /*
  * 
@@ -376,3 +626,74 @@ User8
 User9
 
 */
+private void downloadFromUrl(String imageURL, String fileName) {
+    try {
+            // Connect to the URL
+            URL myImageURL = new URL(imageURL);
+            HttpURLConnection connection = (HttpURLConnection)myImageURL.openConnection();
+            connection.setDoInput(true);
+            connection.setReadTimeout(300);
+            connection.setConnectTimeout(1500);
+            //Log.i("help", " 0");
+            connection.connect();
+            //connection.getErrorStream();
+            //Log.i("help", " 1");
+            InputStream input = connection.getInputStream();
+//            URLConnection ucon = url.openConnection();
+
+            //Log.i("help", " 2");
+
+            // Get the bitmap
+            Bitmap myBitmap = BitmapFactory.decodeStream(input);
+            //Log.i("help", " 3");
+
+            // Save the bitmap to the file
+            String path = Environment.getExternalStorageDirectory().toString();
+
+            OutputStream fOut = null;
+            File file = new File(path, fileName);
+            //Log.i("help", file.getAbsolutePath());
+            //Log.i("help", file.toString());
+            //Log.i("help", file.length() + "");
+            //System.out.println("THIS IS A TEST OF SYSTEM.OUT.PRINTLN()");
+            fOut = new FileOutputStream(file);
+            //Log.i("help", " 4");
+
+            myBitmap.compress(Bitmap.CompressFormat.JPEG, 85, fOut);
+            fOut.flush();
+            fOut.close();
+            Log.d(D_TAG, "saved " + fileName );
+
+            //System.out.println("file Path: " + file.getAbsolutePath());
+            //Log.i("help2", file.getAbsolutePath());
+            //Log.i("help2", file.toString());
+            //Log.i("help2", file.length() + "");
+
+//    } catch (Exception e) {
+    } catch (Throwable e) {
+            Log.d("downloadFromUrl", e.getMessage());
+			e.printStackTrace();
+        }
+    
+}
+	@SuppressWarnings("rawtypes")
+	private String MyToString ( HashMap h ) {
+		// Get a set of the entries 
+		String hs = "";
+		Set set = h.entrySet(); 
+		// Get an iterator 
+		Iterator i = set.iterator(); 
+		// Display elements 
+		hs += "{";
+		while(i.hasNext()) { 
+			Map.Entry me = (Map.Entry)i.next(); 
+			hs += me.getKey();
+			hs += "=";
+			hs += me.getValue();
+			hs += "\n";
+		} 
+		hs += "}";
+		return hs;
+	}
+
+}

@@ -9,8 +9,8 @@
     <item android:id="@+id/menu_event_stop" android:orderInCategory="110" android:title="@string/menu_event_stop" android:icon="@drawable/s_player_stop" android:showAsAction="ifRoom"></item>
     <item android:id="@+id/menu_event_rec" android:orderInCategory="120" android:title="@string/menu_event_rec" android:icon="@drawable/s_player_rec" android:showAsAction="ifRoom"></item>
     <item android:id="@+id/menu_event_stream" android:orderInCategory="130" android:title="@string/menu_event_stream" android:icon="@drawable/s_player_eject" android:showAsAction="ifRoom"></item>
-    <item android:id="@+id/menu_event_volup" android:orderInCategory="135" android:title="@string/menu_event_volup" android:icon="@drawable/s_volume_up"></item>
-    <item android:id="@+id/menu_event_voldown" android:orderInCategory="136" android:title="@string/menu_event_voldown" android:icon="@drawable/s_volume_down"></item>
-    <item android:id="@+id/menu_update" android:orderInCategory="140" android:title="@string/menu_update" android:icon="@drawable/ic_action_refresh" android:visible="true" android:menuCategory="container"></item>
-    <item android:id="@+id/menu_settings" android:orderInCategory="150" android:showAsAction="collapseActionView" android:title="@string/menu_settings" />
+    <item android:id="@+id/menu_event_volup" android:orderInCategory="135" android:title="@string/menu_event_volup" android:icon="@drawable/s_volume_up" android:showAsAction="never" android:enabled="true"></item>
+    <item android:id="@+id/menu_event_voldown" android:orderInCategory="136" android:title="@string/menu_event_voldown" android:icon="@drawable/s_volume_down" android:showAsAction="never" android:enabled="true"></item>
+    <item android:id="@+id/menu_update" android:orderInCategory="140" android:title="@string/menu_update" android:icon="@drawable/ic_action_refresh" android:menuCategory="container" android:showAsAction="never" android:enabled="true"></item>
+    <item android:id="@+id/menu_settings" android:orderInCategory="150" android:title="@string/menu_settings" android:showAsAction="never" android:enabled="true"/>
 </menu>
