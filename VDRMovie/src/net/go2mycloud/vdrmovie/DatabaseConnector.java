@@ -168,6 +168,10 @@ public class DatabaseConnector {
 				null);
 	}
 	
+	public Cursor getOneChannelNumber(long num) {
+		return database.query(DatabaseOpenHelper.TBL_CHANNELS, null, "num=" + num, null, null, null,
+				null);
+	}
 	public Cursor getNowChannels () 
 	{
 		Cursor c;   
@@ -202,6 +206,11 @@ public class DatabaseConnector {
 	public void deleteAllHash() {
 		//open();
 		database.execSQL("DELETE FROM " + DatabaseOpenHelper.TBL_HASH);
+		//close();
+	}
+	public void deleteAllTimers() {
+		//open();
+		database.execSQL("DELETE FROM " + DatabaseOpenHelper.TBL_TIM);
 		//close();
 	}
 
@@ -276,6 +285,28 @@ public class DatabaseConnector {
 				null, newEvent);
 	}
 
+	public long insertTimerNoCheck(int status, long ch_key, long event_key,
+			int t_nr, int e_nr, String date, String start_t, String stop_t,
+			int pri, int rem, String dir, String tt, long start_s, long stop_s) {
+		// new event
+		ContentValues newTim = new ContentValues();
+		newTim.put(DatabaseOpenHelper.TIM_STATUS, status);
+		newTim.put(DatabaseOpenHelper.TIM_CHANNELS_KEY, ch_key);
+		newTim.put(DatabaseOpenHelper.TIM_EVENT_KEY, event_key);
+		newTim.put(DatabaseOpenHelper.TIM_NR, t_nr);
+		newTim.put(DatabaseOpenHelper.TIM_EVENT_NR, e_nr);
+		newTim.put(DatabaseOpenHelper.TIM_DATE, date);
+		newTim.put(DatabaseOpenHelper.TIM_START, start_t);
+		newTim.put(DatabaseOpenHelper.TIM_STOP, stop_t);
+		newTim.put(DatabaseOpenHelper.TIM_PRI, pri);
+		newTim.put(DatabaseOpenHelper.TIM_DIR, rem);
+		newTim.put(DatabaseOpenHelper.TIM_TITLE, tt);
+		newTim.put(DatabaseOpenHelper.TIM_ST, start_s);
+		newTim.put(DatabaseOpenHelper.TIM_SP, stop_s);
+		return database.insertOrThrow(DatabaseOpenHelper.TBL_TIM, null,
+				newTim);
+	}
+
 	public long insertRecNoCheck(long ev_ch_key, int ev_nr, long ev_time, int ev_dr,
 			String ev_tt, String ev_st, String ev_gt,String ev_rt, int ev_wt, long ev_hsh_key) {
 		// new event
@@ -295,7 +326,8 @@ public class DatabaseConnector {
 	}
 
 	private Cursor getOneEventChKeyEvNr(long ev_ch_key, int ev_nr) {
-		Cursor c = database.query(DatabaseOpenHelper.TBL_EVENT, null, 
+		String[] columns = new String[]{ DatabaseOpenHelper.EVENT_ID, "*" };
+		Cursor c = database.query(DatabaseOpenHelper.TBL_EVENT, columns, 
 				DatabaseOpenHelper.EVENT_CHANNELS_KEY + "=" + Long.toString(ev_ch_key) + " AND " +
 				DatabaseOpenHelper.EVENT_NR + "=" + Integer.toString(ev_nr), null, null, null,
 				null);
@@ -370,9 +402,24 @@ public class DatabaseConnector {
 		return -1;
 	}
 
-	public long getCannelIdService(String service) {
+	public long getCannelId(String service) {
 		Cursor c = database.query(DatabaseOpenHelper.TBL_CHANNELS, null, 
 				DatabaseOpenHelper.CHANNELS_SERVICE + "='" + service + "'", null, null, null,
+				null);
+		if ( c != null ) {
+			if ( c.getCount() == 1) {
+				if (c.moveToFirst() ) {
+					// return current HASH					
+					return c.getLong(c.getColumnIndex(DatabaseOpenHelper.TBL_ID));				
+				}
+			}
+		}
+		return -1;
+		
+	}
+	public long getCannelId(int chanNr) {
+		Cursor c = database.query(DatabaseOpenHelper.TBL_CHANNELS, null, 
+				DatabaseOpenHelper.CHANNELS_NUM + "='" + chanNr + "'", null, null, null,
 				null);
 		if ( c != null ) {
 			if ( c.getCount() == 1) {
@@ -419,6 +466,19 @@ public class DatabaseConnector {
 		return database.query(DatabaseOpenHelper.TBL_DATA, null, 
 				DatabaseOpenHelper.TBL_ID + "=" + position, null, null, null,
 				null);
+	}
+
+	public long getEventId(long ev_ch_key, int ev_nr) {
+		Cursor c = getOneEventChKeyEvNr( ev_ch_key, ev_nr );
+		if ( c != null ) {
+			if ( c.getCount() == 1) {
+				if (c.moveToFirst() ) {
+					// return current _id					
+					return c.getLong(c.getColumnIndex(DatabaseOpenHelper.EVENT_ID));				
+				}
+			}
+		}
+		return -1;
 	}
 
 }

@@ -14,7 +14,9 @@
         <item >Timers</item>
         <item >Records</item>
     </string-array>
-        <string name="menu_update">Update Events</string>
+        <string name="menu_s_event">Scan Events</string>
+        <string name="menu_s_rec">Scan Records</string>
+        <string name="menu_s_tim">Scan Timers</string>
         <string name="menu_event_play">Play</string>
         <string name="menu_event_rec">Record</string>
         <string name="menu_event_pause">Pause</string>

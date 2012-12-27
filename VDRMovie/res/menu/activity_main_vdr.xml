@@ -11,6 +11,8 @@
     <item android:id="@+id/menu_event_stream" android:orderInCategory="130" android:title="@string/menu_event_stream" android:icon="@drawable/s_player_eject" android:showAsAction="ifRoom"></item>
     <item android:id="@+id/menu_event_volup" android:orderInCategory="135" android:title="@string/menu_event_volup" android:icon="@drawable/s_volume_up" android:showAsAction="never" android:enabled="true"></item>
     <item android:id="@+id/menu_event_voldown" android:orderInCategory="136" android:title="@string/menu_event_voldown" android:icon="@drawable/s_volume_down" android:showAsAction="never" android:enabled="true"></item>
-    <item android:id="@+id/menu_update" android:orderInCategory="140" android:title="@string/menu_update" android:icon="@drawable/ic_action_refresh" android:menuCategory="container" android:showAsAction="never" android:enabled="true"></item>
+    <item android:id="@+id/menu_s_event" android:orderInCategory="140" android:title="@string/menu_s_event" android:icon="@drawable/ic_action_refresh" android:menuCategory="container" android:showAsAction="never" android:enabled="true"></item>
+    <item android:id="@+id/menu_s_rec" android:orderInCategory="140" android:title="@string/menu_s_rec" android:icon="@drawable/ic_action_refresh" android:menuCategory="container" android:showAsAction="never" android:enabled="true"></item>
+    <item android:id="@+id/menu_s_time" android:orderInCategory="140" android:title="@string/menu_s_tim" android:icon="@drawable/ic_action_refresh" android:menuCategory="container" android:showAsAction="never" android:enabled="true"></item>
     <item android:id="@+id/menu_settings" android:orderInCategory="150" android:title="@string/menu_settings" android:showAsAction="never" android:enabled="true"/>
 </menu>

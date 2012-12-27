@@ -524,13 +524,537 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 		return numEvewnts;
 	}
 	
+	private int scanRecordings(String channels) {
+		int numChannels = 0;
+		String channelsObj[] = channels.split(",");
+
+		try {
+			datasource = new DatabaseConnector(mContext);
+			datasource.open();
+			session = new MovieMeterPluginSession();
+		} catch (SQLException eSQL) {
+
+			throw new Error("Error open database");
+		}
+
+//		} catch (XMLRPCException e) {
+//			throw new Error("Error open MovieMeter session");
+//		}
+		
+		
+		for (int serie = 0; serie < channelsObj.length; serie++) {
+			try {
+				if (channelsObj[serie].contains("-")) {
+					String serieObj[] = channelsObj[serie].split("-", 2);
+					if (serieObj.length != 2) {
+						Log.d(D_TAG, "Error in serie " + channels + " section"
+								+ channelsObj[serie]);
+						break;
+					}
+					int from = Integer.parseInt(serieObj[0]);
+					int to = Integer.parseInt(serieObj[1]);
+					Log.d(D_TAG, "scan Recordings " + from + " to " + to);
+					for (int channel = from; channel <= to; channel++) {
+						if ( scanRecord(channel) < 0 ) {
+							break;
+						}
+						numChannels++;							
+					}
+				} else {
+					if (scanRecord(Integer.parseInt(channelsObj[0])) > 0) {
+						numChannels++;						
+					}
+				}
+			} catch (NumberFormatException eNum) {
+				Log.d(D_TAG, "Error in serie " + channels + " section"
+						+ channelsObj[serie] + eNum.getMessage());
+			}
+		}
+		datasource.close();
+		return numChannels;
+	}
 	
 	
+	@SuppressWarnings("rawtypes")
+	private int scanRecord( int recNr) {
+		boolean endRecordings = false;
+		int numEvewnts=0;
+		long Ev_ch_key = 0;
+		int Ev_nr = 0;
+		long Ev_time = 0;
+		int Ev_dr = 0;
+		String Ev_tt = "";
+		String Ev_gt = "";
+		String Ev_rft = "";
+		String Ev_rlt = "";
+		String Ev_st = "";
+		String Ev_dt = "";
+		int Ev_wt = -1;
+		long Ev_hsh_key = 0;
+		Socket s=null;
+
+		int type;
+		Boolean endOfSession = false;
+		String data = new String();
+		CRC32 checkSum = new CRC32();
+		String sendString = new String();
+
+		byte[] rl = new byte[] { 13, 10 };
+		byte[] buffer = new byte[250];
+		long cur_Id = -1;
+		try {
+			s = new Socket(host, port);
+
+			OutputStream os = s.getOutputStream();
+			InputStream is = s.getInputStream();
+			s.setSoTimeout(2000);
+			DataInputStream dis = new DataInputStream(is);
+			DataOutputStream dos = new DataOutputStream(os);
+
+
+			sendString = "LSTR " + recNr; // + " NOW"; // currently
+														// only
+														// the
+														// now
+														// event
+														// data
+			dos.write(sendString.getBytes());
+			dos.write(rl);
+			// clear data
+			cur_Id = -1;
+			Ev_time = -1;
+			Ev_dr = -1;
+			endOfSession = false;
+			Log.d(D_TAG, "Rec: " + Integer.toString(recNr));
+
+			do {
+					data = dis.readLine();
+					data.getBytes(0, 2, buffer, 0);
+					type = Integer.parseInt(data.substring(0, 3));
+					switch (type) {
+					case 214: // Help message
+						break;
+					case 215: // EPG data record
+						String dataObj[] = data.split(" ", 3);
+
+						if (dataObj[0].contentEquals("215-C")) {
+							// search channel id related to this
+							// service
+
+							cur_Id = datasource.getCannelId(dataObj[1]);
+							break;
+						} else if (dataObj[0].contentEquals("215-E")
+								& cur_Id >= 0) {
+							// Event info
+							Ev_ch_key = cur_Id;
+							Ev_nr = Integer.parseInt(dataObj[1]);
+							String eventObj[] = dataObj[2].split(" ", 4);
+							Ev_time = Long.parseLong(eventObj[0]);
+							Ev_dr = Integer.parseInt(eventObj[1]);
+							Ev_tt = "";
+							Ev_st = "";
+							Ev_gt = "";
+							Ev_rft = "";
+							Ev_rlt = "";
+							Ev_dt = "";
+							Ev_wt = -1;
+							Ev_hsh_key = 0;
+
+						} else if (dataObj[0].contentEquals("215-T")
+								& Ev_time > 0 & Ev_dr > 0) {
+							// Title info
+							if (dataObj.length < 3) {
+								Ev_tt = dataObj[1];
+
+							} else {
+								Ev_tt = dataObj[1] + " " + dataObj[2]; // cat
+																					// together
+							}
+
+						} else if (dataObj[0].contentEquals("215-S")
+								& Ev_time > 0 & Ev_dr > 0) {
+							// Sub Title info
+							Ev_st = dataObj[1];
+						} else if (dataObj[0].contentEquals("215-D")
+								& !Ev_tt.isEmpty()) {
+							// Title info
+							// genre is mostely the first word
+							// regie is mostely the first 2 words
+							// behind Regie:
+
+							int regie = 0;
+							if (dataObj.length < 3) {
+								Ev_dt = dataObj[1];
+
+							} else {
+								Ev_dt = dataObj[1] + " " + dataObj[2]; // cat
+								// together
+							}
+
+							Ev_gt = dataObj[1]; // genre
+							dataObj[1] = dataObj[1].replaceAll("Film|film|\\.",
+									"");
+
+							if (dataObj[1].length() > 2) {
+								Ev_gt = Character.toUpperCase(dataObj[1].charAt(0))
+										+ dataObj[1].substring(1);
+
+								String eventObj[] = dataObj[dataObj.length - 1]
+										.split("[ \\.]");
+								for (int i = 0; eventObj.length > i; i++) {
+									if (eventObj[i].equals("Regie:")) {
+										regie = 2;
+										continue;
+									}
+									if (regie > 1)
+										Ev_rft = eventObj[i];
+									if (regie > 0)
+										Ev_rlt = eventObj[i];
+									regie--;
+								}
+							}
+						} else if (dataObj[0].contentEquals("215")
+								& !Ev_tt.isEmpty() 
+								& (!Ev_st.isEmpty() | !Ev_gt.isEmpty())  ) {
+							// write event data in rec file
+							Ev_hsh_key = datasource.findHashKeyRec(Ev_ch_key,
+									Ev_nr);
+							if (Ev_hsh_key <= 0) {
+								if (Ev_rlt.isEmpty()){
+									Ev_gt = "";
+								}
+
+								checkSum.reset();
+								checkSum.update(Ev_tt.getBytes());
+								checkSum.update(Ev_rft.getBytes());
+								checkSum.update(Ev_rlt.getBytes());
+								checkSum.update(Ev_gt.getBytes());
+
+
+								Cursor c = datasource.getOneHash(checkSum
+										.getValue());
+								if (c != null) {
+									if (c.getCount() < 1) {
+										// hash not found
+										HashMap filmInfo = null;
+										String idFilm = "0";
+										long Data_Id = 0;
+										// session.getMovieDetailsByTitleAndYear(Ev_tt
+										// , "");
+
+										if (!Ev_rlt.isEmpty()) {
+											filmInfo = session
+													.getMovieByTitleRegieGenre(Ev_tt,
+															Ev_rft, Ev_rlt, Ev_gt);
+											if (filmInfo != null) {
+												Log.d(D_TAG,
+															"NEW FILM "
+																	+ String.valueOf(checkSum
+																			.getValue()));
+												idFilm = filmInfo.get("filmId").toString();
+												try {
+													filmInfo = session.getMovieDetailsById( Integer.parseInt(idFilm));
+													Log.d(D_TAG, "getMovieDetailsById " + filmInfo.get("thumbnail").toString() );
+													downloadFromUrl(filmInfo.get("thumbnail").toString(), "VDR_TH_" + idFilm + ".jpg");
+													Log.d(D_TAG, "downloadFromUrl " );
+												} catch (Exception e ) {
+													Log.d(D_TAG, "catch all get details:" +
+															data.toString() + e.getMessage());													
+												}
+											}
+
+										}
+										
+										// session.getMovieByTitle(Ev_tt);
+										// ////session.getMovieByTitle("Fame");
+										// Log.d(DEBUG_TAG, "NEW HASH " +
+										// String.valueOf(checkSum.getValue()) );
+										if (idFilm.contentEquals("0")) {
+											// no movie found use the data from VDR
+											Data_Id = datasource.insertData(0, Ev_dt);
+										} else {
+											Data_Id = datasource.insertData(Integer.parseInt(idFilm), MyToString(filmInfo));
+										}
+										
+										Ev_hsh_key = datasource.insertHash(Data_Id,
+												checkSum.getValue());
+									} else {
+										if (c.moveToFirst()) {
+											Ev_hsh_key = c
+													.getLong(c
+															.getColumnIndex(DatabaseOpenHelper.TBL_ID));
+										}
+									}
+
+									datasource
+											.insertRecNoCheck(Ev_ch_key, Ev_nr,
+													Ev_time, Ev_dr, Ev_tt, Ev_st,
+													Ev_gt, Ev_rft + " " + Ev_rlt, Ev_wt,
+													Ev_hsh_key);
+
+								}
+							}
+						}
+						if (dataObj[0].contentEquals("215")) {
+							// Last event data record quit
+							// connection
+							endOfSession = true;
+							break;
+						}
+						break;
+					case 220: // VDR service ready
+						break;
+					case 221: // VDR service closing transmission
+									// channel
+						endOfSession = true;
+						break;
+					case 554: // Transaction failed
+					case 550: // Requested action not taken
+					case 250: // Requested VDR action okay,
+									// completed
+					case 354: // Start sending EPG data
+					case 451: // Requested action aborted: local
+									// error
+									// in processing
+					case 502: // Command not implemented
+					case 504: // Command parameter not implemented
+						Log.d(D_TAG, data.toString());
+						endOfSession = true;
+						endRecordings = true;
+						break;
+
+					case 500: // Syntax error, command unrecognized
+					case 501: // Syntax error in parameters or
+									// arguments
+						dos.write(sendString.getBytes());
+						dos.write(rl);
+						Log.d(D_TAG,
+								"Try again same command " + data.toString());
+
+						break;
+					default:
+						Log.d(D_TAG, "Default case " + data.toString());
+						break;
+					}
+					//Log.d(DEBUG_TAG, Integer.toString(type));
+
+
+			} while (!endOfSession);
+			sendString = "QUIT";
+			dos.write(sendString.getBytes());
+			dos.write(rl);
+			data = dis.readLine();
+			s.close();
+		} catch (Exception e) {
+			Log.d(D_TAG, "catch all scanChannel:" +
+					data.toString() + e.getMessage());
+			try {
+				s.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
+		if (endRecordings) {
+			Log.d(D_TAG, "Scan recording done fond no recording nr" + Integer.toString(recNr));
+			return -1;
+		}
+		Log.d(D_TAG, "Scan recording done fond new recording nr" + Integer.toString(recNr));
+		return 1;
+	}	
+	
+	private int scanTimers(String channels) {
+		int numChannels = 0;
+		boolean endTimers = false;
+		String channelsObj[] = channels.split(",");
+
+		try {
+			datasource = new DatabaseConnector(mContext);
+			datasource.open();
+			session = new MovieMeterPluginSession();
+		} catch (SQLException eSQL) {
+
+			throw new Error("Error open database");
+		}
+
+//		} catch (XMLRPCException e) {
+//			throw new Error("Error open MovieMeter session");
+//		}
+		
+		datasource.deleteAllTimers();
+		for (int serie = 0; serie < channelsObj.length; serie++) {
+			try {
+				if (channelsObj[serie].contains("-")) {
+					String serieObj[] = channelsObj[serie].split("-", 2);
+					if (serieObj.length != 2) {
+						Log.d(D_TAG, "Error in serie " + channels + " section"
+								+ channelsObj[serie]);
+						break;
+					}
+					int from = Integer.parseInt(serieObj[0]);
+					int to = Integer.parseInt(serieObj[1]);
+					Log.d(D_TAG, "scan Timers " + from + " to " + to);
+					for (int channel = from; channel <= to; channel++) {
+						if ( scanTimer(channel) < 0 ) {
+							endTimers = true;
+							break;
+						}
+						numChannels++;							
+					}
+				} else {
+					if (scanTimer(Integer.parseInt(channelsObj[0])) > 0) {
+						numChannels++;						
+					}
+					else {
+						endTimers = true;						
+					}
+						
+				}
+			} catch (NumberFormatException eNum) {
+				Log.d(D_TAG, "Error in serie " + channels + " section"
+						+ channelsObj[serie] + eNum.getMessage());
+			}
+		}
+		datasource.close();
+		return numChannels;
+	}
 	
 	
-	
-	
-	
+//	@SuppressWarnings("rawtypes")
+	private int scanTimer( int recNr) {
+		boolean endRecordings = false;
+		//TimerTbl";
+//		int db;
+		int status=0;
+		long ch_key=0;
+		long event_key=0;
+		int t_nr=0;
+		int e_nr=0;
+		String date="";
+		String start_t="";
+		String stop_t="";
+		int pri=50;
+		int rem=99;
+		String dir="VDR_Movie";
+		String tt="";
+		long start_s=0;
+		long stop_s=0;
+		Socket s=null;
+
+		
+		
+		
+		
+		
+		
+		
+		int type;
+		Boolean endOfSession = false;
+		String data = new String();
+		String sendString = new String();
+
+		byte[] rl = new byte[] { 13, 10 };
+		byte[] buffer = new byte[250];
+		try {
+			s = new Socket(host, port);
+
+			OutputStream os = s.getOutputStream();
+			InputStream is = s.getInputStream();
+			s.setSoTimeout(2000);
+			DataInputStream dis = new DataInputStream(is);
+			DataOutputStream dos = new DataOutputStream(os);
+
+
+			sendString = "LSTT " + recNr; // + " NOW"; // currently
+														// only
+														// the
+														// now
+														// event
+														// data
+			dos.write(sendString.getBytes());
+			dos.write(rl);
+			// clear data
+//			Ev_time = -1;
+//			Ev_dr = -1;
+			endOfSession = false;
+			Log.d(D_TAG, "Timer: " + Integer.toString(recNr));
+
+			do {
+					data = dis.readLine();
+					data.getBytes(0, 2, buffer, 0);
+					type = Integer.parseInt(data.substring(0, 3));
+					// 2 1:1:2012-12-27:2000:2027:50:99:
+					switch (type) {
+					case 220:
+						break;
+					case 501:
+					case 221:
+						endRecordings = true;
+						endOfSession = true;						
+						break;
+					case 250:
+						String dataObj[] = data.split(":", 9);
+						// 250 1 1
+						if ( dataObj.length != 9 ) {
+							Log.d(D_TAG, "Bad data1: " + data.toString());							
+							break;
+						}
+						String partObj[] = dataObj[0].split(" ", 3);
+						if ( partObj.length != 3 ) {
+							Log.d(D_TAG, "Bad data2: " + dataObj[0].toString());							
+							break;
+						}
+						t_nr = Integer.parseInt(partObj[1].toString());
+						status = Integer.parseInt(partObj[2].toString());
+						ch_key = datasource.getCannelId(Integer.parseInt(dataObj[1]));
+						date= dataObj[2];
+						start_t=dataObj[3];
+						stop_t=dataObj[4];
+						pri=Integer.parseInt(dataObj[5].toString());
+						rem=Integer.parseInt(dataObj[6].toString());
+						partObj = dataObj[7].split("~");
+						if ( partObj.length == 2 ) {
+							dir=partObj[partObj.length-2];
+						}
+						tt=partObj[partObj.length-1];
+						TimerXml xmlTimer = new TimerXml();
+						xmlTimer.setInput(dataObj[8]);
+						start_s=Long.parseLong(xmlTimer.getTag(TimerXml.XML_start));
+						stop_s=Long.parseLong(xmlTimer.getTag(TimerXml.XML_stop));
+						e_nr=Integer.parseInt(xmlTimer.getTag(TimerXml.XML_eventid));
+						event_key = datasource.getEventId(ch_key, e_nr);
+						datasource.insertTimerNoCheck(status, ch_key, event_key,
+								t_nr,e_nr,date,start_t, stop_t,
+								pri,rem, dir, tt, start_s, stop_s) ;
+						endOfSession = true;
+						break;
+					default:
+						Log.d(D_TAG, "Default case " + data.toString());
+						break;
+					}
+					//Log.d(DEBUG_TAG, Integer.toString(type));
+
+			} while (!endOfSession);
+			sendString = "QUIT";
+			dos.write(sendString.getBytes());
+			dos.write(rl);
+			data = dis.readLine();
+			s.close();
+		} catch (Exception e) {
+			Log.d(D_TAG, "catch all scanTimer:" +
+					data.toString() + e.getMessage());
+			try {
+				s.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
+		if (endRecordings) {
+			Log.d(D_TAG, "Scan Timer done fond no nr" + Integer.toString(recNr));
+			return -1;
+		}
+		Log.d(D_TAG, "Scan Timer done fond nr" + Integer.toString(recNr));
+		return 1;
+	}	
 	
 	
 	
@@ -557,8 +1081,13 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
         	if( svdrpC[i].contains("LSTE") ) {
         		return Integer.toString(scanChannels(svdrpC[i+1]));
         	}
+        	if( svdrpC[i].contains("LSTR") ) {
+        		return Integer.toString(scanRecordings(svdrpC[i+1]));
+        	}
+        	if( svdrpC[i].contains("LSTT") ) {
+        		return Integer.toString(scanTimers(svdrpC[i+1]));
+        	}
         }
-    
         
 		// TODO Auto-generated method stub
 		return null;
@@ -572,7 +1101,7 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 	protected void onPostExecute(String result) {
 		// TODO Auto-generated method stub
 		super.onPostExecute(result);
-		pleaseWaitDialog.dismiss();
+//		pleaseWaitDialog.dismiss();
 		
 	}
 
@@ -580,14 +1109,14 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 	protected void onPreExecute() {
 		// TODO Auto-generated method stub
 		super.onPreExecute();
-		pleaseWaitDialog = ProgressDialog.show(mContext,
-				"VDR Guid", "Downloading VDR Guid data", true, true);
-		pleaseWaitDialog.setOnCancelListener(new OnCancelListener() {
-			public void onCancel(DialogInterface dialog) {
-				Log.d("onOptionsItemSelected" , "onCancel ");
-				cancel(true);
-			}
-		});
+//		pleaseWaitDialog = ProgressDialog.show(mContext,
+//				"VDR Guid", "Downloading VDR Guid data", true, true);
+//		pleaseWaitDialog.setOnCancelListener(new OnCancelListener() {
+//			public void onCancel(DialogInterface dialog) {
+//				Log.d("onOptionsItemSelected" , "onCancel ");
+//				cancel(true);
+//			}
+//		});
 	}
 
 @Override

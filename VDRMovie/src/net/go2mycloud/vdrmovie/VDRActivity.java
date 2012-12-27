@@ -171,14 +171,14 @@ public class VDRActivity extends Activity implements OnNavigationListener {
 			//startActivity(new Intent(QuizMenuActivity.this, QuizHelpActivity.class));
 			//QuizMenuActivity.this.finish();
 			break;
-		case R.id.menu_update:
+		case R.id.menu_s_event:
 			svdrSendSync(false,"LSTE", "1-29");
-//			if(downloader.getStatus() == AsyncTask.Status.FINISHED ) {
-//				downloader = new DownloadVDR(VDRActivity.this);
-//			}
-//			if(downloader.getStatus() == AsyncTask.Status.PENDING){
-//				downloader.execute("");
-//			}
+			break;
+		case R.id.menu_s_rec:
+			svdrSendSync(false,"LSTR", "1-10000");
+			break;
+		case R.id.menu_s_time:
+			svdrSendSync(false,"LSTT", "1-50");
 			break;
 		case android.R.id.home:
 			//Intent intent = new Intent(this, QuizSplashActivity.class);

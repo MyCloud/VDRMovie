@@ -194,6 +194,8 @@ public class MovieMeterPluginSession {
 		HashMap result = null;
 		Object[] films = null;
 		Object params1 = getKey();
+		movieName.replaceAll("Film op 2: ", "");
+
 		Object params2 = movieName;
 		int weight_best = 0;
 		int index_best = 0;

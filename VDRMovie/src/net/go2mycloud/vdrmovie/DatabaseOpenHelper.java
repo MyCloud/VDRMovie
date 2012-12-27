@@ -28,6 +28,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 	public static final String CHANNELS_SERVICE = "service";
 
 	public static final String TBL_EVENT = "EventTbl";
+	public static final String EVENT_ID = "rowid";
 	public static final String EVENT_CHANNELS_KEY = "ch_key";
 	public static final String EVENT_NR = "nr";
 	public static final String EVENT_DB = "db";
@@ -181,7 +182,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
     		+ TIM_TITLE + " text not null, "
     		+ TIM_ST + " integer not null, "
     		+ TIM_SP + " integer not null, "
-    		+ "FOREIGN KEY(" + TIM_EVENT_KEY + ") REFERENCES " + TBL_EVENT + "(" + TBL_ID + "), "
+    		+ "FOREIGN KEY(" + TIM_EVENT_KEY + ") REFERENCES " + TBL_EVENT + "(" + EVENT_ID + "), "
     		+ "FOREIGN KEY(" + TIM_CHANNELS_KEY + ") REFERENCES " + TBL_CHANNELS + "(" + TBL_ID + ") "
     		+ ");";                 
 

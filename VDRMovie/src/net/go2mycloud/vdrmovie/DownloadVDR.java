@@ -529,7 +529,7 @@ public class DownloadVDR extends android.os.AsyncTask<Object, String, Boolean> {
 								// search channel id related to this
 								// service
 
-								cur_Id = datasource.getCannelIdService(dataObj[1]);
+								cur_Id = datasource.getCannelId(dataObj[1]);
 								break;
 							} else if (dataObj[0].contentEquals("215-E")
 									& cur_Id >= 0) {
