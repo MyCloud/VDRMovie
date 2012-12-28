@@ -165,7 +165,6 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
     		+ TBL_ID + " integer primary key autoincrement, "
     		+ DATA_NR + " integer , "
     		+ DATA_DETAILS + " text not null);";                 
-
 	private static final String createTblTimers = "CREATE TABLE "+ TBL_TIM + "( " 
     		+ TBL_ID + " integer primary key autoincrement, " 
     		+ TIM_DB + " integer default 0, "

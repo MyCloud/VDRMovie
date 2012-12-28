@@ -203,6 +203,11 @@ public class DatabaseConnector {
 		database.execSQL("DELETE FROM " + DatabaseOpenHelper.TBL_EVENT);
 		//close();
 	}
+	public void deleteAllRecords() {
+		//open();
+		database.execSQL("DELETE FROM " + DatabaseOpenHelper.TBL_REC);
+		//close();
+	}
 	public void deleteAllHash() {
 		//open();
 		database.execSQL("DELETE FROM " + DatabaseOpenHelper.TBL_HASH);
@@ -445,7 +450,14 @@ public class DatabaseConnector {
 		}
 		return -1;
 	}
-
+/*	public long findHashKeyRec(long hash_key) {
+		Cursor c = database.query(DatabaseOpenHelper.TBL_REC, null, 
+				DatabaseOpenHelper.REC_ + "=" + Long.toString(ev_ch_key) + " AND " +
+				DatabaseOpenHelper.REC_E_NR + "=" + Integer.toString(ev_nr), null, null, null,
+				null);
+		return c;
+	}
+*/
 	private Cursor getOneRecChKeyEvNr(long ev_ch_key, int ev_nr) {
 		Cursor c = database.query(DatabaseOpenHelper.TBL_REC, null, 
 				DatabaseOpenHelper.REC_CHANNELS_KEY + "=" + Long.toString(ev_ch_key) + " AND " +

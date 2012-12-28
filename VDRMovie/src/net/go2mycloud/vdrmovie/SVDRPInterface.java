@@ -461,6 +461,8 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 													Ev_gt, Ev_rft + " " + Ev_rlt,
 													Ev_hsh_key);
 
+								} else {
+									//same event 
 								}
 							} else {
 								//Log.d(D_TAG, "Event already in database" + data.toString());								
@@ -540,6 +542,11 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 //		} catch (XMLRPCException e) {
 //			throw new Error("Error open MovieMeter session");
 //		}
+		datasource.deleteAllRecords();
+		// make hash table for all records
+		@SuppressWarnings("rawtypes")
+		HashMap RecInfo = null;
+		RecInfo = getRecInfo();
 		
 		
 		for (int serie = 0; serie < channelsObj.length; serie++) {
@@ -570,14 +577,138 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 						+ channelsObj[serie] + eNum.getMessage());
 			}
 		}
+		
 		datasource.close();
 		return numChannels;
 	}
 	
 	
+	private HashMap getRecInfo() {
+		boolean endRecordings = false;
+		//TimerTbl";
+//		int db;
+		int status=0;
+		long ch_key=0;
+		long event_key=0;
+		int t_nr=0;
+		int e_nr=0;
+		String date="";
+		String start_t="";
+		String stop_t="";
+		int pri=50;
+		int rem=99;
+		String dir="VDR_Movie";
+		String tt="";
+		long start_s=0;
+		long stop_s=0;
+		Socket s=null;
+		int type;
+		Boolean endOfSession = false;
+		String data = new String();
+		String sendString = new String();
+
+		byte[] rl = new byte[] { 13, 10 };
+		byte[] buffer = new byte[250];
+		try {
+			s = new Socket(host, port);
+
+			OutputStream os = s.getOutputStream();
+			InputStream is = s.getInputStream();
+			s.setSoTimeout(2000);
+			DataInputStream dis = new DataInputStream(is);
+			DataOutputStream dos = new DataOutputStream(os);
+
+
+			sendString = "LSTR";
+			dos.write(sendString.getBytes());
+			dos.write(rl);
+			endOfSession = false;
+			Log.d(D_TAG, "Recording list: ");
+			
+			do {
+					data = dis.readLine();
+					data.getBytes(0, 2, buffer, 0);
+					type = Integer.parseInt(data.substring(0, 3));
+					// 2 1:1:2012-12-27:2000:2027:50:99:
+					switch (type) {
+					case 220:
+						break;
+					case 501:
+					case 221:
+						endRecordings = true;
+						endOfSession = true;						
+						break;
+					case 250:
+						String dataObj[] = data.split("[ -]", 6);
+						// 250 1 1
+						if ( dataObj.length != 6 ) {
+							Log.d(D_TAG, "Bad data1: " + data.toString());							
+							break;
+						}
+						String partObj[] = dataObj[6].split("~", 3);
+						dir=partObj[partObj.length-2];
+
+						if ( partObj.length != 3 ) {
+							Log.d(D_TAG, "Bad data2: " + dataObj[0].toString());							
+							break;
+						}
+						t_nr = Integer.parseInt(partObj[1].toString());
+						status = Integer.parseInt(partObj[2].toString());
+						ch_key = datasource.getCannelId(Integer.parseInt(dataObj[1]));
+						date= dataObj[2];
+						start_t=dataObj[3];
+						stop_t=dataObj[4];
+						pri=Integer.parseInt(dataObj[5].toString());
+						rem=Integer.parseInt(dataObj[6].toString());
+						partObj = dataObj[7].split("~");
+						if ( partObj.length == 2 ) {
+							dir=partObj[partObj.length-2];
+						}
+						tt=partObj[partObj.length-1];
+						TimerXml xmlTimer = new TimerXml();
+						xmlTimer.setInput(dataObj[8]);
+						start_s=Long.parseLong(xmlTimer.getTag(TimerXml.XML_start));
+						stop_s=Long.parseLong(xmlTimer.getTag(TimerXml.XML_stop));
+						e_nr=Integer.parseInt(xmlTimer.getTag(TimerXml.XML_eventid));
+						event_key = datasource.getEventId(ch_key, e_nr);
+						datasource.insertTimerNoCheck(status, ch_key, event_key,
+								t_nr,e_nr,date,start_t, stop_t,
+								pri,rem, dir, tt, start_s, stop_s) ;
+						endOfSession = true;
+						break;
+					default:
+						Log.d(D_TAG, "Default case " + data.toString());
+						break;
+					}
+					//Log.d(DEBUG_TAG, Integer.toString(type));
+
+			} while (!endOfSession);
+			sendString = "QUIT";
+			dos.write(sendString.getBytes());
+			dos.write(rl);
+			data = dis.readLine();
+			s.close();
+		} catch (Exception e) {
+			Log.d(D_TAG, "catch all scanTimer:" +
+					data.toString() + e.getMessage());
+			try {
+				s.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
+		if (endRecordings) {
+			Log.d(D_TAG, "Scan Timer done fond no nr");
+			return null;
+		}
+		Log.d(D_TAG, "Scan Timer done fond nr");
+		return null;
+}
+
 	@SuppressWarnings("rawtypes")
 	private int scanRecord( int recNr) {
 		boolean endRecordings = false;
+		boolean sameRecording = false;
 		int numEvewnts=0;
 		long Ev_ch_key = 0;
 		int Ev_nr = 0;
@@ -793,7 +924,10 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 													Ev_hsh_key);
 
 								}
+							} else {
+								sameRecording = true;
 							}
+								
 						}
 						if (dataObj[0].contentEquals("215")) {
 							// Last event data record quit
@@ -939,14 +1073,6 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 		long start_s=0;
 		long stop_s=0;
 		Socket s=null;
-
-		
-		
-		
-		
-		
-		
-		
 		int type;
 		Boolean endOfSession = false;
 		String data = new String();
