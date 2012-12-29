@@ -11,6 +11,7 @@ import java.net.HttpURLConnection;
 import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -546,8 +547,7 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 		// make hash table for all records
 		@SuppressWarnings("rawtypes")
 		HashMap RecInfo = null;
-		RecInfo = getRecInfo();
-		
+		ArrayList<Boolean> recInfo = getRecInfo();
 		
 		for (int serie = 0; serie < channelsObj.length; serie++) {
 			try {
@@ -583,7 +583,7 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 	}
 	
 	
-	private HashMap getRecInfo() {
+	private ArrayList<Boolean> getRecInfo() {
 		boolean endRecordings = false;
 		//TimerTbl";
 //		int db;
@@ -606,9 +606,9 @@ public class SVDRPInterface extends android.os.AsyncTask<String, Integer, String
 		Boolean endOfSession = false;
 		String data = new String();
 		String sendString = new String();
-
 		byte[] rl = new byte[] { 13, 10 };
 		byte[] buffer = new byte[250];
+		ArrayList<Boolean> recInfo = new ArrayList<Boolean>();
 		try {
 			s = new Socket(host, port);
 
